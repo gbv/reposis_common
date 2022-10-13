@@ -1,0 +1,260 @@
+{
+  "year": 2020,
+  "suppressed": false,
+  "journal": {
+    "id": "FOO_TWO",
+    "self": "/journals/FOO_TWO",
+    "name": "Foo Twoo"
+  },
+  "metrics": {
+    "impactMetrics": {
+      "totalCites": 1234,
+      "jif": "7.123",
+      "jifWithoutSelfCitations": "6.999",
+      "jif5Years": 5.412,
+      "immediacyIndex": 1.213,
+      "jci": 0.8
+    },
+    "influenceMetrics": {
+      "eigenFactor": {
+        "score": 0.12331,
+        "normalized": 2.12312
+      },
+      "articleInfluence": 1.1231
+    },
+    "sourceMetrics": {
+      "citableItems": {
+        "total": 566,
+        "articlesPercentage": 56.12
+      },
+      "jifPercentile": 65.123,
+      "halfLife": {
+        "cited": 2.5,
+        "citing": 3.2
+      }
+    }
+  },
+  "ranks": {
+    "jif": [
+      {
+        "category": "MATERIALS SCIENCE, MULTIDISCIPLINARY",
+        "edition": "SCIE",
+        "self": "/categories/PM_SCIE",
+        "rank": "13/123",
+        "quartile": "Q1",
+        "jifPercentile": 42.123
+      },
+      {
+        "category": "ENERGY & FUELS",
+        "edition": "SCIE",
+        "self": "/categories/ID_SCIE",
+        "rank": "13/123",
+        "quartile": "Q2",
+        "jifPercentile": 42.123
+      },
+      {
+        "category": "CHEMISTRY, PHYSICAL",
+        "edition": "SCIE",
+        "self": "/categories/EI_SCIE",
+        "rank": "12/123",
+        "quartile": "Q2",
+        "jifPercentile": 31.0
+      }
+    ],
+    "articleInfluence": [
+      {
+        "category": "MATERIALS SCIENCE, MULTIDISCIPLINARY",
+        "edition": "SCIE",
+        "self": "/categories/PM_SCIE",
+        "rank": "123/214",
+        "quartile": "Q1"
+      },
+      {
+        "category": "CHEMISTRY, PHYSICAL",
+        "edition": "SCIE",
+        "self": "/categories/EI_SCIE",
+        "rank": "123/51512",
+        "quartile": "Q1"
+      },
+      {
+        "category": "ENERGY & FUELS",
+        "edition": "SCIE",
+        "self": "/categories/ID_SCIE",
+        "rank": "123/321",
+        "quartile": "Q1"
+      }
+    ],
+    "eigenFactorScore": [
+      {
+        "category": "MATERIALS SCIENCE, MULTIDISCIPLINARY",
+        "edition": "SCIE",
+        "self": "/categories/PM_SCIE",
+        "rank": "125/1244",
+        "quartile": "Q2"
+      },
+      {
+        "category": "CHEMISTRY, PHYSICAL",
+        "edition": "SCIE",
+        "self": "/categories/EI_SCIE",
+        "rank": "125/123",
+        "quartile": "Q2"
+      },
+      {
+        "category": "ENERGY & FUELS",
+        "edition": "SCIE",
+        "self": "/categories/ID_SCIE",
+        "rank": "967/125",
+        "quartile": "Q2"
+      }
+    ],
+    "immediacyIndex": [
+      {
+        "category": "MATERIALS SCIENCE, MULTIDISCIPLINARY",
+        "edition": "SCIE",
+        "self": "/categories/PM_SCIE",
+        "rank": "23/5464",
+        "quartile": "Q1"
+      },
+      {
+        "category": "ENERGY & FUELS",
+        "edition": "SCIE",
+        "self": "/categories/ID_SCIE",
+        "rank": "23/424",
+        "quartile": "Q2"
+      },
+      {
+        "category": "CHEMISTRY, PHYSICAL",
+        "edition": "SCIE",
+        "self": "/categories/EI_SCIE",
+        "rank": "234/426",
+        "quartile": "Q2"
+      }
+    ],
+    "jci": [
+      {
+        "category": "MATERIALS SCIENCE, MULTIDISCIPLINARY",
+        "rank": "324/864",
+        "quartile": "Q2",
+        "jciPercentile": 15.786
+      },
+      {
+        "category": "ENERGY & FUELS",
+        "rank": "45/125",
+        "quartile": "Q2",
+        "jciPercentile": 16.053
+      },
+      {
+        "category": "CHEMISTRY, PHYSICAL",
+        "rank": "34/245",
+        "quartile": "Q2",
+        "jciPercentile": 17.702
+      }
+    ],
+    "esiCitations": [
+      {
+        "category": "MATERIALS SCIENCE",
+        "rank": "125/515",
+        "quartile": "Q2"
+      }
+    ]
+  },
+  "sourceData": {
+    "articles": {
+      "count": 1111,
+      "references": 22222
+    },
+    "reviews": {
+      "count": 222,
+      "references": 2222
+    },
+    "other": {
+      "count": 33,
+      "references": 333
+    }
+  },
+  "journalProfile": {
+    "startYear": 2018,
+    "endYear": 2020,
+    "citableItems": {
+      "goldOA": 44,
+      "subscription": 66,
+      "other": 88
+    },
+    "citations": {
+      "goldOA": 44,
+      "subscription": 41231,
+      "other": 4,
+      "unlinked": 93
+    },
+    "occurrenceCountries": [
+      {
+        "countryRegion": "CHINA MAINLAND",
+        "occurrence": 123
+      },
+      {
+        "countryRegion": "USA",
+        "occurrence": 321
+      },
+      {
+        "countryRegion": "India",
+        "occurrence": 411
+      },
+      {
+        "countryRegion": "GERMANY (FED REP GER)",
+        "occurrence": 123
+      },
+      {
+        "countryRegion": "Japan",
+        "occurrence": 22
+      },
+      {
+        "countryRegion": "England",
+        "occurrence": 12
+      },
+      {
+        "countryRegion": "South Korea",
+        "occurrence": 11
+      },
+      {
+        "countryRegion": "Australia",
+        "occurrence": 8
+      },
+      {
+        "countryRegion": "Canada",
+        "occurrence": 46
+      },
+      {
+        "countryRegion": "France",
+        "occurrence": 73
+      },
+      {
+        "countryRegion": "Spain",
+        "occurrence": 36
+      }
+    ],
+    "occurrenceOrganizations": [
+      {
+        "organization": "FOO OF SCIENCES",
+        "occurrence": 112
+      },
+      {
+        "organization": "UNITED STATES DEPARTMENT OF BAR",
+        "occurrence": 51
+      },
+      {
+        "organization": "INDIAN INSTITUTE OF BAZ",
+        "occurrence": 36436
+      }
+    ]
+  },
+  "journalData": {
+    "cited": {
+      "url": "/journals/SUSTAIN_ENERG_FUELS/cited/year/2020",
+      "count": 123
+    },
+    "citing": {
+      "url": "/journals/SUSTAIN_ENERG_FUELS/citing/year/2020",
+      "count": 321
+    }
+  }
+}

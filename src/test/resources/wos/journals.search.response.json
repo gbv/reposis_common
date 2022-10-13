@@ -1,0 +1,28 @@
+{
+  "metadata": {
+    "total": 1,
+    "page": 1,
+    "limit": 10
+  },
+  "hits": [
+    {
+      "id": "FOO_TWO",
+      "self": "/journals/FOO_TWO",
+      "name": "Foo Twoo",
+      "matches": [
+        {
+          "field": "eissn",
+          "value": [
+            "<em>2398-4902</em>"
+          ]
+        },
+        {
+          "field": "issn",
+          "value": [
+            "<em>2398-4902</em>"
+          ]
+        }
+      ]
+    }
+  ]
+}

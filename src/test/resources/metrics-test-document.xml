@@ -1,0 +1,96 @@
+<mycoreobject xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="datamodel-mods.xsd" ID="zimport_mods_00001489" version="2.0"
+              label="zimport_mods_00001489">
+    <structure>
+    </structure>
+    <metadata>
+        <def.modsContainer class="MCRMetaXML" heritable="false" notinherit="true">
+            <modsContainer inherited="0">
+                <mods:mods xmlns:mods="http://www.loc.gov/mods/v3">
+                    <mods:genre valueURI="https://www.openagrar.de/classifications/genres#journal"
+                                authorityURI="https://www.openagrar.de/classifications/genres" type="intern"/>
+                    <mods:titleInfo displayLabel="Short form of the title" supplied="yes" usage="primary" xml:lang="en"
+                                    xlink:type="simple">
+                        <mods:title>PLOS ONE</mods:title>
+                    </mods:titleInfo>
+                    <mods:classification generator="typeOfResource2dataciteResType-mycore"
+                                         authorityURI="http://www.mycore.org/classifications/dataciteResType"
+                                         valueURI="http://www.mycore.org/classifications/dataciteResType#text"/>
+                    <mods:titleInfo supplied="yes" usage="primary" xml:lang="en" type="alternative" xlink:type="simple">
+                        <mods:title>PLoS One</mods:title>
+                    </mods:titleInfo>
+                    <mods:titleInfo xml:lang="en" type="alternative" xlink:type="simple">
+                        <mods:title>PLoS one</mods:title>
+                    </mods:titleInfo>
+                    <mods:titleInfo type="alternative" xml:lang="en" xlink:type="simple">
+                        <mods:title>PLoS ONE</mods:title>
+                    </mods:titleInfo>
+                    <mods:identifier type="issn">1932-6203</mods:identifier>
+                    <mods:identifier type="zdbid">2267670-3</mods:identifier>
+                    <mods:extension xmlns:math="http://exslt.org/math"
+                                    xmlns:mcrdataurl="xalan://org.mycore.datamodel.common.MCRDataURL"
+                                    xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions"
+                                    displayLabel="characteristics">
+                        <chars refereed="yes"/>
+                    </mods:extension>
+                    <mods:accessCondition type="restriction on access"
+                                          xlink:href="http://www.mycore.org/classifications/mir_access#unlimited"
+                                          xlink:type="simple"/>
+                    <mods:typeOfResource>text</mods:typeOfResource>
+                    <mods:originInfo eventType="publication">
+                        <mods:publisher supplied="yes">PLoS; PubMed Central; Public Library of Science</mods:publisher>
+                        <mods:place>
+                            <mods:placeTerm type="text">San Francisco, California, US</mods:placeTerm>
+                        </mods:place>
+                    </mods:originInfo>
+                    <mods:accessCondition type="use and reproduction"
+                                          xlink:href="http://www.mycore.org/classifications/mir_licenses#oa"
+                                          xlink:type="simple"/>
+                    <mods:language>
+                        <mods:languageTerm authority="rfc5646" type="code">en</mods:languageTerm>
+                    </mods:language>
+                    <mods:classification displayLabel="sdnb" authority="sdnb">500</mods:classification>
+                    <mods:classification displayLabel="sdnb" authority="sdnb">610</mods:classification>
+                    <mods:location>
+                        <mods:url>http://journals.plos.org/plosone/</mods:url>
+                        <mods:url>https://www.ncbi.nlm.nih.gov/pmc/journals/440/</mods:url>
+                        <mods:url>http://www.bibliothek.uni-regensburg.de/ezeit/?2267670</mods:url>
+                    </mods:location>
+                    <mods:extension type="metrics">
+                        <journalMetrics>
+                            <metric type="SNIP">
+                                <value year="2018">1.205</value>
+                                <value year="2017">1.349</value>
+                                <value year="2016">1.368</value>
+                            </metric>
+                            <metric type="SJR">
+                                <value year="2018">1.023</value>
+                                <value year="2017">0.99</value>
+                                <value year="2016">0.852</value>
+                            </metric>
+                            <metric type="JCR">
+                                <value year="2018">O4VvdIpRkmn6wPSC4ckGCA==</value>
+                                <value year="2017">mYh96E5Wc/9nvrRoaC5n3g==</value>
+                                <value year="2016">OLK75tCpNIiaR1XQNR3zWQ==</value>
+                            </metric>
+                        </journalMetrics>
+                    </mods:extension>
+                    <mods:note type="admin" xlink:type="simple">2020-09-09T15:04:57.000Z - JCR autoupdate</mods:note>
+                    <mods:note type="admin" xlink:type="simple">2021-07-29T18:53:28.000Z - JCR autoupdate</mods:note>
+                </mods:mods>
+            </modsContainer>
+        </def.modsContainer>
+    </metadata>
+    <service>
+        <servdates class="MCRMetaISO8601Date">
+            <servdate type="createdate" inherited="0">2013-02-08T13:17:04.809Z</servdate>
+            <servdate type="modifydate" inherited="0">2022-10-10T11:17:25.428Z</servdate>
+        </servdates>
+        <servflags class="MCRMetaLangText">
+            <servflag type="modifiedby" inherited="0" form="plain">tester</servflag>
+        </servflags>
+        <servstates class="MCRMetaClassification">
+            <servstate inherited="0" classid="state" categid="published"/>
+        </servstates>
+    </service>
+</mycoreobject>
