@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,9 +60,17 @@ public class MCRWOSMetricsProvider extends MCRMetricsProvider {
                 for (Integer requestYear : actualRequestYears) {
                     JsonObject reportYearResponse = client.journalsReportYear(wosId, requestYear);
                     Double jcr = MCRWOSJsonHelper.getJiffFromJournalYearReport(reportYearResponse);
-                    journalMetrics.getJCR().put(requestYear, jcr);
-                }
+                    if (jcr >= 0) {
+                        if (journalMetrics.getJCR().containsKey(requestYear) &&
+                            journalMetrics.getJCR().get(requestYear) > 0 &&
+                            !Objects.equals(journalMetrics.getJCR().get(requestYear), jcr)) {
+                            LOGGER.warn("JCR for year {} already present for WOS id {} overwrite {} with {}",
+                                requestYear, wosId, journalMetrics.getJCR().get(requestYear), jcr);
+                        }
 
+                        journalMetrics.getJCR().put(requestYear, jcr);
+                    }
+                }
             } catch (IOException | InterruptedException e) {
                 throw new MCRException("Error while receiving Metrics from WOS!", e);
             }

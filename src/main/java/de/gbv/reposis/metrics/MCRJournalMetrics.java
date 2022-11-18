@@ -62,4 +62,25 @@ public class MCRJournalMetrics {
     public int hashCode() {
         return Objects.hash(getSnip(), getSJR(), getJCR());
     }
+
+
+    static String outputMap( Map<Integer, Double> map) {
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<Integer, Double> entry : map.entrySet()) {
+             sb.append("Key : ").append(entry.getKey())
+                     .append(" Value : ")
+                     .append(entry.getValue())
+                     .append(System.lineSeparator());
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "MCRJournalMetrics{" +
+                "snip=" + outputMap(snip) +
+                ", SJR=" + outputMap(SJR) +
+                ", JCR=" + outputMap(JCR) +
+                '}';
+    }
 }

@@ -37,25 +37,25 @@ public class MCRScopusMetricsProvider extends MCRMetricsProvider {
 
     public static void applyValues(Element MetricList, MCRJournalMetrics metrics, String type,
         Set<Integer> yearFilter) {
-        Map<Integer, Double> map;
-        switch (type) {
-        case "SNIP":
-            map = metrics.getSnip();
-            break;
-        case "SJR":
-            map = metrics.getSJR();
-            break;
-        default:
-            throw new MCRException("Unknown type " + type + "!");
-        }
+        Map<Integer, Double> map = switch (type) {
+        case "SNIP" -> metrics.getSnip();
+        case "SJR" -> metrics.getSJR();
+        default -> throw new MCRException("Unknown type " + type + "!");
+        };
 
         for (Element metric : MetricList.getChildren()) {
             String valueStr = metric.getText();
             String yearStr = metric.getAttributeValue("year");
             int year = Integer.parseInt(yearStr);
             double value = Double.parseDouble(valueStr);
-            if (yearFilter.isEmpty() || yearFilter.contains(year)) {
-                map.put(year, value);
+            if (value > 0) {
+                if (yearFilter.isEmpty() || yearFilter.contains(year)) {
+                    if (map.containsKey(year) && map.get(year) != value && map.get(year) > 0) {
+                        LOGGER.warn("{} existing data for {}, replace {} with {}!",
+                            type, year, map.get(year), value);
+                    }
+                    map.put(year, value);
+                }
             }
         }
     }

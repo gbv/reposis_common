@@ -256,11 +256,13 @@ public class MCRMODSJournalMetricsHelper {
             LOGGER.info("Loading metrics for {} with provider {}", metadataAsString, entry.getKey());
             try {
                 MCRMetricsProvider metricsProvider = entry.getValue().call();
-                return metricsProvider.getMetrics(metadata, years);
+                MCRJournalMetrics metrics = metricsProvider.getMetrics(metadata, years);
+                LOGGER.info("Got these metrics: {}", metrics.toString());
+                return metrics;
             } catch (Exception e) {
                 throw new MCRException(e);
             }
-        }).collect(Collectors.toList());
+        }).toList();
 
         boolean changed = false;
         MCRJournalMetrics currentMetrics = Optional.ofNullable(getMetrics(mw))
@@ -294,7 +296,8 @@ public class MCRMODSJournalMetricsHelper {
         boolean changed = false;
         for (Map.Entry<Integer, Double> entry : additionalMetricsMap.entrySet()) {
             // if the value is 0 or below then the current value will be deleted
-            if(entry.getValue() <= 0){
+            if (entry.getValue() <= 0
+                && (!metricsMap.containsKey(entry.getKey()) || metricsMap.get(entry.getKey()) <= 0)) {
                 metricsMap.remove(entry.getKey());
                 changed = true;
                 continue;
