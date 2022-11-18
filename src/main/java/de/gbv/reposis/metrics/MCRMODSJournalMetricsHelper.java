@@ -20,7 +20,6 @@ package de.gbv.reposis.metrics;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -294,9 +293,19 @@ public class MCRMODSJournalMetricsHelper {
     private static boolean mergeMetricsMap(Map<Integer, Double> metricsMap, Map<Integer, Double> additionalMetricsMap) {
         boolean changed = false;
         for (Map.Entry<Integer, Double> entry : additionalMetricsMap.entrySet()) {
+            // if the value is 0 or below then the current value will be deleted
+            if(entry.getValue() <= 0){
+                metricsMap.remove(entry.getKey());
+                changed = true;
+                continue;
+            }
+
+            // if the values already match, then nothing needs to be done
             if (metricsMap.containsKey(entry.getKey()) && metricsMap.get(entry.getKey()).equals(entry.getValue())) {
                 continue;
             }
+
+            // the value changed, so it needs to be updated
             changed = true;
             metricsMap.put(entry.getKey(), entry.getValue());
         }
