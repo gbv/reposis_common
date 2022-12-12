@@ -1,6 +1,8 @@
 
 # reposis-common
 
+This is a collection of common code used by the reposis projects.
+
 ## Installation Instructions
 
 * run `mvn clean install`
@@ -8,7 +10,70 @@
 
 ## Features
 
+### Solr Facet Time Bar
+
+The Solr Facet Time Bar is a component that allows to display a time bar for Solr range facet. It´s intended to be displayed
+in the response-mir.xsl.
+
+```xslt
+<xsl:variable name="timebarField" select="'fdrwiso.mods.period_of_reference'"/>
+<div class="card">
+    <div class="card-header" data-toggle="collapse-next">
+        <h3 class="card-title">
+            <xsl:value-of select="i18n:translate('mir.search_facet.date.period_of_reference')"/>
+        </h3>
+    </div>
+    <div class="card-body collapse show">
+        <script src="{$WebApplicationBaseURL}js/timebar.js" type="text/javascript"></script>
+        <div data-timebar="true"
+             data-timebar-height="100"
+             data-search-field="{$timebarField}"
+             data-timebar-start="0001-01-01T00:00:00Z"
+             data-timebar-end="NOW"
+             data-timebar-gap="+1YEAR"
+             data-timebar-mincount="1"
+        >
+        </div>
+    </div>
+/div>
+```
+
+In the example the Variable `timebarField` is used to define the Solr field that should be used for the time bar. The field needs to have the type `date_range`:
+
+```json
+[
+  {
+    "add-field-type": {
+      "name": "date_range_fdrwiso",
+      "class": "solr.DateRangeField"
+    }
+  },
+  {
+    "add-field": {
+      "name": "fdrwiso.mods.period_of_reference",
+      "type": "date_range_fdrwiso",
+      "multiValued": false
+    }
+  }
+]
+```
+
+The attributes of the div will be translated to Solr parameters. The following parameters are supported:
+
+| Attribute             | SOLR Parameter or Description  | Default              |
+|-----------------------|--------------------------------|----------------------|
+| data-timebar-start    | facet.range.start              | 0001-01-01T00:00:00Z |
+| data-timebar-end      | facet.range.end                | NOW                  |
+| data-timebar-gap      | facet.range.gap                | +1YEAR               |
+| data-timebar-mincount | facet.mincount                 | 1                    |
+| ata-timebar-height    | the height in PX of the Canvas | 100                  |
+
+
 ### Properties GUI
+
+The Properties GUI is a component that displays the properties of a mycore application grouped by the module they belong to. 
+It shows the order of the properties and the history in which module they were already defined and what the value was.
+It supports the chaining mechanism of mycore properties, but not the replacement mechanism.
 
 The properties GUI is visible under: http://localhost:8291/mir/servlets/PropertyHelperContentServlet?action=analyze
 
