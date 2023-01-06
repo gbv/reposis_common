@@ -7,10 +7,32 @@
     <servlet-name>PropertyHelperContentServlet</servlet-name>
     <servlet-class>de.gbv.reposis.config.PropertyHelperContentServlet</servlet-class>
   </servlet>
+
   <servlet-mapping>
     <servlet-name>PropertyHelperContentServlet</servlet-name>
     <url-pattern>/servlets/PropertyHelperContentServlet</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>GeoSearchVueRootServlet</servlet-name>
+    <servlet-class>org.mycore.webtools.vue.MCRVueRootServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GeoSearchVueRootServlet</servlet-name>
+    <url-pattern>/vue/geo-search/</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>GeoSearchConfigHelperServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRConfigHelperServlet</servlet-class>
+    <init-param>
+      <param-name>Properties</param-name>
+      <param-value>MCR.GeoSearch.Solr.InternalRoles,MCR.GeoSearch.Solr.WKT.Field,MCR.GeoSearch.Solr.Internal.SearchURI,MCR.GeoSearch.Solr.Public.SearchURI,MCR.GeoSearch.Solr.Map.CenterX,MCR.GeoSearch.Solr.Map.CenterY,MCR.GeoSearch.Solr.Map.Zoom</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GeoSearchConfigHelperServlet</servlet-name>
+    <url-pattern>/vue/geo-search/config.json</url-pattern>
+  </servlet-mapping>
 
 </web-fragment>
