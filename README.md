@@ -68,6 +68,31 @@ The attributes of the div will be translated to Solr parameters. The following p
 | data-timebar-mincount | facet.mincount                 | 1                    |
 | ata-timebar-height    | the height in PX of the Canvas | 100                  |
 
+### GeoSearch
+
+The GeoSearch is a component that show a map with all coordinates of the documents in this repository. 
+The user can then search for documents in a specific area, with different shapes (circle, polygon).
+
+| Property                              | Description                                                            |
+|---------------------------------------|------------------------------------------------------------------------|
+| MCR.GeoSearch.Solr.Map.CenterX        | The center of the map in X direction (longitude) for the initial view  |
+| MCR.GeoSearch.Solr.Map.CenterY        | The center of the map in Y direction (latitude) for the initial view   |
+| MCR.GeoSearch.Solr.Map.Zoom           | The zoom level for the initial view                                    |
+| MCR.GeoSearch.Solr.Public.SearchURI   | The URI for the public search                                          |
+| MCR.GeoSearch.Solr.Internal.SearchURI | The URI for the internal search                                        |
+| MCR.GeoSearch.Solr.InternalRoles      | The roles that are allowed to see the internal search                  |
+| MCR.GeoSearch.Solr.WKT.Field          | The field that will be used for the WKT search                         |
+
+The properties contain sane defaults, so you only need to change them if you want to change the default behavior.
+
+To enable the GeoSearch you need to add the link to the navigation.xml:
+    
+```xml
+<item href="/vue/geo-search/" type="intern" replaceMenu="false" constrainPopUp="false">
+    <label xml:lang="de">Geografischer Sucheinstieg</label>
+    <label xml:lang="en">Geographic search entry</label>
+</item>
+```
 
 ### Properties GUI
 
