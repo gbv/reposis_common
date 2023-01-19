@@ -1,5 +1,7 @@
 package de.gbv.reposis.geo;
 
+import org.w3c.dom.NodeList;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -71,26 +73,35 @@ public class GeoFunctions {
      * @param modsCoords The content of the mods:coordinates element.
      * @return a polygon or point WKT string.
      */
-    public static String getNormalizedWKTString(String modsCoords) {
+    public static String getNormalizedWKTString(NodeList modsCoords) {
         if (modsCoords == null) {
             return null;
         }
 
-        double[][] verticles = getGeoPoints(modsCoords);
+        StringBuilder sb = new StringBuilder();
+        sb.append("GeometryCollection (");
+        for (int i = 0; i < modsCoords.getLength(); i++) {
+            String coords = modsCoords.item(i).getTextContent();
+            double[][] verticles = getGeoPoints(coords);
+            if (verticles.length == 1) {
+                sb.append("POINT (").append(verticles[0][0]).append(" ").append(verticles[0][1]).append(")");
+            } else  {
+                if(!isPolygonInverse(verticles)){
+                    List<double[]> list = Arrays.asList(verticles);
+                    Collections.reverse(list);
+                    verticles = list.toArray(double[][]::new);
+                }
 
-        if (verticles.length == 1) {
-            return "POINT (" + verticles[0][0]+ " " + verticles[0][1] + ")";
-        } else  {
-            if(!isPolygonInverse(verticles)){
-                List<double[]> list = Arrays.asList(verticles);
-                Collections.reverse(list);
-                verticles = list.toArray(double[][]::new);
+                String points = Arrays.stream(verticles)
+                        .map(point -> point[0] + " " + point[1])
+                        .collect(Collectors.joining(", "));
+                sb.append("POLYGON ((").append(points).append("))");
             }
-
-            String points = Arrays.stream(verticles)
-                    .map(point -> point[0] + " " + point[1])
-                    .collect(Collectors.joining(", "));
-            return "POLYGON ((" + points + "))";
+            if(i < modsCoords.getLength() - 1){
+                sb.append(", ");
+            }
         }
+        sb.append(")");
+        return sb.toString();
     }
 }
