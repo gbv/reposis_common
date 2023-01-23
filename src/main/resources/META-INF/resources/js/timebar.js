@@ -1,15 +1,14 @@
 window.addEventListener('load', function () {
     document.querySelectorAll('[data-timebar]').forEach(function (timebar) {
-        let timebarWidth = timebar.offsetWidth;
-        let timebarHeight = parseInt(timebar.getAttribute('data-timebar-height')) || 100;
+        let timebarShowOnReady = timebar.getAttribute('data-timebar-show-on-ready');
         timebar.style.position = 'relative';
 
         let controllLayer = document.createElement('div');
         controllLayer.style.position = 'absolute';
         controllLayer.style.top = '0';
         controllLayer.style.left = '0';
-        controllLayer.style.width = timebarWidth + 'px';
-        controllLayer.style.height = timebarHeight - 3 + 'px';
+
+        resize();
 
         timebar.appendChild(controllLayer);
 
@@ -147,6 +146,11 @@ window.addEventListener('load', function () {
         tooltip.style.whiteSpace = 'nowrap';
         timebar.appendChild(tooltip);
 
+        function resize(){
+            controllLayer.style.width = timebar.offsetWidth + 'px';
+            controllLayer.style.height = (parseInt(timebar.getAttribute('data-timebar-height')) || 100) - 3 + 'px';
+        }
+
 
         function getSelectorOnePos() {
             let posFromLeft = parseInt(selectorStart.style.left.replace("px", ""));
@@ -239,7 +243,7 @@ window.addEventListener('load', function () {
             context.scale(xScale, -1 * yScale);
             context.translate(0, -maxY);
             canvas.style.width = "100%";
-            canvas.style.height = timebarHeight - 3 + 'px';
+            canvas.style.height = (parseInt(timebar.getAttribute('data-timebar-height')) || 100) - 3 + 'px';
 
             context.fillStyle =  window.getComputedStyle(buttonApply).backgroundColor;
 
@@ -533,9 +537,20 @@ window.addEventListener('load', function () {
                             }
                         });
 
-                        parseData();
-                        drawData();
-                        parseURLData();
+                        if(data.length > 0) {
+                            if(timebarShowOnReady!==null && timebarShowOnReady.length>0) {
+                                document.querySelectorAll(timebarShowOnReady).forEach(function (value) {
+                                    value.style.display = 'block';
+                                });
+                            }
+
+                            resize();
+                            window.addEventListener('resize', resize);
+
+                            parseData();
+                            drawData();
+                            parseURLData();
+                        }
                     }
 
                 });
