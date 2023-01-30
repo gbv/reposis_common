@@ -193,13 +193,16 @@ The configuration is done in mycore.properties:
 MCR.User.Shibboleth.PersistUser=true
 MCR.User.Shibboleth.Mapper=de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMapper
 MCR.User.Shibboleth.Merger=de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMerger
+MCR.User.Shibboleth.NewUserHandler=de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethNewUserHandler
 ```
 
-| Property                        | Default                                                                   | Description                                                             |
-|---------------------------------|---------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| MCR.User.Shibboleth.PersistUser | true                                                                      | If true the user will be persisted in the database when he logs in.     |
-| MCR.User.Shibboleth.Mapper      | de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMapper | The class that maps the shibboleth attributes to the user object.       |
-| MCR.User.Shibboleth.Merger      | de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMerger | The class that merges the user object with the user object from the db. |
+| Property                                | Default                                                                       | Description                                                             |
+|-----------------------------------------|-------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| MCR.User.Shibboleth.PersistUser         | true                                                                          | If true the user will be persisted in the database when he logs in.     |
+| MCR.User.Shibboleth.Mapper              | de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMapper     | The class that maps the shibboleth attributes to the user object.       |
+| MCR.User.Shibboleth.Mapper.DefaultRoles |                                                                               | A comma separated list of roles that will be assigned to the user .     |
+| MCR.User.Shibboleth.Merger              | de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMerger     | The class that merges the user object with the user object from the db. |
+| MCR.User.Shibboleth.NewUserHandler      | de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethNewUserHandler | The class that handles the new user. Eg. send an email.                 |
 
 The default mapper maps the following attributes:
 
@@ -212,11 +215,47 @@ The user id is taken from the getRemoteUser() method of the request.
 
 The default merger doesnt merge anything.
 
-Both classes are loaded with the [configurable instace concept](https://www.mycore.de/documentation/basics/basics_configurable_instance/).
+The default new user handler does nothing.
+
+##### MCRConfigurableNewShibbolethUserMailer
+
+The MCRConfigurableNewShibbolethUserMailer is a new user handler that sends an email to somebody when he logs in for the
+first time.
+The Mailer is configured in mycore.properties:
+
+```properties
+MCR.User.Shibboleth.NewUserHandler=de.gbv.reposis.user.shibboleth.MCRConfigurableNewShibbolethUserMailer
+MCR.User.Shibboleth.NewUserHandler.MailTo=exampleReceiver@mail.com
+MCR.User.Shibboleth.NewUserHandler.MailFrom=exampleSender@mail.com
+MCR.User.Shibboleth.NewUserHandler.MailSubjectKey=shibboleth.newUser.mail.subject
+MCR.User.Shibboleth.NewUserHandler.MailBodyKey=shibboleth.newUser.mail.body
+MCR.User.Shibboleth.NewUserHandler.MailLocaleKey=de
+MCR.User.Shibboleth.NewUserHandler.Bcc=false
+```
+
+| Property                                          | Default | Description                                                       |
+|---------------------------------------------------|---------|-------------------------------------------------------------------|
+| MCR.User.Shibboleth.NewUserHandler.MailTo         |         | The email address of the receiver. Can be a comma separated list. |
+| MCR.User.Shibboleth.NewUserHandler.MailFrom       |         | The email address of the sender.                                  |
+| MCR.User.Shibboleth.NewUserHandler.MailSubjectKey |         | The key which will be use to translate the subject.               |
+| MCR.User.Shibboleth.NewUserHandler.MailBodyKey    |         | The key which will be use to translate the body.                  |
+| MCR.User.Shibboleth.NewUserHandler.MailLocaleKey  |         | The locale which will be used for the translation                 |
+| MCR.User.Shibboleth.NewUserHandler.Bcc            | true    | If true the receiver will be in the bcc field.                    |
+
+The arguments for the translation are:
+
+* {0} = the user id
+* {1} = the label of the realm
+* {2} = the email address of the user
+* {3} = the name of the user
+
+All classes are loaded with
+the [configurable instace concept](https://www.mycore.de/documentation/basics/basics_configurable_instance/).
 
 ## Development
 
 You can add these to your ~/.mycore/(dev-)mir/.mycore.properties
+
 ```
 MCR.Developer.Resource.Override=/path/to/reposis_common/src/main/resources
 MCR.LayoutService.LastModifiedCheckPeriod=0

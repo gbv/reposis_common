@@ -22,6 +22,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.common.xml.MCRXMLFunctions;
+import org.mycore.datamodel.common.MCRISO8601Format;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRUser;
@@ -29,6 +31,8 @@ import org.mycore.user2.MCRUserManager;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
 
 /**
  * <p>This servlet is used to login a user via Shibboleth.</p>
@@ -55,6 +59,24 @@ public class MCRShibbolethLoginServlet2 extends MCRServlet {
     public static final Boolean PERSIST_USER
         = MCRConfiguration2.getBoolean(SHIBBOLETH_PERSIST_USER_PROPERTY).orElse(false);
 
+    private static boolean handleUserExpired(MCRServletJob job, MCRUser existingUser) throws IOException {
+        if (!existingUser.loginAllowed()) {
+            String message;
+
+            if (existingUser.isDisabled()) {
+                message = "User " + existingUser.getUserID() + " was disabled!";
+                LOGGER.warn(message);
+            } else {
+                message = "Password expired for user " + existingUser.getUserID() + " on " + MCRXMLFunctions
+                    .getISODate(existingUser.getValidUntil(), MCRISO8601Format.COMPLETE_HH_MM_SS.toString());
+                LOGGER.warn(message);
+            }
+            job.getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED, message);
+            return true;
+        }
+        return false;
+    }
+
     public void doGetPost(MCRServletJob job) throws Exception {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
@@ -78,9 +100,15 @@ public class MCRShibbolethLoginServlet2 extends MCRServlet {
                     MCRUserManager.updateUser(existingUser);
                 }
                 mcrUser = existingUser;
+
+                if (handleUserExpired(job, existingUser)) {
+                    return;
+                }
             } else {
                 // user does not exist
                 MCRUserManager.createUser(mcrUser);
+
+                handleNewUser(job, mcrUser);
             }
         }
 
@@ -88,6 +116,10 @@ public class MCRShibbolethLoginServlet2 extends MCRServlet {
         // MCR-1154
         req.changeSessionId();
         res.sendRedirect(res.encodeRedirectURL(req.getParameter("url")));
+    }
+
+    private void handleNewUser(MCRServletJob job, MCRUser mcrUser) {
+        MCRShibbolethUserActionFactory.getNewUserHandler().handleNewUser(mcrUser);
     }
 
 }
