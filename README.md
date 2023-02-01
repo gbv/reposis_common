@@ -144,9 +144,118 @@ MCR.MODS.Metrics.Provider.WebOfScience=de.gbv.reposis.metrics.wos.MCRWOSMetricsP
 MIR.WebOfScience.API.Key=YOUR_API_KEY
 ```
 
+### Shibboleth
+
+#### Realm Updater
+
+The realm updater takes the dfn aai metadata and takes all the scopes and creates a realm for each scope.
+The realm updater is configured in mycore.properties, e.g.:
+
+```properties
+MCR.Cronjob.Jobs.RealmFileUpdater=de.gbv.reposis.user.shibboleth.MCRSAMLEntitiesRealmFileUpdater
+MCR.Cronjob.Jobs.RealmFileUpdater.Cron=0 4 * * *
+#MCR.Cronjob.Jobs.RealmFileUpdater.Cron=* * * * *
+MCR.Cronjob.Jobs.RealmFileUpdater.Url=https://www.aai.dfn.de/metadata/dfn-aai-idp-metadata.xml
+MCR.Cronjob.Jobs.RealmFileUpdater.PreserveRealmsWithUsers=true
+```
+
+The cronjob uses the [mycore-cronjob implementation](https://www.mycore.de/documentation/basics/basics_cronjob/). It has the following properties:
+
+| Property                                                  | Default                  | Description                                                                                  |
+|-----------------------------------------------------------|--------------------------|----------------------------------------------------------------------------------------------|
+| MCR.Cronjob.Jobs.RealmFileUpdater                         |                          | The Cronjob definition. Contains the class of the Implementation.                            |
+| MCR.Cronjob.Jobs.RealmFileUpdater.Cron                    |                          | When does the cron job run.                                                                  |
+| MCR.Cronjob.Jobs.RealmFileUpdater.Url                     |                          | The URL to the DFN Metadata, which will be converted.                                        |
+| MCR.Cronjob.Jobs.RealmFileUpdater.PreserveRealmsWithUsers | true                     | If true Cronjob does not delete realms if there is a user in the db with the realm assigned. |
+| MCR.Cronjob.Jobs.RealmFileUpdater.RealmsFilePath          | %MCR.datadir%/realms.xml | The path where the realms.xml can be found.                                                  |
+| MCR.Cronjob.Jobs.RealmFileUpdater.FilterEntities          |                          | A comma separated list of entities that should be filtered.                                  |
+| MCR.Cronjob.Jobs.RealmFileUpdater.PreserveRealms          | local,shibboleth         | A comma separated list of realms that should not be changed.                                 |
+
+#### Shibboleth Login 2
+
+The Shibboleth Login 2 is a new implementation of the Shibboleth Login. Its main difference to the old implementation is that it is more flexible regarding the attribute mapping and the user creation.
+You need to add the Servlet to the web-fragment.xml:
+
+```xml
+  <servlet>
+    <servlet-name>MCRShibbolethLoginServlet2</servlet-name>
+    <servlet-class>de.gbv.reposis.user.shibboleth.MCRShibbolethLoginServlet2</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRShibbolethLoginServlet2</servlet-name>
+    <url-pattern>/servlets/MCRShibbolethLoginServlet2</url-pattern>
+  </servlet-mapping>
+```
+
+The configuration is done in mycore.properties:
+
+```properties
+MCR.User.Shibboleth.PersistUser=true
+MCR.User.Shibboleth.Mapper=de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMapper
+MCR.User.Shibboleth.Merger=de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMerger
+MCR.User.Shibboleth.NewUserHandler=de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethNewUserHandler
+```
+
+| Property                                | Default                                                                       | Description                                                             |
+|-----------------------------------------|-------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| MCR.User.Shibboleth.PersistUser         | true                                                                          | If true the user will be persisted in the database when he logs in.     |
+| MCR.User.Shibboleth.Mapper              | de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMapper     | The class that maps the shibboleth attributes to the user object.       |
+| MCR.User.Shibboleth.Mapper.DefaultRoles |                                                                               | A comma separated list of roles that will be assigned to the user .     |
+| MCR.User.Shibboleth.Merger              | de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethUserMerger     | The class that merges the user object with the user object from the db. |
+| MCR.User.Shibboleth.NewUserHandler      | de.gbv.reposis.user.shibboleth.MCRDefaultConfigurableShibbolethNewUserHandler | The class that handles the new user. Eg. send an email.                 |
+
+The default mapper maps the following attributes:
+
+| Shibboleth Attribute | User Attribute | 
+|----------------------|----------------|
+| displayName          | name           | 
+| mail                 | email          | 
+
+The user id is taken from the getRemoteUser() method of the request.
+
+The default merger doesnt merge anything.
+
+The default new user handler does nothing.
+
+##### MCRConfigurableNewShibbolethUserMailer
+
+The MCRConfigurableNewShibbolethUserMailer is a new user handler that sends an email to somebody when he logs in for the
+first time.
+The Mailer is configured in mycore.properties:
+
+```properties
+MCR.User.Shibboleth.NewUserHandler=de.gbv.reposis.user.shibboleth.MCRConfigurableNewShibbolethUserMailer
+MCR.User.Shibboleth.NewUserHandler.MailTo=exampleReceiver@mail.com
+MCR.User.Shibboleth.NewUserHandler.MailFrom=exampleSender@mail.com
+MCR.User.Shibboleth.NewUserHandler.MailSubjectKey=shibboleth.newUser.mail.subject
+MCR.User.Shibboleth.NewUserHandler.MailBodyKey=shibboleth.newUser.mail.body
+MCR.User.Shibboleth.NewUserHandler.MailLocaleKey=de
+MCR.User.Shibboleth.NewUserHandler.Bcc=false
+```
+
+| Property                                          | Default | Description                                                       |
+|---------------------------------------------------|---------|-------------------------------------------------------------------|
+| MCR.User.Shibboleth.NewUserHandler.MailTo         |         | The email address of the receiver. Can be a comma separated list. |
+| MCR.User.Shibboleth.NewUserHandler.MailFrom       |         | The email address of the sender.                                  |
+| MCR.User.Shibboleth.NewUserHandler.MailSubjectKey |         | The key which will be use to translate the subject.               |
+| MCR.User.Shibboleth.NewUserHandler.MailBodyKey    |         | The key which will be use to translate the body.                  |
+| MCR.User.Shibboleth.NewUserHandler.MailLocaleKey  |         | The locale which will be used for the translation                 |
+| MCR.User.Shibboleth.NewUserHandler.Bcc            | true    | If true the receiver will be in the bcc field.                    |
+
+The arguments for the translation are:
+
+* {0} = the user id
+* {1} = the label of the realm
+* {2} = the email address of the user
+* {3} = the name of the user
+
+All classes are loaded with
+the [configurable instace concept](https://www.mycore.de/documentation/basics/basics_configurable_instance/).
+
 ## Development
 
 You can add these to your ~/.mycore/(dev-)mir/.mycore.properties
+
 ```
 MCR.Developer.Resource.Override=/path/to/reposis_common/src/main/resources
 MCR.LayoutService.LastModifiedCheckPeriod=0
