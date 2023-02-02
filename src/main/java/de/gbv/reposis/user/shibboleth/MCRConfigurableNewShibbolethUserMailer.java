@@ -65,7 +65,7 @@ public class MCRConfigurableNewShibbolethUserMailer implements MCRShibbolethNewU
 
     public static String translate(String key, Locale locale, Object... args) {
         String translation = MCRTranslation.translate(key, locale);
-        return MessageFormat.format(translation, args);
+        return new MessageFormat(translation, Locale.ROOT).format(args);
     }
     private Optional<Locale> getMailLocale() {
         return Optional.ofNullable(this.mailLocale).map(MCRTranslation::getLocale);
