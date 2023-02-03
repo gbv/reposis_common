@@ -51,6 +51,9 @@ public class MCRUpdateJournalMetricsEventHandler extends MCREventHandlerBase {
      */
     @Override
     protected void handleObjectCreated(final MCREvent evt, final MCRObject obj) {
+        if(obj.isImportMode()){
+            return;
+        }
         if (!MCRMODSWrapper.isSupported(obj)) {
             return;
         }
