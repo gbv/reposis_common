@@ -143,14 +143,23 @@ public class MCRMODSJournalMetricsHelper {
             String valueString = valueElement.getTextNormalize();
 
             int year = Integer.parseInt(yearString);
+            String strValue;
             double value;
 
             if (ENCRYPTED_METRIC_TYPES_KEY_MAP.containsKey(type)) {
                 String cipherName = ENCRYPTED_METRIC_TYPES_KEY_MAP.get(type);
                 String decryptedString = MCRCipherManager.getCipher(cipherName).decrypt(valueString);
-                value = Double.parseDouble(decryptedString);
+                strValue = decryptedString;
             } else {
-                value = Double.parseDouble(valueString);
+                strValue = valueString;
+            }
+
+            try {
+                value = Double.parseDouble(strValue);
+            } catch (NumberFormatException e) {
+                LOGGER.warn("Could not parse value {} for year {} and type {} to double. Ignoring this value.",
+                    strValue, year, type);
+                continue;
             }
 
             targetMap.put(year, value);
