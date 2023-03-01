@@ -34,41 +34,44 @@ public class MCRWOSMetricsProvider extends MCRMetricsProvider {
                 if (wosIDs.size() == 0) {
                     LOGGER.info("No Results from WebOfScience for issn {}", issn);
                     continue;
-                } else if (wosIDs.size() > 1) {
-                    LOGGER.warn("No distinct result for issn {} found following WOS ids {}", issn,
-                        String.join(",", wosIDs));
-                    continue;
                 }
 
-                String wosId = wosIDs.get(0);
-                JsonObject journalResult = client.journal(wosId);
-                List<Integer> wosReportYears = MCRWOSJsonHelper.getReportYearsFromJournal(journalResult);
+                HashSet<String> distinctWosID = new HashSet<>();
+                for(String wosId:wosIDs) {
+                    if(distinctWosID.contains(wosId)) {
+                        LOGGER.warn("WOS ID {} is not unique for issn {} (skip because already processed)", wosId, issn);
+                        continue;
+                    }
+                    distinctWosID.add(wosId);
+                    JsonObject journalResult = client.journal(wosId);
+                    List<Integer> wosReportYears = MCRWOSJsonHelper.getReportYearsFromJournal(journalResult);
 
-                Set<Integer> actualRequestYears = new HashSet<>();
-                if(years == null || years.size()==0){
-                    actualRequestYears = new HashSet<>(wosReportYears);
-                } else {
-                    actualRequestYears = years.stream().filter(o -> {
-                        boolean yearPresent = wosReportYears.contains(o);
-                        if(!yearPresent){
-                            LOGGER.warn("The requested year {} is not present for WOS id {}", o, wosId);
+                    Set<Integer> actualRequestYears;
+                    if (years == null || years.size() == 0) {
+                        actualRequestYears = new HashSet<>(wosReportYears);
+                    } else {
+                        actualRequestYears = years.stream().filter(o -> {
+                            boolean yearPresent = wosReportYears.contains(o);
+                            if (!yearPresent) {
+                                LOGGER.warn("The requested year {} is not present for WOS id {}", o, wosId);
+                            }
+                            return yearPresent;
+                        }).collect(Collectors.toSet());
+                    }
+
+                    for (Integer requestYear : actualRequestYears) {
+                        JsonObject reportYearResponse = client.journalsReportYear(wosId, requestYear);
+                        Double jcr = MCRWOSJsonHelper.getJiffFromJournalYearReport(reportYearResponse);
+                        if (jcr >= 0) {
+                            if (journalMetrics.getJCR().containsKey(requestYear) &&
+                                    journalMetrics.getJCR().get(requestYear) > 0 &&
+                                    !Objects.equals(journalMetrics.getJCR().get(requestYear), jcr)) {
+                                LOGGER.warn("JCR for year {} already present for WOS id {} overwrite {} with {}",
+                                        requestYear, wosId, journalMetrics.getJCR().get(requestYear), jcr);
+                            }
+
+                            journalMetrics.getJCR().put(requestYear, jcr);
                         }
-                        return yearPresent;
-                    }).collect(Collectors.toSet());
-                }
-
-                for (Integer requestYear : actualRequestYears) {
-                    JsonObject reportYearResponse = client.journalsReportYear(wosId, requestYear);
-                    Double jcr = MCRWOSJsonHelper.getJiffFromJournalYearReport(reportYearResponse);
-                    if (jcr >= 0) {
-                        if (journalMetrics.getJCR().containsKey(requestYear) &&
-                            journalMetrics.getJCR().get(requestYear) > 0 &&
-                            !Objects.equals(journalMetrics.getJCR().get(requestYear), jcr)) {
-                            LOGGER.warn("JCR for year {} already present for WOS id {} overwrite {} with {}",
-                                requestYear, wosId, journalMetrics.getJCR().get(requestYear), jcr);
-                        }
-
-                        journalMetrics.getJCR().put(requestYear, jcr);
                     }
                 }
             } catch (IOException | InterruptedException e) {
