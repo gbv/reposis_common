@@ -262,9 +262,10 @@ the [configurable instace concept](https://www.mycore.de/documentation/basics/ba
 | MIR.Agreement.MailTemplate | The template which will be used for the Mail. Default Value: agreement_mail_template.xhtml                 |
 | MIR.Agreement.File         | The file which will be attached to the mail. The file must be stored in the web folder `content/publish/`. |
 
-There is also an editor specific property which needs to be set in the mycore.properties:
+There is also an editor specific property and an event handler which needs to be set in the mycore.properties:
 ```properties
 MIR.EditorForms.CustomIncludes=%MIR.EditorForms.CustomIncludes%,xslStyle:editor/mir2xeditor:webapp:editor/editor-agreement-customization.xed
+MCR.EventHandler.MCRObject.019j.Class=de.gbv.reposis.agreement.VZGMailAgreementEventHandler
 ```
 
 
