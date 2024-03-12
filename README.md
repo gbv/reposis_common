@@ -94,16 +94,6 @@ To enable the GeoSearch you need to add the link to the navigation.xml:
 </item>
 ```
 
-### Properties GUI
-
-The Properties GUI is a component that displays the properties of a mycore application grouped by the module they belong to. 
-It shows the order of the properties and the history in which module they were already defined and what the value was.
-It supports the chaining mechanism of mycore properties, but not the replacement mechanism.
-
-The properties GUI is visible under: http://localhost:8291/mir/servlets/PropertyHelperContentServlet?action=analyze
-
-You need Admin rights to see the GUI. It shows the properties defined in every component.
-
 ### Metrics
 The metrics implementation allows to load journal metrics from different providers. The metrics are stored  encrypted in the mods:extension section of the journal object.
 

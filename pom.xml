@@ -21,11 +21,11 @@
   <parent>
     <groupId>de.gbv.reposis</groupId>
     <artifactId>reposis_parent</artifactId>
-    <version>2022.06-SNAPSHOT</version>
+    <version>2023.06-SNAPSHOT</version>
   </parent>
 
   <artifactId>reposis_common</artifactId>
-  <version>2022.06-SNAPSHOT</version>
+  <version>2023.06-SNAPSHOT</version>
   <properties>
     <MCR.AppName>reposis-common</MCR.AppName>
   </properties>
@@ -147,14 +147,6 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.activation</groupId>
-      <artifactId>jakarta.activation</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>
