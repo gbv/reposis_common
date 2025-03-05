@@ -59,6 +59,11 @@ public class MCRUpdateJournalMetricsEventHandler extends MCREventHandlerBase {
         }
         MCRMODSWrapper newObjMw = new MCRMODSWrapper(obj);
         List<String> issnNew = MCRMODSJournalMetricsHelper.getIssn(newObjMw);
+
+        if (issnNew.size() == 0) {
+            return;
+        }
+
         try {
             MCRMODSJournalMetricsHelper.updateMetrics(issnNew, newObjMw);
         } catch (MCRCryptKeyNoPermissionException | MCRCryptKeyFileNotFoundException e) {
@@ -81,6 +86,10 @@ public class MCRUpdateJournalMetricsEventHandler extends MCREventHandlerBase {
         MCRMODSWrapper newObjMw = new MCRMODSWrapper(obj);
         List<String> issnNew = MCRMODSJournalMetricsHelper.getIssn(newObjMw);
         issnNew.sort(String::compareTo);
+
+        if (issnNew.size() == 0 && issnOld.size() == 0) {
+            return;
+        }
 
         if (!issnOld.equals(issnNew)) {
             try {
