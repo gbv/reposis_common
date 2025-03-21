@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xed:template xmlns:xed="http://www.mycore.de/xeditor" xmlns:mir="http://www.mycore.de/mir">
+
+  <xed:template id="agreement">
+    <!-- Code für den Autorenvertrag  -->
+    <xed:if test="not(../../../../service/servflags[@class='MCRMetaLangText']/servflag[@type='agreement']/text()=$MIR.Agreement.File)">
+      <xed:if test="xed:call-java('de.gbv.reposis.agreement.VZGAgreementUtil','isOnlySubmitter')">
+        <xed:if test="not(contains($MIR.Agreement.Genres.Skip, concat(',',$genre,',')))">
+          <xed:bind xpath="../../../../service/servflags[@class='MCRMetaLangText']/servflag[@type='agreement']">
+            <fieldset>
+              <legend class="mir-fieldset-legend">
+                <xed:output i18n="project.form.agreement"/>
+              </legend>
+              <div class="row mt-4 mb-4" id="autor-agreement">
+                <div class="offset-3 col-md-9">
+                  <div class="form-check required {$xed-validation-marker}">
+                    <!-- how to translate ??? -->
+                    <input class="form-check-input" type="checkbox" value="{$MIR.Agreement.File}"
+                           id="autor-agreement-check"></input>
+                    <label for="autor-agreement-check" class="form-check-label" id="autor-agreement-link">
+                      <xed:output i18n="project.form.agreement.accept.pre"/>
+                      <a
+                            href="{$WebApplicationBaseURL}content/publish/{$MIR.Agreement.File}"
+                            target="_blank"><xed:output i18n="project.form.agreement.accept.link"/></a>
+                      <xed:output i18n="project.form.agreement.accept.post"/>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+            <xed:validate display="global" xpath="//servflag[@type='agreement']" required="true"
+                          i18n="project.form.validation.agreement"/>
+          </xed:bind>
+        </xed:if>
+      </xed:if>
+    </xed:if>
+    <xed:cleanup-rule xpath="//servflag[@type='agreement']" relevant-if="string-length(text())&gt;0"/>
+  </xed:template>
+
+  <xed:modify ref="genres.submit">
+    <xed:include ref="agreement" before="cancel.submit" />
+  </xed:modify>
+
+
+</xed:template>
+

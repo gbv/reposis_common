@@ -43,6 +43,10 @@
             :format="format"
             :url="docsURL()"
         />
+        <ol-style>
+          <ol-style-stroke :width="1" color="#3399CC"></ol-style-stroke>
+          <ol-style-fill color="rgba(255,255,255,0)"></ol-style-fill>
+        </ol-style>
       </ol-vector-layer>
 
     </ol-map>

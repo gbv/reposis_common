@@ -242,6 +242,46 @@ The arguments for the translation are:
 All classes are loaded with
 the [configurable instace concept](https://www.mycore.de/documentation/basics/basics_configurable_instance/).
 
+### Agreement Mailer
+
+| Property                   | Description                                                                                                |
+|----------------------------|------------------------------------------------------------------------------------------------------------|
+| MCR.mir-module.MailSender  | The Mail Address from which the agreement will be sent                                                     |
+| MCR.mir-module.EditorMail  | The Mail Address where the agreement will be sent to                                                       |
+| MCR.Mail.Server            | The Mail Server which will be used to send the mail                                                        |
+| MIR.Agreement.MailTemplate | The template which will be used for the Mail. Default Value: agreement_mail_template.xhtml                 |
+| MIR.Agreement.File         | The file which will be attached to the mail. The file must be stored in the web folder `content/publish/`. |
+
+There is also an editor specific property and an event handler which needs to be set in the mycore.properties:
+```properties
+MIR.EditorForms.CustomIncludes=%MIR.EditorForms.CustomIncludes%,xslStyle:editor/mir2xeditor:webapp:editor/editor-agreement-customization.xed
+MCR.EventHandler.MCRObject.019j.Class=de.gbv.reposis.agreement.VZGMailAgreementEventHandler
+```
+
+
+The Mail template is a xhtml file which can be found in the reposis_common module.
+The template has Variables which will be replaced with the actual values. The placeholders are Elements in the with the
+Namespace `xmlns:plc="https://gbv.de/mail-placeholder"`.
+
+The template has the following variables:
+
+| Variable       | Description                                                                 |
+|----------------|-----------------------------------------------------------------------------|
+| `<plc:user />` | The name of the user                                                        |
+| `<plc:link />` | The link to the accepted agreement                                          |
+
+
+There are Message Properties which can be set in the message.properties file:
+
+| Property                           | Description                                                                             | Default Value                                     |
+|------------------------------------|-----------------------------------------------------------------------------------------|---------------------------------------------------|
+| project.form.agreement.accept.pre  | The text which will be displayed before the link to the agreement in the editor         | Ich habe die                                      |
+| project.form.agreement.accept.post | The text which will be displayed after the link to the agreement in the editor          | Einverständniserklärung                           |
+| project.form.agreement.accept.link | The text which will be displayed as the link to the agreement in the editor             | gelesen und akzeptiere sie.                       |
+| project.form.agreement             | The text which will be displayed as a legend for the agreement in the editor            | Einverständniserklärung                           |
+| project.form.validation.agreement  | The text which will be displayed as a validation error if the agreement is not accepted | Sie müssen der Einverständniserklärung zustimmen. |
+
+
 ## Development
 
 You can add these to your ~/.mycore/(dev-)mir/.mycore.properties
