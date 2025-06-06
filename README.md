@@ -281,6 +281,29 @@ There are Message Properties which can be set in the message.properties file:
 | project.form.agreement             | The text which will be displayed as a legend for the agreement in the editor            | Einverständniserklärung                           |
 | project.form.validation.agreement  | The text which will be displayed as a validation error if the agreement is not accepted | Sie müssen der Einverständniserklärung zustimmen. |
 
+### Codemeta
+
+#### Metadata
+Codemeta metadata view and export can be enabled via mycore.properties:
+
+```properties
+MIR.Layout.End=%MIR.Layout.End%,export-extension
+MIR.Layout.Start=%MIR.Layout.Start%,reposis-metadata-extension
+MIR.Layout.Display.Div=%MIR.Layout.Display.Div%,reposis-export-extension
+MCR.URIResolver.xslImports.modsmeta=%MCR.URIResolver.xslImports.modsmeta%,metadata/reposis-export-extension.xsl,metadata/reposis-metadata-extension.xsl
+```
+
+#### OAI
+OAI Codemeta set can be enabled via mycore.properties:
+
+```properties
+MCR.ContentTransformer.oai-codemeta.Stylesheet=xslt/mycoreobject2codemeta-jsonld.xsl,xslt/codemeta-jsonld2rdf.xsl
+MCR.ContentTransformer.oai-codemeta.TransformerFactoryClass=net.sf.saxon.TransformerFactoryImpl
+MCR.OAIDataProvider.MetadataFormat.codemeta.Schema=http://www.openarchives.org/OAI/2.0/rdf.xsd
+MCR.OAIDataProvider.MetadataFormat.codemeta.Namespace=http://www.w3.org/1999/02/22-rdf-syntax-ns#
+MCR.OAIDataProvider.OAI2.Sets.codemeta.URI=webapp:oai/set_codemeta.xml
+MCR.OAIDataProvider.OAI2.Sets.codemeta.Query=mods.genre:software
+```
 
 ## Development
 
