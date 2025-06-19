@@ -55,7 +55,7 @@ public class VZGMailAgreementEventHandler extends MCREventHandlerBase {
 
     @Override
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        final ArrayList<String> currentAgreements = obj.getService().getFlags("agreement");
+        final List<String> currentAgreements = obj.getService().getFlags("agreement");
 
         if(!MAILER_PROPERTY_SET){
             return;
@@ -68,7 +68,7 @@ public class VZGMailAgreementEventHandler extends MCREventHandlerBase {
         int oldAgreementsSize = 0;
         if (MCRMetadataManager.exists(obj.getId())) {
             final MCRObject retrieve = MCRMetadataManager.retrieveMCRObject(obj.getId());
-            final ArrayList<String> oldAgreements = retrieve.getService().getFlags("agreement");
+            final List<String> oldAgreements = retrieve.getService().getFlags("agreement");
             oldAgreementsSize = oldAgreements.size();
         }
 
