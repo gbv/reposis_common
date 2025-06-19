@@ -113,7 +113,7 @@ public class MCRScopusMetricsProvider extends MCRMetricsProvider {
                         LOGGER.error("Error while updating scopus metrics!", e);
                     }
                 } else if (response == 401 || response == 403) {
-                    LOGGER.error("Acces denied to the Scopus API - didn't add Scopus Metrics");
+                    LOGGER.error("Access denied to the Scopus API - didn't add Scopus Metrics");
                 } else {
                     LOGGER.info("Unknown '{}' Response from ScopusAPI - didn't add Scopus Metrics", resp.statusCode());
                 }

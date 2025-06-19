@@ -3,6 +3,7 @@ package de.gbv.reposis.user.shibboleth;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -121,9 +122,8 @@ public class MCRSAMLEntitiesRealmFileUpdater extends MCRCronjob {
 
     @MCRProperty(name = "Url", required = true)
     public void setUrl(String url) throws MalformedURLException {
-        setUrl(new URL(url));
+        setUrl(URI.create(url).toURL());
     }
-
     public boolean isPreserveRealmsWithUsers() {
         return preserveRealmsWithUsers;
     }
@@ -215,7 +215,7 @@ public class MCRSAMLEntitiesRealmFileUpdater extends MCRCronjob {
 
     public Map<String, RealmInfo> getRemoteRealms() throws IOException, JDOMException {
         Document document = downloadIDPList();
-        HashMap<String, RealmInfo> realms = new HashMap();
+        HashMap<String, RealmInfo> realms = new HashMap<>();
 
         List<Element> entities = ENTITY_DESCRIPTOR_XPATH.evaluate(document);
 
@@ -288,7 +288,7 @@ public class MCRSAMLEntitiesRealmFileUpdater extends MCRCronjob {
 
     public static class RealmInfo {
         private String id;
-        private Map<String, String> labels = new HashMap();
+        private Map<String, String> labels = new HashMap<>();
         private String passwordChangeURL;
         private String loginURL;
         private String createURL;
