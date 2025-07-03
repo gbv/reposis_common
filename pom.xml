@@ -104,7 +104,6 @@
       <url>https://central.sonatype.com/repository/maven-snapshots/</url>
     </repository>
   </repositories>
-
   <dependencies>
     <dependency>
       <groupId>com.github.jsonld-java</groupId>
@@ -118,13 +117,17 @@
     </dependency>
     <!-- enable theese if you write code using them
     <dependency>
-        <groupId>org.mycore</groupId>
-        <artifactId>mycore-pi</artifactId>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-pi</artifactId>
     </dependency>
     -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.servlet</groupId>
@@ -167,11 +170,6 @@
       <artifactId>mycore-user2</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.rdf4j</groupId>
       <artifactId>rdf4j-rio-api</artifactId>
       <scope>provided</scope>
@@ -185,6 +183,11 @@
       <groupId>org.eclipse.rdf4j</groupId>
       <artifactId>rdf4j-rio-rdfxml</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
