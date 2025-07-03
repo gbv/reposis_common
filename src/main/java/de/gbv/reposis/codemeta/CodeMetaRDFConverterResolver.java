@@ -1,7 +1,7 @@
 package de.gbv.reposis.codemeta;
 
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -34,14 +34,13 @@ public class CodeMetaRDFConverterResolver implements URIResolver {
     private static final String CODEMETA_JSONLD_URL = "https://doi.org/10.5063/schema/codemeta-2.0";
 
     /**
-     * Converts CodeMeta jsonld to rdf
-     *
+     * Converts CodeMeta JSON-LD to RDF.
+     * <p>
      * Syntax: <code>codemeta2rdf:{baseURI}:{json}</code>
-     * 
-     * @param href URI in the syntax above
+     *
+     * @param href the URI in the syntax above
      * @param base not used
-     * 
-     * @return document contains the converted rdf
+     * @return a document containing the converted RDF
      * @see javax.xml.transform.URIResolver
      */
     @Override
@@ -51,7 +50,7 @@ public class CodeMetaRDFConverterResolver implements URIResolver {
             final String baseURI = hrefParts[1];
             final String json = hrefParts[2];
             try (final InputStream input = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
-                    final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 final String codemetaJsonld = IOUtils.resourceToString(CODEMETA_JSONLD_PATH, StandardCharsets.UTF_8);
                 final DocumentLoader docLoader = new DocumentLoader();
                 docLoader.addInjectedDoc(CODEMETA_JSONLD_URL, codemetaJsonld);
