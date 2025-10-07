@@ -18,5 +18,18 @@
       "type": "location_common",
       "multiValued": true
     }
+  },
+  {
+    "add-field": {
+      "name": "common.mods.coordinates.str",
+      "type": "string",
+      "multiValued": true
+    }
+  },
+  {
+    "add-copy-field": {
+      "source": "common.mods.coordinates",
+      "dest": "common.mods.coordinates.str"
+    }
   }
 ]
