@@ -17,17 +17,17 @@ public class MCRShibbolethUserActionFactory {
     public static final String MCR_USER_NEW_USER_HANDLER_CLASS = "MCR.User.Shibboleth.NewUserHandler";
 
     public static MCRShibbolethUserMapper getUserMapper() {
-        return MCRConfiguration2.<MCRShibbolethUserMapper>getSingleInstanceOf(MCR_USER_MAPPER_CLASS)
+        return MCRConfiguration2.getSingleInstanceOf(MCRShibbolethUserMapper.class, MCR_USER_MAPPER_CLASS)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(MCR_USER_MAPPER_CLASS));
     }
 
     public static MCRShibbolethUserMerger getUserMerger() {
-        return MCRConfiguration2.<MCRShibbolethUserMerger>getSingleInstanceOf(MCR_USER_MERGER_CLASS)
+        return MCRConfiguration2.getSingleInstanceOf(MCRShibbolethUserMerger.class, MCR_USER_MERGER_CLASS)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(MCR_USER_MERGER_CLASS));
     }
 
     public static MCRShibbolethNewUserHandler getNewUserHandler() {
-        return MCRConfiguration2.<MCRShibbolethNewUserHandler>getSingleInstanceOf(MCR_USER_NEW_USER_HANDLER_CLASS)
+        return MCRConfiguration2.getSingleInstanceOf(MCRShibbolethNewUserHandler.class, MCR_USER_NEW_USER_HANDLER_CLASS)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(MCR_USER_NEW_USER_HANDLER_CLASS));
     }
 }
