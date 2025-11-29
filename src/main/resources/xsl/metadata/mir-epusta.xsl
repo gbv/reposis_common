@@ -152,10 +152,10 @@
                 </div>
               </div>
             </div>
-            <script type="module" src="{$WebApplicationBaseURL}assets/epusta_elements.js/epusta_elements.js" ></script>
+            <script type="module" src="{$WebApplicationBaseURL}assets/epusta_elements.js/epusta-elements.js" ></script>
             <script type="module" src="{$WebApplicationBaseURL}assets/chart.js/chart.umd.js" ></script>
             <script type="module">
-              import {ePuStaGraph} from "<xsl:value-of select="$WebApplicationBaseURL"/>assets/epusta_elements.js/epusta_elements.js";
+              import {ePuStaGraph} from "<xsl:value-of select="$WebApplicationBaseURL"/>assets/epusta_elements.js/epusta-elements.js";
               
               var graph = document.getElementById('epustaGraph');
               var graphSelect = document.getElementById('epustaGraphSelect');
