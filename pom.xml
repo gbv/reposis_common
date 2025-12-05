@@ -82,16 +82,6 @@
             <phase>generate-sources</phase>
           </execution>
           <execution>
-            <id>yarn-install-for-clean</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>pre-clean</phase>
-            <configuration>
-              <arguments>install</arguments>
-            </configuration>
-          </execution>
-          <execution>
             <id>yarn-install</id>
             <goals>
               <goal>yarn</goal>
@@ -99,6 +89,7 @@
             <phase>generate-sources</phase>
             <configuration>
               <arguments>install</arguments>
+              <workingDirectory>src/main/js/epusta/</workingDirectory>
             </configuration>
           </execution>
           <execution>
@@ -109,16 +100,7 @@
             <phase>compile</phase>
             <configuration>
               <arguments>build</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>yarn-clean</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <phase>clean</phase>
-            <configuration>
-              <arguments>clean</arguments>
+              <workingDirectory>src/main/js/epusta/</workingDirectory>
             </configuration>
           </execution>
         </executions>
