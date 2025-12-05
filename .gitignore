@@ -170,10 +170,6 @@ cmo-module/node/
 cmo-webapp/src/main/webapp/fileupload.xml
 
 #yarn files
-node_modules
-yarn-error.log
-yarn.lock
-
-#assets chart.js and epusta_elements.js
-src/main/resources/META-INF/resources/assets/epusta_elements.js/
-src/main/resources/META-INF/resources/assets/chart.js/
+src/main/js/epusta/node_modules
+src/main/js/epusta/yarn-error.log
+src/main/js/epusta/yarn.lock
