@@ -49,7 +49,7 @@
             <goals>
               <goal>install-node-and-yarn</goal>
             </goals>
-            <phase>generate-resources</phase>
+            <phase>initialize</phase>
           </execution>
           <execution>
             <id>yarn-install-geo-search</id>
