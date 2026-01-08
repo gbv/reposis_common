@@ -289,7 +289,7 @@ By default, the resource is disabled but can be activated and configured as foll
 # Activates the resource
 MCR.Jersey.Resource.Packages=%MCR.Jersey.Resource.Packages%,de.gbv.reposis.sitelinks.resources
 # Basic query for Solr
-SitelinksResource.BasicFilterQuery=worldReadable:true AND ((objectType:mods AND -state:*) OR (objectType:mods AND state:published))
+Sitelinks.Resource.BasicFilterQuery=worldReadable:true AND ((objectType:mods AND -state:*) OR (objectType:mods AND state:published))
 # Pagination / page size of the sitelinks
 Sitelinks.PageSize=100
 ```
