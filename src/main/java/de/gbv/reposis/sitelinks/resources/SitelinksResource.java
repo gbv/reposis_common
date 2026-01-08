@@ -55,7 +55,7 @@ public class SitelinksResource {
     private static final String PATH_PARAM_PAGE = "page";
 
     private static final String BASIC_FILTER_QUERY =
-        MCRConfiguration2.getStringOrThrow("SitelinksResource.BasicFilterQuery");
+        MCRConfiguration2.getStringOrThrow("Sitelinks.Resource.BasicFilterQuery");
 
     private static final int PAGE_SIZE =
         MCRConfiguration2.getString("Sitelinks.PageSize").map(Integer::valueOf).orElseThrow(
