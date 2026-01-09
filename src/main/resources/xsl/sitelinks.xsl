@@ -27,6 +27,10 @@
       <h1>
         <xsl:value-of select="$headline" />
       </h1>
+      <p>
+        This page is intended for crawlers and bots.
+        Content is grouped by year and ordered by <em>Date/Year Issued</em> (newest first).
+      </p>
       <nav>
         <xsl:for-each select="year">
           <a href="{concat($baseUrl, text(), '/')}"
