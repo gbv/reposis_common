@@ -77,13 +77,13 @@
         <xsl:if test="@number > 1">
           <a href="{concat($baseUrl, @year, '/page/', @number - 1)}"
             aria-label="Previous page">
-            <xsl:value-of select="'« Previous'" />
+            <xsl:value-of select="'« Previous Page'" />
           </a>
         </xsl:if>
         <xsl:if test="@number &lt; $maxPageNumber">
           <a href="{concat($baseUrl, @year, '/page/', @number + 1)}"
             aria-label="Next page">
-            <xsl:value-of select="'Next »'" />
+            <xsl:value-of select="'Next Page »'" />
           </a>
         </xsl:if>
       </nav>
