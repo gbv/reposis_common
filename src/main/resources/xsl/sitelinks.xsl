@@ -15,7 +15,7 @@
   </xsl:template>
 
   <xsl:template match="years">
-    <xsl:variable name="headline">Sitelinks Index</xsl:variable>
+    <xsl:variable name="headline">Sitelinks Index for Crawlers</xsl:variable>
     <head>
       <xsl:call-template name="meta" />
       <title>
