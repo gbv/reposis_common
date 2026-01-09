@@ -51,7 +51,6 @@ public class SitelinksResource {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String PATH_PARAM_YEAR = "year";
-    private static final String PATH_PARAM_MONTH = "month";
     private static final String PATH_PARAM_PAGE = "page";
 
     private static final String BASIC_FILTER_QUERY =
@@ -100,65 +99,36 @@ public class SitelinksResource {
     }
 
     /**
-     * Returns a list of months for the given year (descending order).
+     * Returns a list of publications for a specific year (descending order).
+     * The default page (page 1) will be shown.
      *
-     * @param year The year for which to list the months
-     * @return An HTML response containing a list of months for the specified year
+     * @param year The year for which to list the publications
+     * @return An HTML response containing a list of publications for the specified month and year
      */
     @GET
     @Path("/{" + PATH_PARAM_YEAR + "}")
     @Produces(MediaType.TEXT_HTML)
-    public Response listMonthsForYear(@PathParam(PATH_PARAM_YEAR) int year) {
-        return generateResponse(() -> buildMonthsElement(year));
+    public Response listPublicationsForMonthPage(@PathParam(PATH_PARAM_YEAR) int year) {
+        return listPublicationsForMonthPage(year, 1);
     }
 
     /**
-     * Returns a list of publications for a specific month of the given year (descending order).
-     * The default page (page 1) will be shown.
+     * Returns a list of publications for a specific year for the given page (descending order).
      *
      * @param year The year for which to list the publications
-     * @param monthStr The month as a string for which to list the publications
-     * @return An HTML response containing a list of publications for the specified month and year
-     */
-    @GET
-    @Path("/{" + PATH_PARAM_YEAR + "}/{" + PATH_PARAM_MONTH + "}")
-    @Produces(MediaType.TEXT_HTML)
-    public Response listPublicationsForMonthPage(@PathParam(PATH_PARAM_YEAR) int year,
-        @PathParam(PATH_PARAM_MONTH) String monthStr) {
-        return listPublicationsForMonthPage(year, monthStr, 1);
-    }
-
-    /**
-     * Returns a list of publications for a specific month and year for the given page (descending order).
-     *
-     * @param year The year for which to list the publications
-     * @param monthStr The month as a string for which to list the publications
      * @param page The page number of the publications
      * @return An HTML response containing a list of publications for the specified page
      * @throws WebApplicationException if the page number is less than 1
      */
     @GET
-    @Path("/{" + PATH_PARAM_YEAR + "}/{" + PATH_PARAM_MONTH + "}/page/{" + PATH_PARAM_PAGE + "}")
+    @Path("/{" + PATH_PARAM_YEAR + "}/page/{" + PATH_PARAM_PAGE + "}")
     @Produces(MediaType.TEXT_HTML)
     public Response listPublicationsForMonthPage(@PathParam(PATH_PARAM_YEAR) int year,
-        @PathParam(PATH_PARAM_MONTH) String monthStr, @PathParam(PATH_PARAM_PAGE) int page) {
+        @PathParam(PATH_PARAM_PAGE) int page) {
         if (page < 1) {
             throw new WebApplicationException("Page number must be >= 1", Response.Status.BAD_REQUEST);
         }
-        final int month = parseMonth(monthStr);
-        return generateResponse(() -> buildPageElement(year, month, page));
-    }
-
-    private int parseMonth(String monthStr) {
-        try {
-            final int month = Integer.parseInt(monthStr);
-            if (month < 1 || month > 12) {
-                throw new IllegalArgumentException();
-            }
-            return month;
-        } catch (IllegalArgumentException e) {
-            throw new WebApplicationException("Month must be between 01 and 12", Response.Status.BAD_REQUEST);
-        }
+        return generateResponse(() -> buildPageElement(year, page));
     }
 
     private Response generateResponse(ElementBuilder elementBuilder) {
@@ -181,24 +151,14 @@ public class SitelinksResource {
         return yearsElement;
     }
 
-    private Element buildMonthsElement(int year) {
-        final Element monthsElement = new Element("months");
-        monthsElement.setAttribute("year", String.valueOf(year));
-        for (int month : objectMetadataService.getMonthsWithObjects(year)) {
-            monthsElement.addContent(createElement("month", String.valueOf(month)));
-        }
-        return monthsElement;
-    }
-
-    private Element buildPageElement(int year, int month, int page) {
+    private Element buildPageElement(int year, int page) {
         final int offset = (page - 1) * pageSize;
         final ObjectMetadataService.ObjectIdsWithCount objectIdsWithCount =
-            objectMetadataService.getObjectIdsByDate(year, month, offset, pageSize);
+            objectMetadataService.getObjectIdsByDate(year, offset, pageSize);
 
         final Element pageElement = new Element("page");
         pageElement.setAttribute("number", String.valueOf(page));
         pageElement.setAttribute("totalCount", String.valueOf(objectIdsWithCount.totalCount()));
-        pageElement.setAttribute("month", String.valueOf(month));
         pageElement.setAttribute("year", String.valueOf(year));
 
         final Element objectIdsElement = new Element("objectIds");
