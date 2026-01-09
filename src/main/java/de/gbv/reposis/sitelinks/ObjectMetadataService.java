@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -36,6 +35,15 @@ import org.mycore.solr.MCRSolrClientFactory;
 /**
  * Service for retrieving object-related metadata from Solr.
  * Provides methods to fetch years, months, and object IDs for which objects have been issued.
+ * <p>
+ * This service assumes that the Solr documents contain the following fields for grouping and sorting:
+ * <ul>
+ *   <li>{@code yearIssued} the year the object was issued, used for faceting and filtering by year</li>
+ *   <li>{@code dateIssued} the full issued date in {@code yyyy-MM-dd} format (or just {@code yyyy}), used for
+ *       sorting</li>
+ *   <li>{@code created} the creation timestamp of the object, used as a fallback for sorting when {@code
+ *       dateIssued} contains only a year</li>
+ * </ul>
  */
 public class ObjectMetadataService {
 
@@ -44,6 +52,8 @@ public class ObjectMetadataService {
     private static final String FIELD_YEAR_ISSUED = "mods.yearIssued";
 
     private static final String FIELD_DATE_ISSUED = "mods.dateIssued";
+
+    private static final String FIELD_CREATED = "created";
 
     private static final String DEFAULT_SOLR_QUERY = "*:*";
 
@@ -56,7 +66,7 @@ public class ObjectMetadataService {
      *
      *@param basicFilterQuery a Solr filter query applied to all queries
      */
-    public ObjectMetadataService (String basicFilterQuery) {
+    public ObjectMetadataService(String basicFilterQuery) {
         this(MCRSolrClientFactory.getMainSolrClient(), basicFilterQuery);
     }
 
@@ -96,21 +106,38 @@ public class ObjectMetadataService {
     }
 
     /**
-     * Retrieves object IDs for objects issued in a specific year, with support for pagination.
+     * Retrieves object IDs for objects issued in a specific year, with support for pagination,
+     * and sorts the results primarily by the issued date and secondarily by the creation timestamp.
+     * <p>
+     * The returned {@link ObjectIdsWithCount} contains:
+     * <ul>
+     *   <li>a list of object IDs matching the given year, and</li>
+     *   <li>the total number of matching objects in the index.</li>
+     * </ul>
+     * <p>
+     * <b>Sorting behavior:</b>
+     * <ol>
+     *   <li>Objects are sorted in descending order primarily by {@code dateIssued} ({@link #FIELD_DATE_ISSUED}).</li>
+     *   <li>If multiple objects have the same {@code dateIssued} value, they are secondarily sorted
+     *       in descending order by the {@code created} timestamp ({@link #FIELD_CREATED}) as a tie-breaker.</li>
+     *   <li>If {@code dateIssued} is missing for an object, it is effectively sorted according to {@code created}.</li>
+     * </ol>
      *
-     * @param year the year of the issued objects (e.g., 2021)
-     * @param offset the offset from where to start fetching results (for pagination)
-     * @param limit the maximum number of results to fetch (for pagination)
-     * @return an {@link ObjectIdsWithCount} object containing a list of object IDs and total count
+     * @param year   the year of the issued objects (e.g., 2021)
+     * @param offset the offset from which to start fetching results (for pagination)
+     * @param limit  the maximum number of results to fetch (for pagination)
+     * @return an {@link ObjectIdsWithCount} object containing a list of object IDs and the total count
      * @throws MCRException if a Solr query or I/O error occurs, or if the query execution fails
      */
     public ObjectIdsWithCount getObjectIdsByDate(int year, int offset, int limit) {
         final SolrQuery query = new SolrQuery(DEFAULT_SOLR_QUERY);
         query.addFilterQuery(basicFilterQuery);
-        query.addFilterQuery(String.format(Locale.ROOT, FIELD_DATE_ISSUED + ":%s-*", year));
+        query.addFilterQuery(String.format(Locale.ROOT, FIELD_DATE_ISSUED + ":%s*", year));
         query.setFields(FIELD_ID);
         query.setStart(offset);
         query.setRows(limit);
+        query.addSort(FIELD_DATE_ISSUED, SolrQuery.ORDER.desc);
+        query.addSort(FIELD_CREATED, SolrQuery.ORDER.desc);
         try {
             final QueryResponse response = solrClient.query(query);
             long totalCount = response.getResults().getNumFound();
@@ -128,5 +155,6 @@ public class ObjectMetadataService {
      * @param objectIds the list of object IDs that were issued in the specified year and month
      * @param totalCount the total number of objects that match the query criteria (not limited by pagination)
      */
-    public record ObjectIdsWithCount(List<String> objectIds, long totalCount) {}
+    public record ObjectIdsWithCount(List<String> objectIds, long totalCount) {
+    }
 }
