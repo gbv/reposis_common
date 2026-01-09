@@ -95,46 +95,19 @@ public class ObjectMetadataService {
         }
     }
 
-    // TODO easy cachable
     /**
-     * Retrieves all months for which objects exist in a given year.
-     *
-     * @param year the year for which months should be retrieved
-     * @return a descending sorted list of months (1-12) that have objects issued in the given year
-     * @throws MCRException if a Solr query or I/O error occurs
-     */
-    public List<Integer> getMonthsWithObjects(int year) {
-        final SolrQuery query = new SolrQuery(DEFAULT_SOLR_QUERY);
-        query.setRows(0);
-        query.addFilterQuery(basicFilterQuery);
-        query.setFacet(true);
-        query.addFacetField(FIELD_DATE_ISSUED);
-        query.setFacetPrefix(String.format(Locale.ROOT, "%s-", year));
-        query.setFacetSort(FacetParams.FACET_SORT_INDEX);
-        query.setFacetLimit(-1);
-        try {
-            return solrClient.query(query).getFacetField(FIELD_DATE_ISSUED).getValues()
-                .stream().map(FacetField.Count::getName).map(name -> Integer.parseInt(name.substring(5, 7))).distinct()
-                .sorted(Comparator.reverseOrder()).collect(Collectors.toList());
-        } catch (SolrServerException | IOException e) {
-            throw new MCRException(e);
-        }
-    }
-
-    /**
-     * Retrieves object IDs for objects issued in a specific year and month, with support for pagination.
+     * Retrieves object IDs for objects issued in a specific year, with support for pagination.
      *
      * @param year the year of the issued objects (e.g., 2021)
-     * @param month the month of the issued objects (1-12)
      * @param offset the offset from where to start fetching results (for pagination)
      * @param limit the maximum number of results to fetch (for pagination)
      * @return an {@link ObjectIdsWithCount} object containing a list of object IDs and total count
      * @throws MCRException if a Solr query or I/O error occurs, or if the query execution fails
      */
-    public ObjectIdsWithCount getObjectIdsByDate(int year, int month, int offset, int limit) {
+    public ObjectIdsWithCount getObjectIdsByDate(int year, int offset, int limit) {
         final SolrQuery query = new SolrQuery(DEFAULT_SOLR_QUERY);
         query.addFilterQuery(basicFilterQuery);
-        query.addFilterQuery(String.format(Locale.ROOT, FIELD_DATE_ISSUED + ":%s-%02d*", year, month));
+        query.addFilterQuery(String.format(Locale.ROOT, FIELD_DATE_ISSUED + ":%s-*", year));
         query.setFields(FIELD_ID);
         query.setStart(offset);
         query.setRows(limit);

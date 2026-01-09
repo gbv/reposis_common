@@ -3,10 +3,9 @@
 
   <xsl:output method="html" encoding="UTF-8" indent="yes" />
 
-  <xsl:include href="resource:xsl/sitelinks/sitelinks-utils.xsl" />
-
   <xsl:param name="WebApplicationBaseURL" />
   <xsl:param name="baseUrl" select="concat($WebApplicationBaseURL, 'rsc/sitelinks/')" />
+  <xsl:param name="Sitelinks.PageSize" />
 
   <xsl:template match="/">
     <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html&gt;</xsl:text>
@@ -39,50 +38,10 @@
     </body>
   </xsl:template>
 
-  <xsl:template match="months">
-    <xsl:variable name="year" select="@year" />
-    <xsl:variable name="headline">
-      <xsl:value-of select="concat('Sitelinks Index ', @year)" />
-    </xsl:variable>
-    <head>
-      <xsl:call-template name="meta" />
-      <title>
-        <xsl:value-of select="$headline" />
-      </title>
-      <link rel="canonical" href="{concat($baseUrl, $year, '/')}" />
-      <xsl:call-template name="style" />
-    </head>
-    <body>
-      <h1>
-        <xsl:value-of select="$headline" />
-      </h1>
-      <nav>
-        <a href="{$baseUrl}" aria-label="All sitelinks">All Years</a>
-        <xsl:for-each select="month">
-          <xsl:variable name="monthName">
-            <xsl:call-template name="month-name">
-              <xsl:with-param name="month-number" select="text()" />
-            </xsl:call-template>
-          </xsl:variable>
-          <a href="{concat($baseUrl, $year, '/', text())}"
-            aria-label="{concat('Sitelinks for ', $monthName, ' ', $year)}">
-            <xsl:value-of select="$monthName" />
-          </a>
-        </xsl:for-each>
-      </nav>
-    </body>
-  </xsl:template>
-
   <xsl:template match="page">
     <xsl:variable name="year" select="@year" />
-    <xsl:variable name="month" select="@month" />
-    <xsl:variable name="monthName">
-      <xsl:call-template name="month-name">
-        <xsl:with-param name="month-number" select="$month" />
-      </xsl:call-template>
-    </xsl:variable>
     <xsl:variable name="headline">
-      <xsl:value-of select="concat('Sitelinks ', $monthName, ' ', $year, ' - Page ', @number)" />
+      <xsl:value-of select="concat('Sitelinks ', $year, ' - Page ', @number)" />
     </xsl:variable>
     <xsl:variable name="maxPageNumber">
       <xsl:call-template name="max-page-number">
@@ -94,14 +53,14 @@
       <title>
         <xsl:value-of select="$headline" />
       </title>
-      <link rel="canonical" href="{concat($baseUrl, @year, '/', @month, '/')}" />
+      <link rel="canonical" href="{concat($baseUrl, @year, '/')}" />
       <xsl:if test="@number > 1">
         <link rel="prev"
-          href="{concat($baseUrl, @year, '/', @month, '/page/', @number - 1, '/')}" />
+          href="{concat($baseUrl, @year, '/page/', @number - 1, '/')}" />
       </xsl:if>
       <xsl:if test="@number &lt; $maxPageNumber">
         <link rel="next"
-          href="{concat($baseUrl, @year, '/', @month, '/page/', @number + 1, '/')}" />
+          href="{concat($baseUrl, @year, '/page/', @number + 1, '/')}" />
       </xsl:if>
       <xsl:call-template name="style" />
     </head>
@@ -111,18 +70,14 @@
       </h1>
       <nav>
         <a href="{$baseUrl}" aria-label="All sitelinks">All Years</a>
-        <a href="{concat($baseUrl, @year)}"
-          aria-label="{concat('Sitelinks for the year ', @year)}">
-          <xsl:value-of select="@year" />
-        </a>
         <xsl:if test="@number > 1">
-          <a href="{concat($baseUrl, @year, '/', @month, '/page/', @number - 1)}"
+          <a href="{concat($baseUrl, @year, '/page/', @number - 1)}"
             aria-label="Previous page">
             <xsl:value-of select="'« Previous'" />
           </a>
         </xsl:if>
         <xsl:if test="@number &lt; $maxPageNumber">
-          <a href="{concat($baseUrl, @year, '/', @month, '/page/', @number + 1)}"
+          <a href="{concat($baseUrl, @year, '/page/', @number + 1)}"
             aria-label="Next page">
             <xsl:value-of select="'Next »'" />
           </a>
@@ -165,9 +120,21 @@
       li { margin: 0.5em 0; }
       footer { margin-top: 2em; font-size: 0.9em; text-align: center; color: #777; }
       @media (max-width: 768px) {
-        body { font-size: 14px; }
+      body { font-size: 14px; }
       }
     </style>
+  </xsl:template>
+
+  <xsl:template name="max-page-number">
+    <xsl:param name="totalCount" />
+    <xsl:choose>
+      <xsl:when test="($totalCount mod $Sitelinks.PageSize) = 0">
+        <xsl:value-of select="floor($totalCount div $Sitelinks.PageSize)" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="floor($totalCount div $Sitelinks.PageSize) + 1" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
 </xsl:stylesheet>
