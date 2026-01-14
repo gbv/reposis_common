@@ -281,6 +281,19 @@ There are Message Properties which can be set in the message.properties file:
 | project.form.agreement             | The text which will be displayed as a legend for the agreement in the editor            | Einverständniserklärung                           |
 | project.form.validation.agreement  | The text which will be displayed as a validation error if the agreement is not accepted | Sie müssen der Einverständniserklärung zustimmen. |
 
+## Sitelinks
+The Sitelinks resource provides sitelinks based on Solr and is optimized for **Google Scholar**.
+It allows for hierarchical navigation through sitelinks, organized by publication year and month, using path parameters.
+By default, the resource is disabled but can be activated and configured as follows.
+```
+# Activates the resource
+MCR.Jersey.Resource.Packages=%MCR.Jersey.Resource.Packages%,de.gbv.reposis.sitelinks.resources
+# Basic query for Solr
+Sitelinks.Resource.BasicFilterQuery=worldReadable:true AND ((objectType:mods AND -state:*) OR (objectType:mods AND state:published))
+# Pagination / page size of the sitelinks
+Sitelinks.PageSize=100
+```
+The entry page is located at `/rsc/sitelinks/` and may need to be allowed in the `robots.txt` file.
 
 ## Development
 
