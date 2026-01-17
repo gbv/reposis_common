@@ -1,4 +1,3 @@
-
 # reposis-common - LTS2022.06.x
 
 This is a collection of common code used by the reposis projects.
