@@ -1,0 +1,22 @@
+{
+  "name": "reposis_common",
+  "version": "0.0.1",
+  "repository": "https://github.com/gbv/reposis_common.git",
+  "license": "GPL-3.0-or-later",
+  "private": false,
+  "scripts": {
+    "copy-chartjs": "copyfiles -u 3 ./node_modules/chart.js/dist/chart.js ../../../../target/classes/META-INF/resources/assets/chart.js",
+    "copy-chartjs2": "copyfiles -u 3 ./node_modules/chart.js/dist/chart.umd.js ../../../../target/classes/META-INF/resources/assets/chart.js",
+    "copy-epustaelements": "copyfiles -u 2 ./node_modules/epusta_elements.js/epusta-elements.js ../../../../target/classes/META-INF/resources/assets/epusta_elements.js",
+    "copy-all": "yarpm run copy-chartjs && yarpm run copy-chartjs2 && yarpm run copy-epustaelements",
+    "build": "yarpm run copy-all"
+  },
+  "dependencies": {
+
+    "epusta_elements.js": "1.0.2"
+  },
+  "devDependencies": {
+    "yarpm": "^1.2.0",
+    "copyfiles": "^2.4.1"
+  }
+}
