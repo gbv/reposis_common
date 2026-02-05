@@ -257,7 +257,7 @@ public class MCRMODSJournalMetricsHelper {
         Map<String, List<String>> metadata = new HashMap<>();
         metadata.put("issn", issnList);
         Map<String, Callable<MCRMetricsProvider>> metricsProviders
-            = MCRConfiguration2.getInstances(METRICS_PROVIDER_PROPERTY_PREFIX);
+            = MCRConfiguration2.getInstances(MCRMetricsProvider.class, METRICS_PROVIDER_PROPERTY_PREFIX);
 
         List<MCRJournalMetrics> newMetrics = metricsProviders.entrySet().stream().map(entry -> {
             String metadataAsString = getMetadataAsString(metadata);

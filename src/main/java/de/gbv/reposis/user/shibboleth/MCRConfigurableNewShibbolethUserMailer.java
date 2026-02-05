@@ -34,7 +34,7 @@ public class MCRConfigurableNewShibbolethUserMailer implements MCRShibbolethNewU
     @Override
     public void handleNewUser(MCRUser user) {
         String userID = user.getUserName();
-        String mailAddress = user.getEMailAddress();
+        String mailAddress = user.getEMail();
         String realmLabel = getRealmLabel(user.getRealm());
         String realName = user.getRealName();
 

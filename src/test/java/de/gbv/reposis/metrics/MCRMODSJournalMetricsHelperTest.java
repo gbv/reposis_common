@@ -6,10 +6,15 @@ import org.jdom2.JDOMException;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.xpath.XPathFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRClassTools;
-import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfiguration2;
+import org.mycore.crypt.MCRAESCipher;
 import org.mycore.crypt.MCRCryptKeyNoPermissionException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.mods.MCRMODSWrapper;
@@ -21,8 +26,23 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 import java.util.Objects;
+import org.mycore.test.MyCoReTest;
 
-public class MCRMODSJournalMetricsHelperTest extends MCRTestCase {
+/**
+ *         properties.put("MCR.Crypt.Cipher.jcr_intern.class", "org.mycore.crypt.MCRAESCipher");
+ *         properties.put("MCR.Crypt.Cipher.jcr_intern.KeyFile", storeSecret());
+ *         properties.put("MCR.Crypt.Cipher.jcr_intern.EnableACL", "false");
+ */
+@MyCoReTest
+@MCRTestConfiguration(
+    properties = {
+        @MCRTestProperty(key = "MCR.Metadata.Type.object", string = "true"),
+        @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true"),
+        @MCRTestProperty(key = "MCR.Crypt.Cipher.jcr_intern.class", classNameOf = MCRAESCipher.class),
+        @MCRTestProperty(key = "MCR.Crypt.Cipher.jcr_intern.EnableACL", string = "false"),
+    }
+)
+public class MCRMODSJournalMetricsHelperTest {
 
     private static final Double TEST_SNIP_VALUE_2019 = 0.213;
     private static final Double TEST_SNIP_VALUE_2018 = 1.205;
@@ -43,6 +63,21 @@ public class MCRMODSJournalMetricsHelperTest extends MCRTestCase {
 
     private static final String TEST_ENCRYPTED_JCR_VALUE_2018 = "O4VvdIpRkmn6wPSC4ckGCA==";
 
+    private String keyFile;
+
+    @BeforeEach
+    public void setup() {
+        keyFile = storeSecret();
+        MCRConfiguration2.set("MCR.Crypt.Cipher.jcr_intern.KeyFile", keyFile);
+    }
+
+    @AfterEach
+    public void teardown() throws IOException {
+        if (keyFile != null) {
+            Files.deleteIfExists(Path.of(keyFile));
+        }
+    }
+
     @Test
     public void getMetrics() throws IOException, JDOMException, MCRCryptKeyNoPermissionException {
         try (InputStream is = MCRClassTools.getClassLoader().getResourceAsStream("metrics-test-document.xml")) {
@@ -51,23 +86,23 @@ public class MCRMODSJournalMetricsHelperTest extends MCRTestCase {
             MCRMODSWrapper wrapper = new MCRMODSWrapper(mcrObject);
             MCRJournalMetrics metrics = MCRMODSJournalMetricsHelper.getMetrics(wrapper);
 
-            Assert.assertNotNull(metrics);
+            Assertions.assertNotNull(metrics);
 
             Map<Integer, Double> snip = metrics.getSnip();
-            Assert.assertEquals(TEST_SNIP_VALUE_2018, snip.get(2018));
-            Assert.assertEquals(TEST_SNIP_VALUE_2017, snip.get(2017));
-            Assert.assertEquals(TEST_SNIP_VALUE_2016, snip.get(2016));
+            Assertions.assertEquals(TEST_SNIP_VALUE_2018, snip.get(2018));
+            Assertions.assertEquals(TEST_SNIP_VALUE_2017, snip.get(2017));
+            Assertions.assertEquals(TEST_SNIP_VALUE_2016, snip.get(2016));
 
             Map<Integer, Double> sjr = metrics.getSJR();
-            Assert.assertEquals(TEST_SJR_VALUE_2018, sjr.get(2018));
-            Assert.assertEquals(TEST_SJR_VALUE_2017, sjr.get(2017));
-            Assert.assertEquals(TEST_SJR_VALUE_2016, sjr.get(2016));
+            Assertions.assertEquals(TEST_SJR_VALUE_2018, sjr.get(2018));
+            Assertions.assertEquals(TEST_SJR_VALUE_2017, sjr.get(2017));
+            Assertions.assertEquals(TEST_SJR_VALUE_2016, sjr.get(2016));
 
             Map<Integer, Double> jcr = metrics.getJCR();
 
-            Assert.assertEquals(TEST_JCR_VALUE_2016, jcr.get(2016));
-            Assert.assertEquals(TEST_JCR_VALUE_2018, jcr.get(2018));
-            Assert.assertEquals(TEST_JCR_VALUE_2017, jcr.get(2017));
+            Assertions.assertEquals(TEST_JCR_VALUE_2016, jcr.get(2016));
+            Assertions.assertEquals(TEST_JCR_VALUE_2018, jcr.get(2018));
+            Assertions.assertEquals(TEST_JCR_VALUE_2017, jcr.get(2017));
         }
     }
 
@@ -86,13 +121,13 @@ public class MCRMODSJournalMetricsHelperTest extends MCRTestCase {
             MCRMODSJournalMetricsHelper.setMetrics(wrapper, metrics);
 
             Element mods = wrapper.getMODS();
-            Assert.assertEquals(TEST_SNIP_VALUE_2018.toString(), getMetricValueWithXpath(mods, "SNIP", 2018));
-            Assert.assertEquals(TEST_SJR_VALUE_2018.toString(), getMetricValueWithXpath(mods, "SJR", 2018));
-            Assert.assertEquals(TEST_ENCRYPTED_JCR_VALUE_2018, getMetricValueWithXpath(mods, "JCR", 2018));
+            Assertions.assertEquals(TEST_SNIP_VALUE_2018.toString(), getMetricValueWithXpath(mods, "SNIP", 2018));
+            Assertions.assertEquals(TEST_SJR_VALUE_2018.toString(), getMetricValueWithXpath(mods, "SJR", 2018));
+            Assertions.assertEquals(TEST_ENCRYPTED_JCR_VALUE_2018, getMetricValueWithXpath(mods, "JCR", 2018));
 
-            Assert.assertEquals(TEST_SNIP_VALUE_2019.toString(), getMetricValueWithXpath(mods, "SNIP", 2019));
-            Assert.assertEquals(TEST_SJR_VALUE_2019.toString(), getMetricValueWithXpath(mods, "SJR", 2019));
-            Assert.assertEquals(TEST_ENCRYPTED_JCR_VALUE_2019, getMetricValueWithXpath(mods, "JCR", 2019));
+            Assertions.assertEquals(TEST_SNIP_VALUE_2019.toString(), getMetricValueWithXpath(mods, "SNIP", 2019));
+            Assertions.assertEquals(TEST_SJR_VALUE_2019.toString(), getMetricValueWithXpath(mods, "SJR", 2019));
+            Assertions.assertEquals(TEST_ENCRYPTED_JCR_VALUE_2019, getMetricValueWithXpath(mods, "JCR", 2019));
         }
     }
 
@@ -102,16 +137,6 @@ public class MCRMODSJournalMetricsHelperTest extends MCRTestCase {
             .evaluateFirst(mods).getValue();
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        Map<String, String> properties = super.getTestProperties();
-
-        properties.put("MCR.Crypt.Cipher.jcr_intern.class", "org.mycore.crypt.MCRAESCipher");
-        properties.put("MCR.Crypt.Cipher.jcr_intern.KeyFile", storeSecret());
-        properties.put("MCR.Crypt.Cipher.jcr_intern.EnableACL", "false");
-
-        return properties;
-    }
 
     private String storeSecret() {
         Path file;

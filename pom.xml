@@ -8,11 +8,11 @@
   <parent>
     <groupId>de.gbv.reposis</groupId>
     <artifactId>reposis_parent</artifactId>
-    <version>2025.06-SNAPSHOT</version>
+    <version>2025.12-SNAPSHOT</version>
   </parent>
 
   <artifactId>reposis_common</artifactId>
-  <version>2025.06-SNAPSHOT</version>
+  <version>2025.12-SNAPSHOT</version>
   <properties>
     <MCR.AppName>reposis-common</MCR.AppName>
     <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
@@ -162,8 +162,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

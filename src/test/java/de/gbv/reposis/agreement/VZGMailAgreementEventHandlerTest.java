@@ -20,15 +20,23 @@ package de.gbv.reposis.agreement;
 
 import org.jdom2.Document;
 import org.jdom2.output.XMLOutputter;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mycore.common.MCRTestCase;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mycore.common.MCRTestConfiguration;
+import org.mycore.common.MCRTestProperty;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-import java.util.Map;
+import org.mycore.test.MyCoReTest;
 
-public class VZGMailAgreementEventHandlerTest extends MCRTestCase {
+@MyCoReTest
+@MCRTestConfiguration(
+    properties = {
+        @MCRTestProperty(key = "MCR.Metadata.Type.object", string = "true"),
+    }
+)
+public class VZGMailAgreementEventHandlerTest {
 
     @Test
     public void getHTMLPart() {
@@ -43,17 +51,9 @@ public class VZGMailAgreementEventHandlerTest extends MCRTestCase {
         final String html = new XMLOutputter().outputString(htmlPart);
         System.out.println(html);
 
-        Assert.assertTrue("Mail should contain the link", html.contains("receive/mir_object_00000001"));
-        Assert.assertTrue("Mail should contain the user", html.contains("guest"));
+        Assertions.assertTrue(html.contains("receive/mir_object_00000001"), "Mail should contain the link");
+        Assertions.assertTrue(html.contains("guest"), "Mail should contain the user");
     }
 
-    @Override
-    protected Map<String, String> getTestProperties() {
-        final Map<String, String> testProperties = super.getTestProperties();
 
-        testProperties.put("MCR.Metadata.Type.object", Boolean.TRUE.toString());
-
-
-        return testProperties;
-    }
 }
