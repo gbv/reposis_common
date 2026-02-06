@@ -156,7 +156,7 @@
             <script type="module" src="{$WebApplicationBaseURL}assets/chart.js/chart.umd.js" ></script>
             <script type="module">
               import {ePuStaGraph} from "<xsl:value-of select="$WebApplicationBaseURL"/>assets/epusta_elements.js/epusta-elements.js";
-              
+
               var graph = document.getElementById('epustaGraph');
               var graphSelect = document.getElementById('epustaGraphSelect');
               var granularity = 'day' ;
@@ -179,7 +179,7 @@
                   tagquery: "-epusta:filter:httpMethod -epusta:filter:httpStatus -filter:30sek:counter3 -filter:robot oas:content:counter_abstract"
                 }
               ];
-              
+
               $('#epustaGraphModal').on('shown.bs.modal', function () {
                 var granularity = document.querySelector('input[name="granularity"]:checked').value;
                 var epustaElement = new ePuStaGraph(graph,epustaProviderurl,identifier,from,until,labelsByTagQuery,granularity)
