@@ -15,7 +15,7 @@
   <version>2024.06-SNAPSHOT</version>
   <properties>
     <MCR.AppName>reposis-common</MCR.AppName>
-    <maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
+    <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
     <node.version>v16.19.1</node.version>
   </properties>
 
