@@ -18,20 +18,9 @@
 
 package de.gbv.reposis.sitelinks;
 
-import java.io.IOException;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.params.FacetParams;
 import org.mycore.common.MCRException;
-import org.mycore.common.config.MCRConfiguration2;
-import org.mycore.solr.MCRSolrClientFactory;
 
 /**
  * Service interface for retrieving object metadata used to generate sitelinks for search engine crawlers.
