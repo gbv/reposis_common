@@ -282,18 +282,25 @@ There are Message Properties which can be set in the message.properties file:
 | project.form.validation.agreement  | The text which will be displayed as a validation error if the agreement is not accepted | Sie müssen der Einverständniserklärung zustimmen. |
 
 ## Sitelinks
-The Sitelinks resource provides sitelinks based on Solr and is optimized for **Google Scholar**.
-It allows for hierarchical navigation through sitelinks, organized by publication year and month, using path parameters.
-By default, the resource is disabled but can be activated and configured as follows.
+
+The Sitelinks servlet provides HTML sitelinks based on Solr and is optimized for **Google Scholar**.
+It allows hierarchical navigation through publications, organized by year, using path parameters.
+By default, the servlet is disabled but can be activated and configured as follows:
+
 ```
-# Activates the resource
-MCR.Jersey.Resource.Packages=%MCR.Jersey.Resource.Packages%,de.gbv.reposis.sitelinks.resources
-# Basic query for Solr
-Sitelinks.Resource.BasicFilterQuery=worldReadable:true AND ((objectType:mods AND -state:*) OR (objectType:mods AND state:published))
-# Pagination / page size of the sitelinks
-Sitelinks.PageSize=100
+# Set to "false" to enable the servlet.
+MCR.Servlet.SitelinksServlet.Disabled=true
+
+# Configure the metadata service and content builder for the Sitelinks servlet.
+SitelinksServlet.MetadataService.Class=de.gbv.reposis.sitelinks.SitelinksSolrMetadataService
+SitelinksServlet.MetadataService.FilterQuery=worldReadable:true AND ((objectType:mods AND -state:*) OR (objectType:mods AND state:published))
+SitelinksServlet.ContentBuilder.Class=de.gbv.reposis.sitelinks.SitelinksContentBuilderImpl
+
+# Number of objects displayed per page in the sitelinks pagination.
+Sitelinks.ObjectsPerPage=100
 ```
-The entry page is located at `/rsc/sitelinks/` and may need to be allowed in the `robots.txt` file.
+
+The entry page is located at `/sitelinks` and may need to be allowed in the `robots.txt` file.
 
 ## Development
 
