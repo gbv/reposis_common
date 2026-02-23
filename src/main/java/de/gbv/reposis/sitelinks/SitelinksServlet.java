@@ -97,7 +97,12 @@ public class SitelinksServlet extends MCRContentServlet {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             // GET /sitelinks -> list years
-            return mapper.map(service.getRootPage());
+            try {
+                return mapper.map(service.getRootPage());
+            } catch (SitelinksMappingException e) {
+                LOGGER.error("Failed to map root page", e);
+                return null;
+            }
         }
         if (pathInfo.endsWith("/")) {
             pathInfo = pathInfo.substring(0, pathInfo.length() - 1);
@@ -137,13 +142,12 @@ public class SitelinksServlet extends MCRContentServlet {
     }
 
     private Optional<MCRContent> getYearPage(int year, int page) {
-        SitelinksYearPageDto resultPage = service.getYearPage(year, page, pageSize);
-        long totalPages = (resultPage.totalCount() + pageSize - 1) / pageSize;
-        if (resultPage.totalCount() == 0 || page > totalPages) {
-            return Optional.empty();
-        }
         try {
+            SitelinksYearPageDto resultPage = service.getYearPage(year, page, pageSize);
             return Optional.of(mapper.map(resultPage));
+        } catch (SitelinksNotFoundException e) {
+            LOGGER.debug("Sitelinks not found: {}", e.getMessage());
+            return Optional.empty();
         } catch (SitelinksMappingException e) {
             LOGGER.error("Mapping failed for year {} page {}", year, page, e);
             return Optional.empty();
