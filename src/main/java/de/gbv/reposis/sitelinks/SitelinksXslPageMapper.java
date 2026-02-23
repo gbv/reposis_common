@@ -21,16 +21,27 @@ package de.gbv.reposis.sitelinks;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Supplier;
+
 import org.jdom2.Element;
+import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.xml.MCRLayoutTransformerFactory;
 
+import de.gbv.reposis.sitelinks.dto.SitelinksRootPageDto;
+import de.gbv.reposis.sitelinks.dto.SitelinksYearPageDto;
+
 /**
- * Default implementation of {@link SitelinksContentBuilder} that generates HTML/XML content pages.
+ * Implementation of {@link SitelinksPageMapper} that transforms sitelinks pages to HTML via XSL transformation.
+ * <p>
+ * This mapper converts sitelinks page objects into XML structures and applies XSL transformations
+ * to generate HTML output. The XML structure follows a defined schema with elements for years,
+ * pages, and object IDs.
  */
-public class SitelinksContentBuilderImpl implements SitelinksContentBuilder {
+@MCRConfigurationProxy(proxyClass = SitelinksXslPageMapper.Factory.class)
+public class SitelinksXslPageMapper implements SitelinksPageMapper {
 
     private static final String ROOT = "sitelinks-page";
     private static final String YEARS = "years";
@@ -45,25 +56,44 @@ public class SitelinksContentBuilderImpl implements SitelinksContentBuilder {
     private final MCRContentTransformer transformer;
 
     /**
-     * Constructs a new {@code SitelinksContentBuilder} with a transformer
-     * for the root element "sitelinks-page".
+     * Constructs a new SitelinksPageMapperImpl with default XSL transformer.
+     * <p>
+     * The transformer is obtained from the {@link MCRLayoutTransformerFactory}
+     * using the root element name as transformer key.
      */
-    public SitelinksContentBuilderImpl() {
-        this.transformer = new MCRLayoutTransformerFactory().getTransformer(ROOT);
+    public SitelinksXslPageMapper() {
+        this(new MCRLayoutTransformerFactory().getTransformer(ROOT));
+    }
+
+    /**
+     * Constructs a new SitelinksPageMapperImpl with an XSL transformer.
+     *
+     * @param transformer the transformer
+     */
+    public SitelinksXslPageMapper(MCRContentTransformer transformer) {
+        this.transformer = transformer;
     }
 
     @Override
-    public MCRContent createRootPage(List<Integer> years) throws IOException {
+    public MCRContent map(SitelinksRootPageDto rootPage) {
         Element root = new Element(ROOT);
-        root.addContent(buildYearsElement(years));
-        return transformer.transform(new MCRJDOMContent(root));
+        root.addContent(buildYearsElement(rootPage.years()));
+        try {
+            return transformer.transform(new MCRJDOMContent(root));
+        } catch (IOException e) {
+            throw new SitelinksMappingException("Error while mapping page", e);
+        }
     }
 
     @Override
-    public MCRContent createPage(int year, int page, long totalCount, List<String> objectIds) throws IOException {
+    public MCRContent map(SitelinksYearPageDto yearPage) {
         Element root = new Element(ROOT);
-        root.addContent(buildPageElement(year, page, totalCount, objectIds));
-        return transformer.transform(new MCRJDOMContent(root));
+        root.addContent(buildPageElement(yearPage.year(), yearPage.page(), yearPage.totalCount(), yearPage.objectIds()));
+        try {
+            return transformer.transform(new MCRJDOMContent(root));
+        }  catch (IOException e) {
+            throw new SitelinksMappingException("Error while mapping page", e);
+        }
     }
 
     private static Element buildYearsElement(List<Integer> years) {
@@ -91,5 +121,19 @@ public class SitelinksContentBuilderImpl implements SitelinksContentBuilder {
         Element element = new Element(name);
         element.setText(text);
         return element;
+    }
+
+    /**
+     * Factory class for creating {@link SitelinksService} instances via configuration.
+     * <p>
+     * This factory is used by the {@link MCRConfigurationProxy} annotation to automatically
+     * instantiate the service with configuration values from properties.
+     */
+    public static class Factory implements Supplier<SitelinksXslPageMapper> {
+
+        @Override
+        public SitelinksXslPageMapper get() {
+            return new SitelinksXslPageMapper();
+        }
     }
 }

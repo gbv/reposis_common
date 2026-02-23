@@ -291,13 +291,14 @@ By default, the servlet is disabled but can be activated and configured as follo
 # Set to "false" to enable the servlet.
 MCR.Servlet.SitelinksServlet.Disabled=true
 
-# Configure the metadata service and content builder for the Sitelinks servlet.
-SitelinksServlet.MetadataService.Class=de.gbv.reposis.sitelinks.SitelinksSolrMetadataService
-SitelinksServlet.MetadataService.FilterQuery=worldReadable:true AND ((objectType:mods AND -state:*) OR (objectType:mods AND state:published))
-SitelinksServlet.ContentBuilder.Class=de.gbv.reposis.sitelinks.SitelinksContentBuilderImpl
+# Configure the service and mapper for the Sitelinks servlet.
+SitelinksServlet.Service.Class=de.gbv.reposis.sitelinks.SitelinksService
+SitelinksServlet.Service.MetadataService.Class=de.gbv.reposis.sitelinks.SitelinksSolrMetadataService
+SitelinksServlet.Service.MetadataService.FilterQuery=worldReadable:true AND ((objectType:mods AND -state:*) OR (objectType:mods AND state:published))
+SitelinksServlet.Mapper.Class=de.gbv.reposis.sitelinks.SitelinksXslPageMapper
 
 # Number of objects displayed per page in the sitelinks pagination.
-Sitelinks.ObjectsPerPage=100
+Sitelinks.PageSize=100
 ```
 
 The entry page is located at `/sitelinks` and may need to be allowed in the `robots.txt` file.

@@ -4,7 +4,7 @@
   <xsl:output method="html" encoding="UTF-8" indent="yes" />
 
   <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="Sitelinks.ObjectsPerPage" />
+  <xsl:param name="Sitelinks.PageSize" />
   <xsl:param name="base-url" select="concat($WebApplicationBaseURL, 'sitelinks')" />
 
   <xsl:template match="/">
@@ -122,14 +122,14 @@
   <xsl:template name="max-page-number">
     <xsl:param name="total-count" />
     <xsl:choose>
-      <xsl:when test="$Sitelinks.ObjectsPerPage = 0 or $total-count = 0">
+      <xsl:when test="$Sitelinks.PageSize = 0 or $total-count = 0">
         <xsl:value-of select="1" />
       </xsl:when>
-      <xsl:when test="($total-count mod $Sitelinks.ObjectsPerPage) = 0">
-        <xsl:value-of select="floor($total-count div $Sitelinks.ObjectsPerPage)" />
+      <xsl:when test="($total-count mod $Sitelinks.PageSize) = 0">
+        <xsl:value-of select="floor($total-count div $Sitelinks.PageSize)" />
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="floor($total-count div $Sitelinks.ObjectsPerPage) + 1" />
+        <xsl:value-of select="floor($total-count div $Sitelinks.PageSize) + 1" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

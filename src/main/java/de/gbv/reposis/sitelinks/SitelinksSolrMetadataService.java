@@ -84,6 +84,7 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
         this.filterQuery = filterQuery;
     }
 
+    @Override
     public List<Integer> getYearsWithObjects() {
         final SolrQuery query = new SolrQuery(DEFAULT_SOLR_QUERY);
         query.setRows(0);
@@ -100,6 +101,7 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
         }
     }
 
+    @Override
     public ObjectIdsWithCount getObjectIdsByYear(int year, int offset, int limit) {
         final SolrQuery query = new SolrQuery(DEFAULT_SOLR_QUERY);
         query.addFilterQuery(filterQuery);
