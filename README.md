@@ -281,6 +281,27 @@ There are Message Properties which can be set in the message.properties file:
 | project.form.agreement             | The text which will be displayed as a legend for the agreement in the editor            | Einverständniserklärung                           |
 | project.form.validation.agreement  | The text which will be displayed as a validation error if the agreement is not accepted | Sie müssen der Einverständniserklärung zustimmen. |
 
+## Sitelinks
+
+The Sitelinks servlet provides HTML sitelinks based on Solr and is optimized for **Google Scholar**.
+It allows hierarchical navigation through publications, organized by year, using path parameters.
+By default, the servlet is disabled but can be activated and configured as follows:
+
+```
+# Set to "false" to enable the servlet.
+MCR.Servlet.SitelinksServlet.Disabled=true
+
+# Configure the service and mapper for the Sitelinks servlet.
+SitelinksServlet.Service.Class=de.gbv.reposis.sitelinks.SitelinksService
+SitelinksServlet.Service.MetadataService.Class=de.gbv.reposis.sitelinks.SitelinksSolrMetadataService
+SitelinksServlet.Service.MetadataService.FilterQuery=worldReadable:true AND ((objectType:mods AND -state:*) OR (objectType:mods AND state:published))
+SitelinksServlet.Mapper.Class=de.gbv.reposis.sitelinks.SitelinksXslPageMapper
+
+# Number of objects displayed per page in the sitelinks pagination.
+Sitelinks.PageSize=100
+```
+
+The entry page is located at `/sitelinks` and may need to be allowed in the `robots.txt` file.
 
 ## Development
 
