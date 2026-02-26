@@ -19,6 +19,7 @@
 package de.gbv.reposis.sitelinks;
 
 import java.io.Serial;
+import java.util.Locale;
 
 import org.mycore.common.MCRException;
 
@@ -62,6 +63,6 @@ public class SitelinksNotFoundException extends MCRException {
      */
     public static SitelinksNotFoundException forPage(int year, int page, long totalPages) {
         return new SitelinksNotFoundException(
-            String.format("Page %d does not exist for year %d (total pages: %d)", page, year, totalPages));
+            String.format(Locale.ROOT,"Page %d does not exist for year %d (total pages: %d)", page, year, totalPages));
     }
 }
