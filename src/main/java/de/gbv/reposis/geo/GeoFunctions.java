@@ -1,5 +1,7 @@
 package de.gbv.reposis.geo;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.NodeList;
 
 import java.util.Arrays;
@@ -9,13 +11,15 @@ import java.util.stream.Collectors;
 
 public class GeoFunctions {
 
-    public static double[] getGeoPoint(String modsCoords) {
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    public static double[] getGeoPoint(String modsCoords) throws NumberFormatException {
         if (modsCoords == null) {
-            return null;
+            throw new IllegalArgumentException("Coordinate string cannot be null");
         }
         String[] parts = modsCoords.split(" ");
         if (parts.length != 2) {
-            return null;
+            throw new IllegalArgumentException("Invalid coordinate format: " + modsCoords);
         }
 
         double[] result = new double[2];
@@ -24,12 +28,11 @@ public class GeoFunctions {
         return result;
     }
 
-    public static double[][] getGeoPoints(String modsCoords){
+    public static double[][] getGeoPoints(String modsCoords) throws NumberFormatException{
         String[] points = modsCoords.split(",[ ]*");
-        double[][] doubles = Arrays.stream(points)
-                .map(GeoFunctions::getGeoPoint)
-                .toArray(double[][]::new);
-        return doubles;
+      return Arrays.stream(points)
+              .map(GeoFunctions::getGeoPoint)
+              .toArray(double[][]::new);
     }
 
     public static boolean isPolygonInverse(double[][] vertices) {
@@ -77,31 +80,41 @@ public class GeoFunctions {
         if (modsCoords == null) {
             return null;
         }
-
         StringBuilder sb = new StringBuilder();
-        sb.append("GeometryCollection (");
-        for (int i = 0; i < modsCoords.getLength(); i++) {
-            String coords = modsCoords.item(i).getTextContent();
-            double[][] verticles = getGeoPoints(coords);
-            if (verticles.length == 1) {
-                sb.append("POINT (").append(verticles[0][0]).append(" ").append(verticles[0][1]).append(")");
-            } else  {
-                if(!isPolygonInverse(verticles)){
-                    List<double[]> list = Arrays.asList(verticles);
-                    Collections.reverse(list);
-                    verticles = list.toArray(double[][]::new);
-                }
+        try {
+            sb.append("GeometryCollection (");
+            for (int i = 0; i < modsCoords.getLength(); i++) {
+                String coords = modsCoords.item(i).getTextContent();
+                double[][] verticles = getGeoPoints(coords);
+                if (verticles.length == 1) {
+                    sb.append("POINT (").append(verticles[0][0]).append(" ").append(verticles[0][1])
+                        .append(")");
+                } else if (verticles.length == 2) {
+                    sb.append("LINESTRING (").append(verticles[0][0]).append(" ")
+                        .append(verticles[0][1])
+                        .append(", ").append(verticles[1][0]).append(" ").append(verticles[1][1])
+                        .append(")");
+                } else {
+                    if (!isPolygonInverse(verticles)) {
+                        List<double[]> list = Arrays.asList(verticles);
+                        Collections.reverse(list);
+                        verticles = list.toArray(double[][]::new);
+                    }
 
-                String points = Arrays.stream(verticles)
+                    String points = Arrays.stream(verticles)
                         .map(point -> point[0] + " " + point[1])
                         .collect(Collectors.joining(", "));
-                sb.append("POLYGON ((").append(points).append("))");
+                    sb.append("POLYGON ((").append(points).append("))");
+                }
+                if (i < modsCoords.getLength() - 1) {
+                    sb.append(", ");
+                }
             }
-            if(i < modsCoords.getLength() - 1){
-                sb.append(", ");
-            }
+            sb.append(")");
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Error while preparing coordinates for Solr: {}",  e::getMessage);
+            return "";
         }
-        sb.append(")");
         return sb.toString();
     }
 }
