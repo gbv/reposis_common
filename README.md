@@ -303,6 +303,43 @@ Sitelinks.PageSize=100
 
 The entry page is located at `/sitelinks` and may need to be allowed in the `robots.txt` file.
 
+## LDAPLoginServlet
+
+The LDAPLoginServlet can be used to enable login via LDAP. By default, the servlet is disabled.
+To set it up, an LDAP client must be configured, and, if necessary, mappers for the user attributes can be defined.
+Additionally, a default role can be assigned to all LDAP users.
+
+```
+# Set to "false" to enable the servlet.
+MCR.Servlet.LDAPLoginServlet.Disabled=false
+LDAPLoginServlet.PersistUser=true
+
+# Configure the auth service service.
+MCRLDAPLoginServlet.AuthService.test.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthService
+MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
+
+# Configure the ldap client.
+MCRLDAPLoginServlet.AuthService.test.Client.Class=de.gbv.reposis.user.ldap.MCRLDAPClient
+MCRLDAPLoginServlet.AuthService.test.Client.ProviderUrl=ldap://xxxxx
+MCRLDAPLoginServlet.AuthService.test.Client.SecurityPrincipal=cn=readonly,dc=example,dc=com
+MCRLDAPLoginServlet.AuthService.test.Client.SecurityCredentials=readonly
+MCRLDAPLoginServlet.AuthService.test.Client.SecurityAuthentication=simple
+MCRLDAPLoginServlet.AuthService.test.Client.ConnectTimeout=5000
+MCRLDAPLoginServlet.AuthService.test.Client.ReadTimeout=5000
+MCRLDAPLoginServlet.AuthService.test.Client.BaseDn=ou=users,dc=example,dc=com
+MCRLDAPLoginServlet.AuthService.test.Client.SecurityProtocol=plain
+MCRLDAPLoginServlet.AuthService.test.Client.UserFilterTemplate=(uid={0})
+
+# Configure the attribute mappings.
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Class=de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Class=de.gbv.reposis.user.ldap.mapper.MCRDefaultLDAPMapping
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Name=displayName
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.TargetName=realName
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Class=de.gbv.reposis.user.ldap.mapper.MCRDefaultLDAPMapping
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Name=mail
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.TargetName=eMail
+```
+
 ## Development
 
 You can add these to your ~/.mycore/(dev-)mir/.mycore.properties
