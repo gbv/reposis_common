@@ -24,6 +24,7 @@ import javax.naming.directory.SearchResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
@@ -323,8 +324,13 @@ public class MCRLDAPClient {
                 switch (SecuritySettings.Authentication.valueOf(securityAuthentication.toUpperCase(Locale.ROOT))) {
                     case NONE -> new SecuritySettings.None(getProtocol());
                     case EXTERNAL -> new SecuritySettings.External();
-                    case SIMPLE ->
-                        new SecuritySettings.Simple(getProtocol(), securityPrincipal, securityCredentials);
+                    case SIMPLE -> {
+                        if (securityPrincipal == null || securityCredentials == null) {
+                            throw new MCRConfigurationException(
+                                "SecurityPrincipal and SecurityCredentials are required for SIMPLE authentication");
+                        }
+                        yield new SecuritySettings.Simple(getProtocol(), securityPrincipal, securityCredentials);
+                    }
                 },
                 Integer.parseInt(connectTimeoutMillis),
                 Integer.parseInt(readTimeoutMillis));
