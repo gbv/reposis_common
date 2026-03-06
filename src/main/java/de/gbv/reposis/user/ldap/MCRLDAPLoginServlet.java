@@ -17,8 +17,6 @@ import org.mycore.user2.login.MCRLogin;
 import org.mycore.user2.login.MCRLoginServlet;
 import org.xml.sax.SAXException;
 
-import de.gbv.reposis.sitelinks.SitelinksPageMapper;
-import de.gbv.reposis.sitelinks.SitelinksService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,7 +41,7 @@ public class MCRLDAPLoginServlet extends MCRLoginServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            this.persistUser = MCRConfiguration2.getBoolean(PROP_PREFIX + "PersistUser").orElseThrow();
+            this.persistUser = MCRConfiguration2.getBoolean(PROP_PREFIX + "PersistUser").orElse(false);
         } catch (MCRConfigurationException e) {
             throw new ServletException("Failed to initialize MCRLDAPLoginServlet", e);
         }
