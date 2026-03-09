@@ -123,9 +123,9 @@ public class MCRLDAPAuthClient {
     private static String escapeLdap(String value) {
         return value
             .replace("\\", "\\5c")
-            .replace("*",  "\\2a")
-            .replace("(",  "\\28")
-            .replace(")",  "\\29")
+            .replace("*", "\\2a")
+            .replace("(", "\\28")
+            .replace(")", "\\29")
             .replace("\0", "\\00");
     }
 
@@ -163,12 +163,14 @@ public class MCRLDAPAuthClient {
     /**
      * Transport security protocol for the LDAP connection.
      */
-    public enum Protocol { PLAIN, SSL }
+    public enum Protocol {PLAIN, SSL}
 
     /**
      * Factory for creating {@link MCRLDAPAuthClient} instances from configuration properties.
      */
     public static class Factory implements Supplier<MCRLDAPAuthClient> {
+
+        private static final String DEFAULT_PROP_PREFIX = "LDAPAuthClient.Default.";
 
         @MCRProperty(name = "ProviderUrl")
         public String providerUrl;
@@ -176,14 +178,14 @@ public class MCRLDAPAuthClient {
         @MCRProperty(name = "Protocol")
         public String protocol;
 
-        @MCRProperty(name = "ConnectTimeout")
-        public String connectTimeoutMillis;
-
-        @MCRProperty(name = "ReadTimeout")
-        public String readTimeoutMillis;
-
         @MCRProperty(name = "PrincipalTemplate")
         public String principalTemplate;
+
+        @MCRProperty(name = "ConnectTimeout", defaultName = DEFAULT_PROP_PREFIX + "ConnectTimeout")
+        public String connectTimeoutMillis;
+
+        @MCRProperty(name = "ReadTimeout", defaultName = DEFAULT_PROP_PREFIX + "ReadTimeout")
+        public String readTimeoutMillis;
 
         @Override
         public MCRLDAPAuthClient get() {

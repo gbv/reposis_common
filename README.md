@@ -312,6 +312,7 @@ Additionally, a default role can be assigned to all LDAP users.
 ```
 # Set to "false" to enable the servlet.
 MCR.Servlet.LDAPLoginServlet.Disabled=false
+# Persist new users
 LDAPLoginServlet.PersistUser=true
 
 # Configure the auth service service.
@@ -321,9 +322,12 @@ MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
 # Configure the ldap client.
 MCRLDAPLoginServlet.AuthService.test.Client.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthClient
 MCRLDAPLoginServlet.AuthService.test.Client.ProviderUrl=ldap://xxxxx
+# Set protocol: plain|ssl
 MCRLDAPLoginServlet.AuthService.test.Client.Protocol=plain
-MCRLDAPLoginServlet.AuthService.test.Client.ConnectTimeout=5000
-MCRLDAPLoginServlet.AuthService.test.Client.ReadTimeout=5000
+# Optionally set custom connection timeout in milliseconds (default: 5000)
+#MCRLDAPLoginServlet.AuthService.test.Client.ConnectTimeout=5000
+# Optionally set custom read timeout in milliseconds (default: 5000)
+#MCRLDAPLoginServlet.AuthService.test.Client.ReadTimeout=5000
 MCRLDAPLoginServlet.AuthService.test.Client.PrincipalTemplate=(uid={0}),ou=users,dc=example,dc=com
 
 # Configure the attribute mappings.
@@ -348,7 +352,7 @@ It can then look like this:
     <label xml:lang="en">LDAP Login</label>
     <login url="LDAPLoginServlet?action=login" redirectParameter="url" realmParameter="realm">
       <label xml:lang="de">Login mit dem LDAP-Account</label>
-      <label xml:lang="en">Author login using LDAP account</label>
+      <label xml:lang="en">Login using LDAP account</label>
       <info>
         <label xml:lang="de">Hier können sie sich mit ihrem LDAP-Account anmelden.</label>
         <label xml:lang="en">You can log in using your LDAP account.</label>
