@@ -336,6 +336,27 @@ MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Name=mail
 MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.TargetName=eMail
 ```
 
+### realms.xml
+
+For login, the servlet can be enabled via realms.xml
+(for more information, see https://www.mycore.de/documentation/permissions/user_external_ldap/).
+It can then look like this:
+
+```xml
+  <realm id="test">
+    <label xml:lang="de">LDAP-Login</label>
+    <label xml:lang="en">LDAP Login</label>
+    <login url="LDAPLoginServlet?action=login" redirectParameter="url" realmParameter="realm">
+      <label xml:lang="de">Login mit dem LDAP-Account</label>
+      <label xml:lang="en">Author login using LDAP account</label>
+      <info>
+        <label xml:lang="de">Hier können sie sich mit ihrem LDAP-Account anmelden.</label>
+        <label xml:lang="en">You can log in using your LDAP account.</label>
+      </info>
+    </login>
+  </realm>
+```
+
 ## Development
 
 You can add these to your ~/.mycore/(dev-)mir/.mycore.properties
