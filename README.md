@@ -319,16 +319,12 @@ MCRLDAPLoginServlet.AuthService.test.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthS
 MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
 
 # Configure the ldap client.
-MCRLDAPLoginServlet.AuthService.test.Client.Class=de.gbv.reposis.user.ldap.MCRLDAPClient
+MCRLDAPLoginServlet.AuthService.test.Client.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthClient
 MCRLDAPLoginServlet.AuthService.test.Client.ProviderUrl=ldap://xxxxx
-MCRLDAPLoginServlet.AuthService.test.Client.SecurityPrincipal=cn=readonly,dc=example,dc=com
-MCRLDAPLoginServlet.AuthService.test.Client.SecurityCredentials=readonly
-MCRLDAPLoginServlet.AuthService.test.Client.SecurityAuthentication=simple
+MCRLDAPLoginServlet.AuthService.test.Client.Protocol=plain
 MCRLDAPLoginServlet.AuthService.test.Client.ConnectTimeout=5000
 MCRLDAPLoginServlet.AuthService.test.Client.ReadTimeout=5000
-MCRLDAPLoginServlet.AuthService.test.Client.BaseDn=ou=users,dc=example,dc=com
-MCRLDAPLoginServlet.AuthService.test.Client.SecurityProtocol=plain
-MCRLDAPLoginServlet.AuthService.test.Client.UserFilterTemplate=(uid={0})
+MCRLDAPLoginServlet.AuthService.test.Client.PrincipalTemplate=(uid={0}),ou=users,dc=example,dc=com
 
 # Configure the attribute mappings.
 MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Class=de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper

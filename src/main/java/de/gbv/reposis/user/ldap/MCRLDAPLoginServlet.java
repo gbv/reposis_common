@@ -89,7 +89,7 @@ public class MCRLDAPLoginServlet extends MCRLoginServlet {
                 LOGGER.debug("user {} logged in successfully", user.getUserID());
                 res.sendRedirect(res.encodeRedirectURL(getReturnURL(req)));
                 return;
-            } catch (MCRLDAPAuthenticationException e) {
+            } catch (MCRLDAPAuthException e) {
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 loginForm.setLoginFailed(true);
             }

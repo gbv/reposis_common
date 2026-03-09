@@ -18,7 +18,7 @@ import de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper;
 @MCRConfigurationProxy(proxyClass = MCRLDAPAuthService.Factory.class)
 public class MCRLDAPAuthService {
 
-    private final MCRLDAPClient client;
+    private final MCRLDAPAuthClient client;
     private final MCRLDAPAttributeMapper attributeMapper;
     private final List<String> defaultRoles;
     private String realmId;
@@ -30,7 +30,7 @@ public class MCRLDAPAuthService {
      * @param attributeMapper used to map LDAP attributes to user attributes
      * @param defaultRoles roles assigned to every successfully authenticated LDAP user
      */
-    public MCRLDAPAuthService(MCRLDAPClient client, MCRLDAPAttributeMapper attributeMapper, List<String> defaultRoles) {
+    public MCRLDAPAuthService(MCRLDAPAuthClient client, MCRLDAPAttributeMapper attributeMapper, List<String> defaultRoles) {
         this.client = client;
         this.attributeMapper = attributeMapper;
         this.defaultRoles = defaultRoles;
@@ -50,16 +50,15 @@ public class MCRLDAPAuthService {
      * @param username the login name (UID)
      * @param password the plain-text password
      * @return {@link MCRUser} for the authenticated user
-     * @throws MCRLDAPAuthenticationException if the user is not found or the password is invalid
+     * @throws MCRLDAPAuthException if the user is not found or the password is invalid
      * @throws org.mycore.common.MCRUsageException if the user is ambiguous or an LDAP error occurs
      */
     public MCRUser authenticate(String username, String password) {
-        final String dn = client.resolveDn(username)
-            .orElseThrow(() -> new MCRLDAPAuthenticationException("Invalid username or password"));
-        if (!client.bind(dn, password)) {
-            throw new MCRLDAPAuthenticationException("Invalid username or password");
+        MCRLDAPAuthResult ldapUser = client.authenticate(username, password);
+        if (ldapUser == null) {
+            throw new MCRLDAPAuthException("Invalid username or password");
         }
-        MCRLDAPAttributeMapper.MappingsResult mappingsResult = attributeMapper.map(client.findAttributes(dn));
+        MCRLDAPAttributeMapper.MappingsResult mappingsResult = attributeMapper.map(ldapUser.attributes());
         MCRUser user = new MCRUser(username, realmId);
         mappingsResult.userAttributes().forEach(user::setUserAttribute);
         defaultRoles.forEach(user::assignRole);
@@ -71,8 +70,8 @@ public class MCRLDAPAuthService {
      */
     public static class Factory implements Supplier<MCRLDAPAuthService> {
 
-        @MCRInstance(name = "Client", valueClass = MCRLDAPClient.class)
-        public MCRLDAPClient client;
+        @MCRInstance(name = "Client", valueClass = MCRLDAPAuthClient.class)
+        public MCRLDAPAuthClient client;
 
         @MCRInstance(name = "AttributeMapper", valueClass = MCRLDAPAttributeMapper.class)
         public MCRLDAPAttributeMapper attributeMapper;
