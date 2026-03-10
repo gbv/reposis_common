@@ -32,6 +32,15 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>LDAPLoginServlet</servlet-name>
+    <servlet-class>de.gbv.reposis.user.ldap.MCRLDAPLoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LDAPLoginServlet</servlet-name>
+    <url-pattern>/servlets/LDAPLoginServlet</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>GeoSearchConfigHelperServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRConfigHelperServlet</servlet-class>
     <init-param>
