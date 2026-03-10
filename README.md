@@ -281,6 +281,85 @@ There are Message Properties which can be set in the message.properties file:
 | project.form.agreement             | The text which will be displayed as a legend for the agreement in the editor            | Einverständniserklärung                           |
 | project.form.validation.agreement  | The text which will be displayed as a validation error if the agreement is not accepted | Sie müssen der Einverständniserklärung zustimmen. |
 
+## Sitelinks
+
+The Sitelinks servlet provides HTML sitelinks based on Solr and is optimized for **Google Scholar**.
+It allows hierarchical navigation through publications, organized by year, using path parameters.
+By default, the servlet is disabled but can be activated and configured as follows:
+
+```
+# Set to "false" to enable the servlet.
+MCR.Servlet.SitelinksServlet.Disabled=true
+
+# Configure the service and mapper for the Sitelinks servlet.
+SitelinksServlet.Service.Class=de.gbv.reposis.sitelinks.SitelinksService
+SitelinksServlet.Service.MetadataService.Class=de.gbv.reposis.sitelinks.SitelinksSolrMetadataService
+SitelinksServlet.Service.MetadataService.FilterQuery=worldReadable:true AND ((objectType:mods AND -state:*) OR (objectType:mods AND state:published))
+SitelinksServlet.Mapper.Class=de.gbv.reposis.sitelinks.SitelinksXslPageMapper
+
+# Number of objects displayed per page in the sitelinks pagination.
+Sitelinks.PageSize=100
+```
+
+The entry page is located at `/sitelinks` and may need to be allowed in the `robots.txt` file.
+
+## LDAPLoginServlet
+
+The LDAPLoginServlet can be used to enable login via LDAP. By default, the servlet is disabled.
+To set it up, an LDAP client must be configured, and, if necessary, mappers for the user attributes can be defined.
+Additionally, a default role can be assigned to all LDAP users.
+
+```
+# Set to "false" to enable the servlet.
+MCR.Servlet.LDAPLoginServlet.Disabled=false
+# Persist new users
+LDAPLoginServlet.PersistUser=true
+
+# Configure the auth service service.
+MCRLDAPLoginServlet.AuthService.test.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthService
+MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
+
+# Configure the ldap client.
+MCRLDAPLoginServlet.AuthService.test.Client.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthClient
+MCRLDAPLoginServlet.AuthService.test.Client.ProviderUrl=ldap://xxxxx
+# Set protocol: plain|ssl
+MCRLDAPLoginServlet.AuthService.test.Client.Protocol=plain
+# Optionally set custom connection timeout in milliseconds (default: 5000)
+#MCRLDAPLoginServlet.AuthService.test.Client.ConnectTimeout=5000
+# Optionally set custom read timeout in milliseconds (default: 5000)
+#MCRLDAPLoginServlet.AuthService.test.Client.ReadTimeout=5000
+MCRLDAPLoginServlet.AuthService.test.Client.PrincipalTemplate=(uid={0}),ou=users,dc=example,dc=com
+
+# Configure the attribute mappings.
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Class=de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Class=de.gbv.reposis.user.ldap.mapper.MCRDefaultLDAPMapping
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Name=displayName
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.TargetName=realName
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Class=de.gbv.reposis.user.ldap.mapper.MCRDefaultLDAPMapping
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Name=mail
+MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.TargetName=eMail
+```
+
+### realms.xml
+
+For login, the servlet can be enabled via realms.xml
+(for more information, see https://www.mycore.de/documentation/permissions/user_external_ldap/).
+It can then look like this:
+
+```xml
+  <realm id="test">
+    <label xml:lang="de">LDAP-Login</label>
+    <label xml:lang="en">LDAP Login</label>
+    <login url="LDAPLoginServlet?action=login" redirectParameter="url" realmParameter="realm">
+      <label xml:lang="de">Login mit dem LDAP-Account</label>
+      <label xml:lang="en">Login using LDAP account</label>
+      <info>
+        <label xml:lang="de">Hier können sie sich mit ihrem LDAP-Account anmelden.</label>
+        <label xml:lang="en">You can log in using your LDAP account.</label>
+      </info>
+    </login>
+  </realm>
+```
 
 ## Development
 
