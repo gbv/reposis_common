@@ -13,7 +13,7 @@ public class GeoFunctions {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static double[] getGeoPoint(String modsCoords) throws NumberFormatException {
+    public static double[] getGeoPoint(String modsCoords) {
         if (modsCoords == null) {
             throw new IllegalArgumentException("Coordinate string cannot be null");
         }
