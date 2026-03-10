@@ -28,7 +28,7 @@ public class GeoFunctions {
         return result;
     }
 
-    public static double[][] getGeoPoints(String modsCoords) throws NumberFormatException{
+    public static double[][] getGeoPoints(String modsCoords) {
         String[] points = modsCoords.split(",[ ]*");
       return Arrays.stream(points)
               .map(GeoFunctions::getGeoPoint)
