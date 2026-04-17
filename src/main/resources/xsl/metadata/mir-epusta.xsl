@@ -122,9 +122,9 @@
                       type="button"
                       class="btn-close modalFrame-cancel"
                       data-bs-dismiss="modal"
-                      aria-label="Close">
-                      <i class="fas fa-times" aria-hidden="true"></i>
-                    </button>
+                      aria-label="Close"/>
+                      
+                    
                   </div>
                   <div class="modal-body">
                     <div id="epustaGraph" class="mir-epusta-graph"/>
