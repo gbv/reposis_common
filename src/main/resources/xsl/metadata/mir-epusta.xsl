@@ -50,10 +50,10 @@
               </strong>
             </span>
             <div class="row">
-              <div class="col-md-7 col-sm-9 col-6 text-right">
+              <div class="col-md-7 col-sm-9 col-6 text-end">
                 <xsl:value-of select="i18n:translate('mir.epusta.counter.fulltext')" />
               </div>
-              <div
+              <div class="col-md-5 col-sm-3 col-6"
                   data-epustaelementtype="ePuStaInline"
                   data-epustaproviderurl="{$MIR.ePuSta.providerURL}"
                   data-epustaidentifier="{$MIR.ePuSta.Prefix}{$objID}"
@@ -61,10 +61,10 @@
               />
             </div>
             <div class="row">
-              <div class="col-md-7 col-sm-9 col-6 text-right">
+              <div class="col-md-7 col-sm-9 col-6 text-end">
                 <xsl:value-of select="i18n:translate('mir.epusta.counter.abstract')" />
               </div>
-              <div
+              <div class="col-md-5 col-sm-3 col-6"
                   data-epustaelementtype="ePuStaInline"
                   data-epustaproviderurl="{$MIR.ePuSta.providerURL}"
                   data-epustaidentifier="{$MIR.ePuSta.Prefix}{$objID}"
@@ -77,10 +77,10 @@
               </strong>
             </span>
             <div class="row">
-              <div class="col-md-7 col-sm-9 col-6 text-right">
+              <div class="col-md-7 col-sm-9 col-6 text-end">
                 <xsl:value-of select="i18n:translate('mir.epusta.counter.fulltext')" />
               </div>
-              <div
+              <div class="col-md-5 col-sm-3 col-6"
                   data-epustaelementtype="ePuStaInline"
                   data-epustaproviderurl="{$MIR.ePuSta.providerURL}"
                   data-epustaidentifier="{$MIR.ePuSta.Prefix}{$objID}"
@@ -89,18 +89,19 @@
               />
             </div>
             <div class="row">
-              <div class="col-md-7 col-sm-9 col-6 text-right">
+              <div class="col-md-7 col-sm-9 col-6 text-end">
                 <xsl:value-of select="i18n:translate('mir.epusta.counter.abstract')" />
               </div>
-              <div data-epustaelementtype="ePuStaInline"
+              <div class="col-md-5 col-sm-3 col-6"
+                   data-epustaelementtype="ePuStaInline"
                    data-epustaproviderurl="{$MIR.ePuSta.providerURL}"
                    data-epustaidentifier="{$MIR.ePuSta.Prefix}{$objID}"
                    data-epustacounttype="counter_abstract"
                    data-epustafrom="{$from}" data-epustauntil="{$until}"
               />
             </div>
-            <div class="text-right">
-              <a href="#" data-toggle="modal" data-target="#epustaGraphModal">
+            <div class="text-end">
+              <a href="#" data-bs-toggle="modal" data-bs-target="#epustaGraphModal">
                 <xsl:value-of select="i18n:translate('mir.epusta.open')" />
               </a>
             </div>
@@ -108,9 +109,9 @@
               class="modal fade"
               id="epustaGraphModal"
               tabindex="-1"
-              role="dialog"
               aria-labelledby="epustaGraphTitel"
-              aria-hidden="true">
+              aria-hidden="true"
+              data-bs-backdrop="static">
               <div class="modal-dialog" role="document">
                 <div class="modal-content">
                   <div class="modal-header">
@@ -119,28 +120,20 @@
                     </h4>
                     <button
                       type="button"
-                      class="close modalFrame-cancel"
-                      data-dismiss="modal"
-                      aria-label="Close">
-                      <i class="fas fa-times" aria-hidden="true"></i>
-                    </button>
+                      class="btn-close modalFrame-cancel"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"/>
+                      
+                    
                   </div>
                   <div class="modal-body">
                     <div id="epustaGraph" class="mir-epusta-graph"/>
                     <div class="row mir-epusta-graph-controls" style="margin-top:13px">
                       <div class="col-md-12 text-center">
-                        <!--<select id="epustaGraphSelect" class="form-select" onchange="changeEpustaGraphSelect();" style="margin-top:10px">
-                          <option value='day'>letzten 30 Tage</option>
-                          <option value='month'>letzten 12 Monate</option>
-                          <option value='year'>letzten 10 Jahre</option>
-                        </select>-->
                         die letzten:
-                        <input style="margin-left:6px" type="radio" id="grday" name="granularity" value="day" onchange="changeEpustaGraphSelect();" checked="checked"/>
-                        <label for="grday">30 Tage</label>
-                        <input style="margin-left:13px" type="radio" id="grmonth" name="granularity" value="month" onchange="changeEpustaGraphSelect();" />
-                        <label for="grday">12 Monate</label>
-                        <input style="margin-left:13px" type="radio" id="gryear" name="granularity" value="year" onchange="changeEpustaGraphSelect();" />
-                        <label for="grday">10 Jahre</label>
+                        <input type="radio" name="granularity" value="day" checked="checked"/> 30 Tage
+                        <input type="radio" name="granularity" value="month" class="ms-2"/> 12 Monate
+                        <input type="radio" name="granularity" value="year" class="ms-2"/> 10 Jahre
                       </div>
                     </div>
                   </div>
@@ -156,41 +149,80 @@
             <script type="module" src="{$WebApplicationBaseURL}assets/chart.js/chart.umd.js" ></script>
             <script type="module">
               import {ePuStaGraph} from "<xsl:value-of select="$WebApplicationBaseURL"/>assets/epusta_elements.js/epusta-elements.js";
-              
-              var graph = document.getElementById('epustaGraph');
-              var graphSelect = document.getElementById('epustaGraphSelect');
-              var granularity = 'day' ;
-              var epustaProviderurl='<xsl:value-of select="$MIR.ePuSta.providerURL"/>';
-              var identifier='<xsl:value-of select="$objID"/>';
-              var from='auto';
-              var until='<xsl:value-of select="$until"/>';
-              //var tagQuery = "-epusta:filter:httpMethod -epusta:filter:httpStatus -filter:30sek:counter3 -filter:robot oas:content:counter";
-              var labelsByTagQuery = [
-                {
-                  label: "Volltextzugriffe",
-                  //color: "#003259",
-                  color: "#3b617f",
-                  tagquery: "-epusta:filter:httpMethod -epusta:filter:httpStatus -filter:30sek:counter3 -filter:robot oas:content:counter"
-                },
-                {
-                  label: "Metadatenansichten",
-                  //color: "#e40c31",
-                  color: "#eb4a66",
-                  tagquery: "-epusta:filter:httpMethod -epusta:filter:httpStatus -filter:30sek:counter3 -filter:robot oas:content:counter_abstract"
+
+              const modal = document.getElementById('epustaGraphModal');
+              let graphInstance = null;
+
+              const epustaConfig = {
+                providerUrl: '<xsl:value-of select="$MIR.ePuSta.providerURL"/>',
+                identifier: '<xsl:value-of select="$objID"/>',
+                from: 'auto',
+                until: '<xsl:value-of select="$until"/>',
+                labels: [
+                  {
+                    label: "Volltextzugriffe",
+                    color: "#3b617f",
+                    tagquery: "-epusta:filter:httpMethod -epusta:filter:httpStatus -filter:30sek:counter3 -filter:robot oas:content:counter"
+                  },
+                  {
+                    label: "Metadatenansichten",
+                    color: "#eb4a66",
+                    tagquery: "-epusta:filter:httpMethod -epusta:filter:httpStatus -filter:30sek:counter3 -filter:robot oas:content:counter_abstract"
+                  }
+                ]
+              };
+
+              modal.addEventListener('shown.bs.modal', () => {
+                const graphElement = document.getElementById('epustaGraph');
+
+                if (!graphElement) {
+                  console.error("epustaGraph Element nicht gefunden");
+                  return;
                 }
-              ];
-              
-              $('#epustaGraphModal').on('shown.bs.modal', function () {
-                var granularity = document.querySelector('input[name="granularity"]:checked').value;
-                var epustaElement = new ePuStaGraph(graph,epustaProviderurl,identifier,from,until,labelsByTagQuery,granularity)
-                epustaElement.requestData();
-              })
-              function changeFunc() {
-                var granularity = document.querySelector('input[name="granularity"]:checked').value; 
-                var epustaElement = new ePuStaGraph(graph,epustaProviderurl,identifier,from,until,labelsByTagQuery,granularity)
-                epustaElement.requestData();
-              }
-              window.changeEpustaGraphSelect = changeFunc;
+
+                const granularity = document.querySelector('input[name="granularity"]:checked').value;
+
+                if (graphInstance) {
+                  graphElement.innerHTML = '';
+                  graphInstance = null;
+                }
+
+                graphInstance = new ePuStaGraph(
+                  graphElement,
+                  epustaConfig.providerUrl,
+                  epustaConfig.identifier,
+                  epustaConfig.from,
+                  epustaConfig.until,
+                  epustaConfig.labels,
+                  granularity
+                );
+
+                graphInstance.requestData();
+              });
+
+              document.querySelectorAll('input[name="granularity"]').forEach(radio => {
+                radio.addEventListener('change', () => {
+                  if (!graphInstance) return;
+
+                  const graphElement = document.getElementById('epustaGraph');
+                  const granularity = document.querySelector('input[name="granularity"]:checked').value;
+
+                  graphElement.innerHTML = '';
+
+                  graphInstance = new ePuStaGraph(
+                    graphElement,
+                    epustaConfig.providerUrl,
+                    epustaConfig.identifier,
+                    epustaConfig.from,
+                    epustaConfig.until,
+                    epustaConfig.labels,
+                    granularity
+                  );
+
+                  graphInstance.requestData();
+                });
+              });
+
             </script>
           </div>
         </div>

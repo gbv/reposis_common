@@ -168,8 +168,8 @@ cmo-module/node/
 
 # fileupload workaround
 cmo-webapp/src/main/webapp/fileupload.xml
-
 #yarn files
 src/main/js/epusta/node_modules
 src/main/js/epusta/yarn-error.log
 src/main/js/epusta/yarn.lock
+yarn.lock
