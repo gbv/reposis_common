@@ -19,9 +19,12 @@
 
     <xsl:template match="mods:mods" mode="common">
         <xsl:if test="count(mods:subject/mods:cartographics/mods:coordinates) &gt; 0">
-            <field name="{$MCR.GeoSearch.Solr.WKT.Field}">
-                <xsl:value-of select="geofn:getNormalizedWKTString(mods:subject/mods:cartographics/mods:coordinates)"/>
-            </field>
+            <xsl:variable name="coordinates" select="geofn:getNormalizedWKTString(mods:subject/mods:cartographics/mods:coordinates)" />
+            <xsl:if test="string-length(normalize-space($coordinates)) &gt; 0">
+                <field name="{$MCR.GeoSearch.Solr.WKT.Field}">
+                    <xsl:value-of select="$coordinates"/>
+                </field>
+            </xsl:if>
         </xsl:if>
         <xsl:apply-templates select="mods:subject/mods:cartographics/mods:coordinates" mode="common" />
     </xsl:template>

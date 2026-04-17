@@ -12,7 +12,6 @@
     "build": "yarpm run copy-all"
   },
   "dependencies": {
-    
     "epusta_elements.js": "1.0.4"
   },
   "devDependencies": {

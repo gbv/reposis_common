@@ -149,10 +149,10 @@
             <script type="module" src="{$WebApplicationBaseURL}assets/chart.js/chart.umd.js" ></script>
             <script type="module">
               import {ePuStaGraph} from "<xsl:value-of select="$WebApplicationBaseURL"/>assets/epusta_elements.js/epusta-elements.js";
-              
+
               const modal = document.getElementById('epustaGraphModal');
               let graphInstance = null;
-              
+
               const epustaConfig = {
                 providerUrl: '<xsl:value-of select="$MIR.ePuSta.providerURL"/>',
                 identifier: '<xsl:value-of select="$objID"/>',
@@ -171,7 +171,7 @@
                   }
                 ]
               };
-              
+
               modal.addEventListener('shown.bs.modal', () => {
                 const graphElement = document.getElementById('epustaGraph');
 
@@ -179,14 +179,14 @@
                   console.error("epustaGraph Element nicht gefunden");
                   return;
                 }
-                
+
                 const granularity = document.querySelector('input[name="granularity"]:checked').value;
-                
+
                 if (graphInstance) {
                   graphElement.innerHTML = '';
                   graphInstance = null;
                 }
-                
+
                 graphInstance = new ePuStaGraph(
                   graphElement,
                   epustaConfig.providerUrl,
@@ -199,7 +199,7 @@
 
                 graphInstance.requestData();
               });
-              
+
               document.querySelectorAll('input[name="granularity"]').forEach(radio => {
                 radio.addEventListener('change', () => {
                   if (!graphInstance) return;
@@ -222,7 +222,7 @@
                   graphInstance.requestData();
                 });
               });
-              
+
             </script>
           </div>
         </div>

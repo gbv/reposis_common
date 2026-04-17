@@ -1,0 +1,116 @@
+# ── Organizational Units ──────────────────────────────────────────────────────
+
+dn: ou=users,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+# ── Test User: Alice ──────────────────────────────────────────────────────────
+
+dn: uid=alice,ou=users,dc=example,dc=com
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: alice
+cn: Alice Muster
+sn: Muster
+givenName: Alice
+displayName: Alice Muster
+mail: alice@example.com
+userPassword: alice123
+uidNumber: 1001
+gidNumber: 1001
+homeDirectory: /home/alice
+loginShell: /bin/bash
+departmentNumber: Engineering
+title: Senior Developer
+telephoneNumber: +49 531 1000
+mobile: +49 151 10000001
+postalAddress: Musterstraße 1, 37073 Göttingen
+employeeNumber: EMP001
+employeeType: fulltime
+description: Testbenutzer Alice – Engineering
+
+# ── Test User: Bob ────────────────────────────────────────────────────────────
+
+dn: uid=bob,ou=users,dc=example,dc=com
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: bob
+cn: Bob Beispiel
+sn: Beispiel
+givenName: Bob
+displayName: Bob Beispiel
+mail: bob@example.com
+userPassword: bob456
+uidNumber: 1002
+gidNumber: 1002
+homeDirectory: /home/bob
+loginShell: /bin/bash
+departmentNumber: Marketing
+title: Marketing Manager
+telephoneNumber: +49 531 2000
+mobile: +49 151 10000002
+postalAddress: Beispielweg 2, 37073 Göttingen
+employeeNumber: EMP002
+employeeType: fulltime
+description: Testbenutzer Bob – Marketing
+
+# ── Test User: Charlie (deaktiviert) ─────────────────────────────────────────
+
+dn: uid=charlie,ou=users,dc=example,dc=com
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: charlie
+cn: Charlie Inaktiv
+sn: Inaktiv
+givenName: Charlie
+displayName: Charlie Inaktiv
+mail: charlie@example.com
+userPassword: charlie789
+uidNumber: 1003
+gidNumber: 1003
+homeDirectory: /home/charlie
+loginShell: /sbin/nologin
+departmentNumber: IT
+title: Intern
+telephoneNumber: +49 531 3000
+employeeNumber: EMP003
+employeeType: intern
+description: Testbenutzer Charlie – deaktiviert/intern
+
+# ── Gruppen ───────────────────────────────────────────────────────────────────
+
+dn: cn=admins,ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: admins
+description: Administratoren
+member: uid=alice,ou=users,dc=example,dc=com
+
+dn: cn=developers,ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: developers
+description: Entwickler
+member: uid=alice,ou=users,dc=example,dc=com
+member: uid=bob,ou=users,dc=example,dc=com
+
+dn: cn=all-users,ou=groups,dc=example,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: all-users
+description: Alle Benutzer
+member: uid=alice,ou=users,dc=example,dc=com
+member: uid=bob,ou=users,dc=example,dc=com
+member: uid=charlie,ou=users,dc=example,dc=com
