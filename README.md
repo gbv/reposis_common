@@ -1,4 +1,3 @@
-
 # reposis-common
 
 This is a collection of common code used by the reposis projects.
