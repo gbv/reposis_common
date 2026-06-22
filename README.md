@@ -360,6 +360,20 @@ It can then look like this:
   </realm>
 ```
 
+## Frontend
+
+### Error Page
+
+A stylesheet with customizations for the standard email addresses is available for `mcr_error`.
+In addition, further error-page-specific templates should be integrated using the `xslInclude:ErrorPage` hook.  
+The email addresses can be configured via the following properties: `REP.ErrorPage.Mail.General` and
+`REP.ErrorPage.Mail.Technical`.  
+The stylesheet can be activated as follows:
+
+```
+MCR.ContentTransformer.mcr_error.Stylesheet=xsl/rep-error-page.xsl,%MCR.LayoutTransformerFactory.Default.Stylesheets%
+```
+
 ## Development
 
 You can add these to your ~/.mycore/(dev-)mir/.mycore.properties
