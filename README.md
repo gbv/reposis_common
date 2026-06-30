@@ -326,6 +326,19 @@ MCRLDAPLoginServlet.AuthService.test.Resolver.Class=de.gbv.reposis.user.ldap.dn.
 MCRLDAPLoginServlet.AuthService.test.Resolver.BaseDN=ou=people,dc=example,dc=org
 MCRLDAPLoginServlet.AuthService.test.Resolver.AttributeName=uid
 
+# Alternatively, configure the ldap dn resolver as a search-based resolver,
+# which looks up the DN via an LDAP search instead of building it from a template.
+# Useful when usernames are not directly part of the DN (e.g. multiple OUs, custom RDN attributes).
+#MCRLDAPLoginServlet.AuthService.test.Resolver.Class=de.gbv.reposis.user.ldap.dn.MCRLDAPSearchDNResolver
+#MCRLDAPLoginServlet.AuthService.test.Resolver.BaseDN=ou=people,dc=example,dc=org
+#MCRLDAPLoginServlet.AuthService.test.Resolver.SearchFilter=(uid={0})
+#MCRLDAPLoginServlet.AuthService.test.Resolver.ConnectionSettings.Class=de.gbv.reposis.user.ldap.MCRLDAPConnectionSettings
+#MCRLDAPLoginServlet.AuthService.test.Resolver.ConnectionSettings.ProviderUrl=ldap://xxxxx
+#MCRLDAPLoginServlet.AuthService.test.Resolver.ConnectionSettings.Protocol=plain
+# Optionally configure a service account for the search; if omitted, the search is anonymous.
+#MCRLDAPLoginServlet.AuthService.test.Resolver.BindDN=cn=service,dc=example,dc=org
+#MCRLDAPLoginServlet.AuthService.test.Resolver.BindPassword=xxxxx
+
 # Configure the ldap client.
 MCRLDAPLoginServlet.AuthService.test.Client.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthClient
 MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.Class=de.gbv.reposis.user.ldap.MCRLDAPConnectionSettings
