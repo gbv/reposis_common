@@ -320,13 +320,14 @@ MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
 
 # Configure the ldap client.
 MCRLDAPLoginServlet.AuthService.test.Client.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthClient
-MCRLDAPLoginServlet.AuthService.test.Client.ProviderUrl=ldap://xxxxx
+MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.Class=de.gbv.reposis.user.ldap.MCRLDAPConnectionSettings
+MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.ProviderUrl=ldap://xxxxx
 # Set protocol: plain|ssl
-MCRLDAPLoginServlet.AuthService.test.Client.Protocol=plain
+MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.Protocol=plain
 # Optionally set custom connection timeout in milliseconds (default: 5000)
-#MCRLDAPLoginServlet.AuthService.test.Client.ConnectTimeout=5000
+#MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.ConnectTimeout=5000
 # Optionally set custom read timeout in milliseconds (default: 5000)
-#MCRLDAPLoginServlet.AuthService.test.Client.ReadTimeout=5000
+#MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.ReadTimeout=5000
 MCRLDAPLoginServlet.AuthService.test.Client.PrincipalTemplate=(uid={0}),ou=users,dc=example,dc=com
 
 # Configure the attribute mappings.

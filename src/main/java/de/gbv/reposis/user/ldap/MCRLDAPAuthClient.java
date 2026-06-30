@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -22,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
@@ -45,7 +45,7 @@ public class MCRLDAPAuthClient {
      * @param principalTemplate  template for building the bind principal;
      *                           {@code {0}} is replaced with the LDAP-escaped username
      */
-    public MCRLDAPAuthClient(ConnectionSettings connectionSettings, String principalTemplate) {
+    public MCRLDAPAuthClient(MCRLDAPConnectionSettings connectionSettings, String principalTemplate) {
         this.baseEnv = new Hashtable<>(connectionSettings.toEnv());
         this.principalTemplate = principalTemplate;
     }
@@ -64,6 +64,7 @@ public class MCRLDAPAuthClient {
     public MCRLDAPAuthResult authenticate(String username, String password) {
         final Hashtable<String, String> bindEnv = new Hashtable<>(baseEnv);
         String principal = buildPrincipal(username);
+        bindEnv.put(Context.SECURITY_AUTHENTICATION, "simple");
         bindEnv.put(Context.SECURITY_PRINCIPAL, principal);
         bindEnv.put(Context.SECURITY_CREDENTIALS, password);
         DirContext ctx = null;
@@ -130,74 +131,19 @@ public class MCRLDAPAuthClient {
     }
 
     /**
-     * Base LDAP connection settings shared across all authentication requests.
-     * <p>
-     * Does not include bind credentials, as those are provided per {@link #authenticate} call.
-     * Authentication mode is always {@code simple}.
-     *
-     * @param providerUrl the LDAP server URL
-     * @param protocol the transport security protocol
-     * @param connectTimeoutMillis connection timeout in milliseconds
-     * @param readTimeoutMillis read timeout in milliseconds
-     */
-    public record ConnectionSettings(
-        String providerUrl,
-        Protocol protocol,
-        Integer connectTimeoutMillis,
-        Integer readTimeoutMillis) {
-
-        public Map<String, String> toEnv() {
-            final Map<String, String> env = new HashMap<>();
-            env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-            env.put(Context.SECURITY_AUTHENTICATION, "simple");
-            env.put(Context.PROVIDER_URL, providerUrl);
-            if (protocol == Protocol.SSL) {
-                env.put(Context.SECURITY_PROTOCOL, "ssl");
-            }
-            env.put("com.sun.jndi.ldap.connect.timeout", connectTimeoutMillis.toString());
-            env.put("com.sun.jndi.ldap.read.timeout", readTimeoutMillis.toString());
-            return env;
-        }
-    }
-
-    /**
-     * Transport security protocol for the LDAP connection.
-     */
-    public enum Protocol {PLAIN, SSL}
-
-    /**
      * Factory for creating {@link MCRLDAPAuthClient} instances from configuration properties.
      */
     public static class Factory implements Supplier<MCRLDAPAuthClient> {
 
-        private static final String DEFAULT_PROP_PREFIX = "LDAPAuthClient.Default.";
-
-        @MCRProperty(name = "ProviderUrl")
-        public String providerUrl;
-
-        @MCRProperty(name = "Protocol")
-        public String protocol;
+        @MCRInstance(name = "ConnectionSettings", valueClass = MCRLDAPConnectionSettings.class)
+        public MCRLDAPConnectionSettings connectionSettings;
 
         @MCRProperty(name = "PrincipalTemplate")
         public String principalTemplate;
 
-        @MCRProperty(name = "ConnectTimeout", defaultName = DEFAULT_PROP_PREFIX + "ConnectTimeout")
-        public String connectTimeoutMillis;
-
-        @MCRProperty(name = "ReadTimeout", defaultName = DEFAULT_PROP_PREFIX + "ReadTimeout")
-        public String readTimeoutMillis;
-
         @Override
         public MCRLDAPAuthClient get() {
-            return new MCRLDAPAuthClient(
-                new ConnectionSettings(
-                    providerUrl,
-                    Protocol.valueOf(protocol.toUpperCase(Locale.ROOT)),
-                    Integer.parseInt(connectTimeoutMillis),
-                    Integer.parseInt(readTimeoutMillis)
-                ),
-                principalTemplate
-            );
+            return new MCRLDAPAuthClient(connectionSettings, principalTemplate);
         }
     }
 }
