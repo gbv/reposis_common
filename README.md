@@ -305,7 +305,10 @@ The entry page is located at `/sitelinks` and may need to be allowed in the `rob
 ## LDAPLoginServlet
 
 The LDAPLoginServlet can be used to enable login via LDAP. By default, the servlet is disabled.
-To set it up, an LDAP client must be configured, and, if necessary, mappers for the user attributes can be defined.
+To set it up, an LDAP DN resolver and an LDAP client must be configured, and, if necessary, mappers for the user
+attributes can be defined.
+The DN resolver determines the distinguished name (DN) used to authenticate a user by their username (e.g. by template
+or LDAP search).
 Additionally, a default role can be assigned to all LDAP users.
 
 ```
@@ -318,6 +321,11 @@ MCRLDAPLoginServlet.PersistUser=true
 MCRLDAPLoginServlet.AuthService.test.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthService
 MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
 
+# Configure the ldap dn resolver as static template resolver
+MCRLDAPLoginServlet.AuthService.test.Resolver.Class=de.gbv.reposis.user.ldap.dn.MCRLDAPTemplateDNResolver
+MCRLDAPLoginServlet.AuthService.test.Resolver.BaseDN=ou=people,dc=example,dc=org
+MCRLDAPLoginServlet.AuthService.test.Resolver.AttributeName=uid
+
 # Configure the ldap client.
 MCRLDAPLoginServlet.AuthService.test.Client.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthClient
 MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.Class=de.gbv.reposis.user.ldap.MCRLDAPConnectionSettings
@@ -328,7 +336,6 @@ MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.Protocol=plain
 #MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.ConnectTimeout=5000
 # Optionally set custom read timeout in milliseconds (default: 5000)
 #MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.ReadTimeout=5000
-MCRLDAPLoginServlet.AuthService.test.Client.PrincipalTemplate=(uid={0}),ou=users,dc=example,dc=com
 
 # Configure the attribute mappings.
 MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Class=de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper

@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import javax.naming.ldap.LdapName;
+
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.user2.MCRUser;
 
 import de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper;
+import de.gbv.reposis.user.ldap.dn.MCRLDAPDNResolver;
 
 /**
  * Service for authenticating users against an LDAP server.
@@ -19,6 +22,7 @@ import de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper;
 @MCRConfigurationProxy(proxyClass = MCRLDAPAuthService.Factory.class)
 public class MCRLDAPAuthService {
 
+    private final MCRLDAPDNResolver resolver;
     private final MCRLDAPAuthClient client;
     private final MCRLDAPAttributeMapper attributeMapper;
     private final List<String> defaultRoles;
@@ -27,12 +31,14 @@ public class MCRLDAPAuthService {
     /**
      * Creates a new {@code MCRLDAPAuthService}.
      *
-     * @param client used to resolve the user's DN and verify the password
+     * @param resolver used to resolve the user's DN
+     * @param client used to verify the password
      * @param attributeMapper used to map LDAP attributes to user attributes
      * @param defaultRoles roles assigned to every successfully authenticated LDAP user
      */
-    public MCRLDAPAuthService(MCRLDAPAuthClient client, MCRLDAPAttributeMapper attributeMapper,
-        List<String> defaultRoles) {
+    public MCRLDAPAuthService(MCRLDAPDNResolver resolver, MCRLDAPAuthClient client,
+        MCRLDAPAttributeMapper attributeMapper, List<String> defaultRoles) {
+        this.resolver = Objects.requireNonNull(resolver, "resolver must not be null");
         this.client = Objects.requireNonNull(client, "client must not be null");
         this.attributeMapper = attributeMapper;
         this.defaultRoles = Objects.requireNonNull(defaultRoles, "defaultRoles must not be null");
@@ -61,9 +67,11 @@ public class MCRLDAPAuthService {
      * @throws org.mycore.common.MCRUsageException if the user is ambiguous or an LDAP error occurs
      */
     public MCRUser authenticate(String username, String password) {
-        MCRLDAPAuthResult ldapUser = client.authenticate(username, password);
+        String dn = resolver.resolve(username).map(LdapName::toString)
+            .orElseThrow(() -> new MCRLDAPAuthException("No DN found for username: " + username));
+        MCRLDAPAuthResult ldapUser = client.authenticate(dn, password);
         if (ldapUser == null) {
-            throw new MCRLDAPAuthException("Invalid username or password");
+            throw new MCRLDAPAuthException("Authentication failed for DN: " + dn);
         }
         MCRLDAPAttributeMapper.MappingsResult mappingsResult = attributeMapper.map(ldapUser.attributes());
         MCRUser user = new MCRUser(username, realmId);
@@ -76,6 +84,9 @@ public class MCRLDAPAuthService {
      * Factory for creating {@link MCRLDAPAuthService} instances from configuration properties.
      */
     public static class Factory implements Supplier<MCRLDAPAuthService> {
+
+        @MCRInstance(name = "Resolver", valueClass = MCRLDAPDNResolver.class)
+        public MCRLDAPDNResolver resolver;
 
         @MCRInstance(name = "Client", valueClass = MCRLDAPAuthClient.class)
         public MCRLDAPAuthClient client;
@@ -90,7 +101,7 @@ public class MCRLDAPAuthService {
         public MCRLDAPAuthService get() {
             List<String> defaultRoles = defaultRolesString == null ? Collections.emptyList() : Arrays.asList(
                 defaultRolesString.split("\\s*,\\s*"));
-            return new MCRLDAPAuthService(client, attributeMapper, defaultRoles);
+            return new MCRLDAPAuthService(resolver, client, attributeMapper, defaultRoles);
         }
     }
 }

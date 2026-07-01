@@ -22,7 +22,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
-import org.mycore.common.config.annotation.MCRProperty;
 
 /**
  * Low-level LDAP client that authenticates a user via direct bind and returns all attributes.
@@ -36,42 +35,36 @@ public class MCRLDAPAuthClient {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private final Hashtable<String, String> baseEnv;
-    private final String principalTemplate;
 
     /**
      * Creates a new {@code MCRLDAPAuthClient}.
      *
      * @param connectionSettings base connection settings (URL, protocol, timeouts)
-     * @param principalTemplate  template for building the bind principal;
-     *                           {@code {0}} is replaced with the LDAP-escaped username
      */
-    public MCRLDAPAuthClient(MCRLDAPConnectionSettings connectionSettings, String principalTemplate) {
+    public MCRLDAPAuthClient(MCRLDAPConnectionSettings connectionSettings) {
         this.baseEnv = new Hashtable<>(connectionSettings.toEnv());
-        this.principalTemplate = principalTemplate;
     }
 
     /**
      * Authenticates a user via direct LDAP bind and returns all attributes on success.
      * <p>
-     * The bind principal is derived from the username using the configured template.
      * If the bind succeeds, all LDAP attributes of the entry are fetched and returned.
      *
-     * @param username the login name (inserted into the principal template)
+     * @param dn the distinguished name (DN) used as the bind principal
      * @param password the user's password
      * @return all LDAP attributes of the authenticated user or {@code null} if the credentials are invalid
      * @throws MCRUsageException if a connection or LDAP server error occurs
      */
-    public MCRLDAPAuthResult authenticate(String username, String password) {
+    public MCRLDAPAuthResult authenticate(String dn, String password) {
         final Hashtable<String, String> bindEnv = new Hashtable<>(baseEnv);
-        String principal = buildPrincipal(username);
         bindEnv.put(Context.SECURITY_AUTHENTICATION, "simple");
-        bindEnv.put(Context.SECURITY_PRINCIPAL, principal);
+        bindEnv.put(Context.SECURITY_PRINCIPAL, dn);
         bindEnv.put(Context.SECURITY_CREDENTIALS, password);
         DirContext ctx = null;
         try {
             ctx = new InitialDirContext(bindEnv);
-            LOGGER.debug("Credentials verified for principal: {}", principal);
-            Map<String, List<String>> attributes = getAttributes(ctx, principal);
+            LOGGER.debug("Credentials verified for principal: {}", dn);
+            Map<String, List<String>> attributes = getAttributes(ctx, dn);
             return new MCRLDAPAuthResult(attributes);
         } catch (AuthenticationException e) {
             return null;
@@ -80,10 +73,6 @@ public class MCRLDAPAuthClient {
         } finally {
             closeQuietly(ctx);
         }
-    }
-
-    private String buildPrincipal(String username) {
-        return principalTemplate.replace("{0}", escapeLdap(username));
     }
 
     private Map<String, List<String>> getAttributes(DirContext ctx, String principal) {
@@ -121,15 +110,6 @@ public class MCRLDAPAuthClient {
         }
     }
 
-    private static String escapeLdap(String value) {
-        return value
-            .replace("\\", "\\5c")
-            .replace("*", "\\2a")
-            .replace("(", "\\28")
-            .replace(")", "\\29")
-            .replace("\0", "\\00");
-    }
-
     /**
      * Factory for creating {@link MCRLDAPAuthClient} instances from configuration properties.
      */
@@ -138,12 +118,9 @@ public class MCRLDAPAuthClient {
         @MCRInstance(name = "ConnectionSettings", valueClass = MCRLDAPConnectionSettings.class)
         public MCRLDAPConnectionSettings connectionSettings;
 
-        @MCRProperty(name = "PrincipalTemplate")
-        public String principalTemplate;
-
         @Override
         public MCRLDAPAuthClient get() {
-            return new MCRLDAPAuthClient(connectionSettings, principalTemplate);
+            return new MCRLDAPAuthClient(connectionSettings);
         }
     }
 }
