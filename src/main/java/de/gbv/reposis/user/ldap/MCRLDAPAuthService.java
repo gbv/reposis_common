@@ -3,6 +3,7 @@ package de.gbv.reposis.user.ldap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
@@ -30,12 +31,18 @@ public class MCRLDAPAuthService {
      * @param attributeMapper used to map LDAP attributes to user attributes
      * @param defaultRoles roles assigned to every successfully authenticated LDAP user
      */
-    public MCRLDAPAuthService(MCRLDAPAuthClient client, MCRLDAPAttributeMapper attributeMapper, List<String> defaultRoles) {
-        this.client = client;
+    public MCRLDAPAuthService(MCRLDAPAuthClient client, MCRLDAPAttributeMapper attributeMapper,
+        List<String> defaultRoles) {
+        this.client = Objects.requireNonNull(client, "client must not be null");
         this.attributeMapper = attributeMapper;
-        this.defaultRoles = defaultRoles;
+        this.defaultRoles = Objects.requireNonNull(defaultRoles, "defaultRoles must not be null");
     }
 
+    /**
+     * Initializes this service with the ID of the realm it is responsible for.
+     *
+     * @param realmId the realm ID
+     */
     public void init(String realmId) {
         this.realmId = realmId;
     }
@@ -73,7 +80,7 @@ public class MCRLDAPAuthService {
         @MCRInstance(name = "Client", valueClass = MCRLDAPAuthClient.class)
         public MCRLDAPAuthClient client;
 
-        @MCRInstance(name = "AttributeMapper", valueClass = MCRLDAPAttributeMapper.class)
+        @MCRInstance(name = "AttributeMapper", valueClass = MCRLDAPAttributeMapper.class, required = false)
         public MCRLDAPAttributeMapper attributeMapper;
 
         @MCRProperty(name = "DefaultRoles", required = false)
