@@ -29,6 +29,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;
 
+import de.gbv.reposis.user.merger.MCRUserMerger;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -43,8 +44,8 @@ import java.io.IOException;
  * <p>
  * If the property {@link #SHIBBOLETH_PERSIST_USER_PROPERTY} is set to true, the user is persisted in the user database.
  * If the User with the given ID already exists, the user in the Database is merged with the user from the Shibboleth
- * attributes using {@link MCRShibbolethUserMerger}.
- * The {@link MCRShibbolethUserActionFactory} is used to resolve a {@link MCRShibbolethUserMerger}.
+ * attributes using {@link MCRUserMerger}.
+ * The {@link MCRShibbolethUserActionFactory} is used to resolve a {@link MCRUserMerger}.
  * </p>
  *
  * @author Sebastian Hofmann
