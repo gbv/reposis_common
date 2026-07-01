@@ -319,7 +319,10 @@ MCRLDAPLoginServlet.PersistUser=true
 
 # Configure the auth service service.
 MCRLDAPLoginServlet.AuthService.test.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthService
-MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
+# Always map the default role.
+#MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
+# If no role is mapped, the fallback is used
+#MCRLDAPLoginServlet.AuthService.test.FallbackRoles=submitter
 
 # Configure the ldap dn resolver as static template resolver
 MCRLDAPLoginServlet.AuthService.test.Resolver.Class=de.gbv.reposis.user.ldap.dn.MCRLDAPTemplateDNResolver
@@ -358,6 +361,15 @@ MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.Protocol=plain
 #MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Class=de.gbv.reposis.user.mapper.attribute.MCRGenericAttributeMapping
 #MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Source=mail
 #MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Target=eMail
+
+# Configure the role mappings.
+#MCRLDAPLoginServlet.AuthService.test.RoleMapper.Class=de.gbv.reposis.user.mapper.role.MCRRoleMapper
+# If the foo attribute equals bar, map the baz role
+#MCRLDAPLoginServlet.AuthService.test.RoleMapper.Roles.1.Class=de.gbv.reposis.user.mapper.role.MCRConditionalRoleMapping
+#MCRLDAPLoginServlet.AuthService.test.RoleMapper.Roles.1.Source=foo
+#MCRLDAPLoginServlet.AuthService.test.RoleMapper.Roles.1.Matcher.Class=de.gbv.reposis.user.matcher.MCREqualsStringMatcher
+#MCRLDAPLoginServlet.AuthService.test.RoleMapper.Roles.1.Matcher.ExpectedValue=bar
+#MCRLDAPLoginServlet.AuthService.test.RoleMapper.Roles.1.Role=baz
 ```
 
 ### realms.xml

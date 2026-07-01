@@ -1,14 +1,17 @@
 package de.gbv.reposis.user.ldap;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.naming.ldap.LdapName;
 
+import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -16,6 +19,7 @@ import org.mycore.user2.MCRUser;
 
 import de.gbv.reposis.user.ldap.dn.MCRLDAPDNResolver;
 import de.gbv.reposis.user.mapper.attribute.MCRAttributeMapper;
+import de.gbv.reposis.user.mapper.role.MCRRoleMapper;
 
 /**
  * Service for authenticating users against an LDAP server.
@@ -23,10 +27,15 @@ import de.gbv.reposis.user.mapper.attribute.MCRAttributeMapper;
 @MCRConfigurationProxy(proxyClass = MCRLDAPAuthService.Factory.class)
 public class MCRLDAPAuthService {
 
+    private static final Set<String> EXCLUDED_ATTRIBUTE_NAMES =
+        Set.of(MCRUserInformation.ATT_EMAIL, MCRUserInformation.ATT_REAL_NAME);
+
     private final MCRLDAPDNResolver resolver;
     private final MCRLDAPAuthClient client;
     private final MCRAttributeMapper attributeMapper;
+    private final MCRRoleMapper roleMapper;
     private final List<String> defaultRoles;
+    private final List<String> fallbackRoles;
     private String realmId;
 
     /**
@@ -35,14 +44,19 @@ public class MCRLDAPAuthService {
      * @param resolver used to resolve the user's DN
      * @param client used to verify the password
      * @param attributeMapper used to map LDAP attributes to user attributes
+     * @param roleMapper used to map LDAP attributes to roles
      * @param defaultRoles roles assigned to every successfully authenticated LDAP user
+     * @param fallbackRoles roles assigned if there is no role
      */
     public MCRLDAPAuthService(MCRLDAPDNResolver resolver, MCRLDAPAuthClient client,
-        MCRAttributeMapper attributeMapper, List<String> defaultRoles) {
+        MCRAttributeMapper attributeMapper, MCRRoleMapper roleMapper, List<String> defaultRoles,
+        List<String> fallbackRoles) {
         this.resolver = Objects.requireNonNull(resolver, "resolver must not be null");
         this.client = Objects.requireNonNull(client, "client must not be null");
         this.attributeMapper = attributeMapper;
+        this.roleMapper = roleMapper;
         this.defaultRoles = Objects.requireNonNull(defaultRoles, "defaultRoles must not be null");
+        this.fallbackRoles = Objects.requireNonNull(fallbackRoles, "fallbackRoles must not be null");
     }
 
     /**
@@ -78,7 +92,7 @@ public class MCRLDAPAuthService {
         if (attributeMapper != null) {
             assignAttributes(user, ldapUser.attributes());
         }
-        defaultRoles.forEach(user::assignRole);
+        assignRoles(user, ldapUser.attributes());
         return user;
     }
 
@@ -97,6 +111,20 @@ public class MCRLDAPAuthService {
         }
     }
 
+    private void assignRoles(MCRUser user, Map<String, List<String>> rawAttributes) {
+        Set<String> roles = new HashSet<>();
+        if (roleMapper != null) {
+            roles.addAll(roleMapper.map(rawAttributes));
+        }
+        if (!defaultRoles.isEmpty()) {
+            roles.addAll(defaultRoles);
+        }
+        if (roles.isEmpty() && !fallbackRoles.isEmpty()) {
+            roles.addAll(fallbackRoles);
+        }
+        roles.forEach(user::assignRole);
+    }
+
     /**
      * Factory for creating {@link MCRLDAPAuthService} instances from configuration properties.
      */
@@ -111,14 +139,30 @@ public class MCRLDAPAuthService {
         @MCRInstance(name = "AttributeMapper", valueClass = MCRAttributeMapper.class, required = false)
         public MCRAttributeMapper attributeMapper;
 
+        @MCRInstance(name = "RoleMapper", valueClass = MCRRoleMapper.class, required = false)
+        public MCRRoleMapper roleMapper;
+
         @MCRProperty(name = "DefaultRoles", required = false)
         public String defaultRolesString;
 
+        @MCRProperty(name = "FallbackRoles", required = false)
+        public String fallbackRolesString;
+
         @Override
         public MCRLDAPAuthService get() {
-            List<String> defaultRoles = defaultRolesString == null ? Collections.emptyList() : Arrays.asList(
-                defaultRolesString.split("\\s*,\\s*"));
-            return new MCRLDAPAuthService(resolver, client, attributeMapper, defaultRoles);
+            List<String> defaultRoles = splitToList(defaultRolesString);
+            List<String> fallbackRoles = splitToList(fallbackRolesString);
+            return new MCRLDAPAuthService(resolver, client, attributeMapper, roleMapper, defaultRoles, fallbackRoles);
+        }
+
+        private static List<String> splitToList(String value) {
+            if (value == null || value.isBlank()) {
+                return List.of();
+            }
+            return Arrays.stream(value.split(","))
+                .map(String::strip)
+                .filter(s -> !s.isEmpty())
+                .toList();
         }
     }
 }
