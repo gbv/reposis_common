@@ -351,13 +351,13 @@ MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.Protocol=plain
 #MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.ReadTimeout=5000
 
 # Configure the attribute mappings.
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Class=de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Class=de.gbv.reposis.user.ldap.mapper.MCRDefaultLDAPMapping
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Name=displayName
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.TargetName=realName
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Class=de.gbv.reposis.user.ldap.mapper.MCRDefaultLDAPMapping
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Name=mail
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.TargetName=eMail
+#MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Class=de.gbv.reposis.user.mapper.attribute.MCRAttributeMapper
+#MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Class=de.gbv.reposis.user.mapper.attribute.MCRGenericAttributeMapping
+#MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Source=displayName
+#MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Target=realName
+#MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Class=de.gbv.reposis.user.mapper.attribute.MCRGenericAttributeMapping
+#MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Source=mail
+#MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Target=eMail
 ```
 
 ### realms.xml

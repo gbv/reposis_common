@@ -3,6 +3,7 @@ package de.gbv.reposis.user.ldap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -13,8 +14,8 @@ import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.user2.MCRUser;
 
-import de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper;
 import de.gbv.reposis.user.ldap.dn.MCRLDAPDNResolver;
+import de.gbv.reposis.user.mapper.attribute.MCRAttributeMapper;
 
 /**
  * Service for authenticating users against an LDAP server.
@@ -24,7 +25,7 @@ public class MCRLDAPAuthService {
 
     private final MCRLDAPDNResolver resolver;
     private final MCRLDAPAuthClient client;
-    private final MCRLDAPAttributeMapper attributeMapper;
+    private final MCRAttributeMapper attributeMapper;
     private final List<String> defaultRoles;
     private String realmId;
 
@@ -37,7 +38,7 @@ public class MCRLDAPAuthService {
      * @param defaultRoles roles assigned to every successfully authenticated LDAP user
      */
     public MCRLDAPAuthService(MCRLDAPDNResolver resolver, MCRLDAPAuthClient client,
-        MCRLDAPAttributeMapper attributeMapper, List<String> defaultRoles) {
+        MCRAttributeMapper attributeMapper, List<String> defaultRoles) {
         this.resolver = Objects.requireNonNull(resolver, "resolver must not be null");
         this.client = Objects.requireNonNull(client, "client must not be null");
         this.attributeMapper = attributeMapper;
@@ -73,11 +74,17 @@ public class MCRLDAPAuthService {
         if (ldapUser == null) {
             throw new MCRLDAPAuthException("Authentication failed for DN: " + dn);
         }
-        MCRLDAPAttributeMapper.MappingsResult mappingsResult = attributeMapper.map(ldapUser.attributes());
         MCRUser user = new MCRUser(username, realmId);
-        mappingsResult.userAttributes().forEach(user::setUserAttribute);
+        if (attributeMapper != null) {
+            assignAttributes(user, ldapUser.attributes());
+        }
         defaultRoles.forEach(user::assignRole);
         return user;
+    }
+
+    private void assignAttributes(MCRUser user, Map<String, List<String>> rawAttributes) {
+        Map<String, String> attributes = attributeMapper.map(rawAttributes).userAttributes();
+        attributes.forEach(user::setUserAttribute);
     }
 
     /**
@@ -91,8 +98,8 @@ public class MCRLDAPAuthService {
         @MCRInstance(name = "Client", valueClass = MCRLDAPAuthClient.class)
         public MCRLDAPAuthClient client;
 
-        @MCRInstance(name = "AttributeMapper", valueClass = MCRLDAPAttributeMapper.class, required = false)
-        public MCRLDAPAttributeMapper attributeMapper;
+        @MCRInstance(name = "AttributeMapper", valueClass = MCRAttributeMapper.class, required = false)
+        public MCRAttributeMapper attributeMapper;
 
         @MCRProperty(name = "DefaultRoles", required = false)
         public String defaultRolesString;
