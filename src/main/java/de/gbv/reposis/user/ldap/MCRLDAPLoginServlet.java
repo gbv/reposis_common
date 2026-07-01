@@ -65,30 +65,20 @@ public class MCRLDAPLoginServlet extends MCRLoginServlet {
         String pwd = getProperty(req, "pwd");
         String realm = getProperty(req, "realm");
         if (uid != null && realm != null) {
-            MCRLDAPAuthService authService =
-                MCRConfiguration2.<MCRLDAPAuthService>getSingleInstanceOf(
-                        PROP_PREFIX + "AuthService." + realm + ".Class")
-                    .orElseThrow(
-                        () -> new MCRConfigurationException("No LDAP auth service configured for realm: " + realm));
-            authService.init(realm);
             try {
+                MCRLDAPAuthService authService = getAuthService(realm);
                 MCRUser user = authService.authenticate(uid, pwd);
                 if (persistUser) {
-                    if (!MCRUserManager.exists(uid, realm)) {
-                        MCRUserManager.createUser(user);
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("Created User {}", user.getUserID());
-                        }
-                    } else {
-                        if (LOGGER.isDebugEnabled()) {
-                            LOGGER.debug("User {} already exists", user.getUserID());
-                        }
-                    }
+                    persistUserIfAbsent(user, realm);
                 }
                 MCRSessionMgr.getCurrentSession().setUserInformation(user);
                 req.changeSessionId();
                 LOGGER.debug("user {} logged in successfully", user.getUserID());
                 res.sendRedirect(res.encodeRedirectURL(getReturnURL(req)));
+                return;
+            } catch (MCRConfigurationException e) {
+                LOGGER.error("Error while authenticating user", e);
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             } catch (MCRLDAPAuthException e) {
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -97,5 +87,23 @@ public class MCRLDAPLoginServlet extends MCRLoginServlet {
         }
         addFormFields(loginForm, job.getRequest().getParameter(REALM_URL_PARAMETER));
         getLayoutService().doLayout(req, res, new MCRJAXBContent<>(JAXBContext.newInstance(MCRLogin.class), loginForm));
+    }
+
+    private MCRLDAPAuthService getAuthService(String realm) {
+        MCRLDAPAuthService authService =
+            MCRConfiguration2.<MCRLDAPAuthService>getSingleInstanceOf(PROP_PREFIX + "AuthService." + realm + ".Class")
+                .orElseThrow(
+                    () -> new MCRConfigurationException("No LDAP auth service configured for realm: " + realm));
+        authService.init(realm);
+        return authService;
+    }
+
+    private void persistUserIfAbsent(MCRUser user, String realm) {
+        if (MCRUserManager.exists(user.getUserID(), realm)) {
+            LOGGER.debug("User {} already exists", user.getUserID());
+            return;
+        }
+        MCRUserManager.createUser(user);
+        LOGGER.debug("Created User {}", user.getUserID());
     }
 }
