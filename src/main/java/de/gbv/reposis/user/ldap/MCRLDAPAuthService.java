@@ -84,7 +84,17 @@ public class MCRLDAPAuthService {
 
     private void assignAttributes(MCRUser user, Map<String, List<String>> rawAttributes) {
         Map<String, String> attributes = attributeMapper.map(rawAttributes).userAttributes();
-        attributes.forEach(user::setUserAttribute);
+        attributes.entrySet().stream()
+            .filter(entry -> !EXCLUDED_ATTRIBUTE_NAMES.contains(entry.getKey()))
+            .forEach(entry -> user.setUserAttribute(entry.getKey(), entry.getValue()));
+        String eMail = attributes.get(MCRUserInformation.ATT_EMAIL);
+        if (eMail != null) {
+            user.setEMail(eMail);
+        }
+        String realName = attributes.get(MCRUserInformation.ATT_REAL_NAME);
+        if (realName != null) {
+            user.setRealName(realName);
+        }
     }
 
     /**
