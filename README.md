@@ -312,7 +312,7 @@ Additionally, a default role can be assigned to all LDAP users.
 # Set to "false" to enable the servlet.
 MCR.Servlet.LDAPLoginServlet.Disabled=false
 # Persist new users
-LDAPLoginServlet.PersistUser=true
+MCRLDAPLoginServlet.PersistUser=true
 
 # Configure the auth service service.
 MCRLDAPLoginServlet.AuthService.test.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthService
