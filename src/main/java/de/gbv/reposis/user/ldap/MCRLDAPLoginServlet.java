@@ -17,6 +17,9 @@ import org.mycore.user2.login.MCRLogin;
 import org.mycore.user2.login.MCRLoginServlet;
 import org.xml.sax.SAXException;
 
+import de.gbv.reposis.user.MCRStandaloneTransientUser;
+import de.gbv.reposis.user.MCRUserData;
+import de.gbv.reposis.user.MCRUserFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -64,25 +67,38 @@ public class MCRLDAPLoginServlet extends MCRLoginServlet {
         String uid = getProperty(req, "uid");
         String pwd = getProperty(req, "pwd");
         String realm = getProperty(req, "realm");
+
+        MCRLDAPAuthService authService;
+
+        try {
+            authService = getAuthService(realm);
+        } catch (MCRConfigurationException e) {
+            LOGGER.error("Error while authenticating user", e);
+            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
         if (uid != null && realm != null) {
             try {
-                MCRLDAPAuthService authService = getAuthService(realm);
-                MCRUser user = authService.authenticate(uid, pwd);
+                MCRUserData userData = authService.authenticate(uid, pwd);
                 if (persistUser) {
-                    persistUserIfAbsent(user, realm);
+                    MCRUser currentUser = persistUserIfAbsent(userData);
+                    MCRSessionMgr.getCurrentSession().setUserInformation(currentUser);
+                } else {
+                    MCRUser currentUser = new MCRStandaloneTransientUser(userData);
+                    MCRSessionMgr.getCurrentSession().setUserInformation(currentUser);
                 }
-                MCRSessionMgr.getCurrentSession().setUserInformation(user);
                 req.changeSessionId();
-                LOGGER.debug("user {} logged in successfully", user.getUserID());
+                LOGGER.debug("user {} logged in successfully", userData.userId());
                 res.sendRedirect(res.encodeRedirectURL(getReturnURL(req)));
-                return;
-            } catch (MCRConfigurationException e) {
-                LOGGER.error("Error while authenticating user", e);
-                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             } catch (MCRLDAPAuthException e) {
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 loginForm.setLoginFailed(true);
+            } catch (Exception e) {
+                LOGGER.error("Error while authenticating user", e);
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return;
             }
         }
         addFormFields(loginForm, job.getRequest().getParameter(REALM_URL_PARAMETER));
@@ -98,12 +114,15 @@ public class MCRLDAPLoginServlet extends MCRLoginServlet {
         return authService;
     }
 
-    private void persistUserIfAbsent(MCRUser user, String realm) {
-        if (MCRUserManager.exists(user.getUserID(), realm)) {
-            LOGGER.debug("User {} already exists", user.getUserID());
-            return;
+    private MCRUser persistUserIfAbsent(MCRUserData userData) {
+        MCRUser user = MCRUserManager.getUser(userData.userId());
+        if (user != null) {
+            LOGGER.debug("User {} already exists", userData.userId());
+            return user;
         }
-        MCRUserManager.createUser(user);
-        LOGGER.debug("Created User {}", user.getUserID());
+        MCRUser toCreate = MCRUserFactory.createUser(userData);
+        MCRUserManager.createUser(toCreate);
+        LOGGER.debug("Created User {}", userData.userId());
+        return toCreate;
     }
 }

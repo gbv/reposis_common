@@ -1,7 +1,7 @@
 package de.gbv.reposis.user.ldap;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,12 +11,11 @@ import java.util.function.Supplier;
 
 import javax.naming.ldap.LdapName;
 
-import org.mycore.common.MCRUserInformation;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.user2.MCRUser;
 
+import de.gbv.reposis.user.MCRUserData;
 import de.gbv.reposis.user.ldap.dn.MCRLDAPDNResolver;
 import de.gbv.reposis.user.mapper.attribute.MCRAttributeMapper;
 import de.gbv.reposis.user.mapper.role.MCRRoleMapper;
@@ -26,9 +25,6 @@ import de.gbv.reposis.user.mapper.role.MCRRoleMapper;
  */
 @MCRConfigurationProxy(proxyClass = MCRLDAPAuthService.Factory.class)
 public class MCRLDAPAuthService {
-
-    private static final Set<String> EXCLUDED_ATTRIBUTE_NAMES =
-        Set.of(MCRUserInformation.ATT_EMAIL, MCRUserInformation.ATT_REAL_NAME);
 
     private final MCRLDAPDNResolver resolver;
     private final MCRLDAPAuthClient client;
@@ -77,41 +73,26 @@ public class MCRLDAPAuthService {
      *
      * @param username the login name (UID)
      * @param password the plain-text password
-     * @return {@link MCRUser} for the authenticated user
+     * @return {@link MCRUserData} for the authenticated user
      * @throws MCRLDAPAuthException if the user is not found or the password is invalid
      * @throws org.mycore.common.MCRUsageException if the user is ambiguous or an LDAP error occurs
      */
-    public MCRUser authenticate(String username, String password) {
+    public MCRUserData authenticate(String username, String password) {
         String dn = resolver.resolve(username).map(LdapName::toString)
             .orElseThrow(() -> new MCRLDAPAuthException("No DN found for username: " + username));
-        MCRLDAPAuthResult ldapUser = client.authenticate(dn, password);
-        if (ldapUser == null) {
+        MCRLDAPAuthResult ldapResult = client.authenticate(dn, password);
+        if (ldapResult == null) {
             throw new MCRLDAPAuthException("Authentication failed for DN: " + dn);
         }
-        MCRUser user = new MCRUser(username, realmId);
+        return getUserData(username, realmId, ldapResult.attributes());
+    }
+
+    private MCRUserData getUserData(String username, String realmId, Map<String,
+        List<String>> rawAttributes) {
+        Map<String, String> attributes = new HashMap<>();
         if (attributeMapper != null) {
-            assignAttributes(user, ldapUser.attributes());
+            attributes.putAll(attributeMapper.map(rawAttributes).userAttributes());
         }
-        assignRoles(user, ldapUser.attributes());
-        return user;
-    }
-
-    private void assignAttributes(MCRUser user, Map<String, List<String>> rawAttributes) {
-        Map<String, String> attributes = attributeMapper.map(rawAttributes).userAttributes();
-        attributes.entrySet().stream()
-            .filter(entry -> !EXCLUDED_ATTRIBUTE_NAMES.contains(entry.getKey()))
-            .forEach(entry -> user.setUserAttribute(entry.getKey(), entry.getValue()));
-        String eMail = attributes.get(MCRUserInformation.ATT_EMAIL);
-        if (eMail != null) {
-            user.setEMail(eMail);
-        }
-        String realName = attributes.get(MCRUserInformation.ATT_REAL_NAME);
-        if (realName != null) {
-            user.setRealName(realName);
-        }
-    }
-
-    private void assignRoles(MCRUser user, Map<String, List<String>> rawAttributes) {
         Set<String> roles = new HashSet<>();
         if (roleMapper != null) {
             roles.addAll(roleMapper.map(rawAttributes));
@@ -122,7 +103,7 @@ public class MCRLDAPAuthService {
         if (roles.isEmpty() && !fallbackRoles.isEmpty()) {
             roles.addAll(fallbackRoles);
         }
-        roles.forEach(user::assignRole);
+        return new MCRUserData(username, realmId, roles, attributes);
     }
 
     /**
