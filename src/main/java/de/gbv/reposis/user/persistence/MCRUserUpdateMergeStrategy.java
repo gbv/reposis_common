@@ -18,7 +18,10 @@ import org.mycore.user2.MCRUserManager;
 import de.gbv.reposis.user.merger.MCRUserMerger;
 
 /**
- * Existing user update strategy that merges the incoming user into an existing user.
+ * Existing user update strategy that merges the existing user in an incoming user.
+ * <p>
+ * User roles are always updated during the merge process.
+ * Therefore, the user is persisted regardless of whether the merge reports other changes.
  */
 @MCRConfigurationProxy(proxyClass = MCRUserUpdateMergeStrategy.Factory.class)
 public class MCRUserUpdateMergeStrategy implements MCRUserUpdateStrategy {
