@@ -97,7 +97,7 @@ public class MCRShibbolethLoginServlet2 extends MCRServlet {
 
             if (existingUser != null) {
                 // user exists and attributes need to be updated
-                if (MCRShibbolethUserActionFactory.getUserMerger().merge(existingUser, mcrUser)) {
+                if (MCRShibbolethUserActionFactory.getUserMerger().merge(mcrUser, existingUser)) {
                     MCRUserManager.updateUser(existingUser);
                 }
                 mcrUser = existingUser;
