@@ -26,6 +26,8 @@ public class MCRStandaloneTransientUser extends MCRTransientUser {
         super(wrap(userData));
         this.initialized = true;
         try {
+            // MCRUser#setRealmID(String) has package-private visibility, so reflection
+            // is required to initialize the realm outside the package.
             Method setRealm = MCRUser.class.getDeclaredMethod("setRealmID", String.class);
             setRealm.setAccessible(true);
             setRealm.invoke(this, userData.realmId());

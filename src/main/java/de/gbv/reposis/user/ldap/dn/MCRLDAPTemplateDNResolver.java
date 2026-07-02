@@ -7,6 +7,8 @@ import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
@@ -16,6 +18,8 @@ import org.mycore.common.config.annotation.MCRProperty;
  */
 @MCRConfigurationProxy(proxyClass = MCRLDAPTemplateDNResolver.Factory.class)
 public class MCRLDAPTemplateDNResolver implements MCRLDAPDNResolver {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final String baseDN;
     private final String attributeName;
@@ -38,6 +42,7 @@ public class MCRLDAPTemplateDNResolver implements MCRLDAPDNResolver {
             dn.add(new Rdn(attributeName, username));
             return Optional.of(dn);
         } catch (InvalidNameException e) {
+            LOGGER.warn("Invalid LDAP DN provided for username: {}", username);
             return Optional.empty();
         }
     }

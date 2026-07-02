@@ -68,8 +68,8 @@ public class MCRLDAPAuthService {
      * Authenticates a user against the LDAP server.
      * <p>
      * Resolves the user's DN by UID, then verifies the password via a simple bind.
-     * The same exception is thrown regardless of whether the user was not found or
-     * the password was incorrect – to avoid leaking information about existing accounts.
+     * Authentication failures use the same exception type regardless of whether
+     * the user was not found or the password was incorrect.
      *
      * @param username the login name (UID)
      * @param password the plain-text password
