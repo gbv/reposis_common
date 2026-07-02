@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<realms local="local">
+  <realm id="local">
+    <label xml:lang="de">lokal</label>
+    <label xml:lang="en">local</label>
+  </realm>
+</realms>
