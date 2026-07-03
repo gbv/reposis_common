@@ -16,7 +16,6 @@ import org.mycore.common.config.annotation.MCRInstanceList;
  * <p>
  * Each configured mapping is applied independently to the given raw attributes.
  * Mappings that do not produce a result (i.e. return {@link Optional#empty()}) are skipped.
- * The results of all mappings are combined into a single {@link MappingsResult}.
  */
 @MCRConfigurationProxy(proxyClass = MCRAttributeMapper.Factory.class)
 public class MCRAttributeMapper {
@@ -41,18 +40,18 @@ public class MCRAttributeMapper {
      *
      * @param attributes the raw attributes, keyed by attribute name, with each value being the
      *                   (possibly multi-valued) list of values for that attribute
-     * @return the aggregated result of all applied mappings
+     * @return a map containing the aggregated result of all applied mappings, keyed by the
+     *         result key produced by each mapping
      */
-    public MappingsResult map(Map<String, List<String>> attributes) {
-        Map<String, String> userAttributes = attributeMappings.stream()
+    public Map<String, String> map(Map<String, List<String>> attributes) {
+        return attributeMappings.stream()
             .map(m -> m.apply(attributes))
             .flatMap(Optional::stream)
-            .collect(Collectors.toMap(
+            .collect(Collectors.toUnmodifiableMap(
                 MCRAttributeMapping.Result::key,
                 MCRAttributeMapping.Result::value,
                 (first, second) -> first
             ));
-        return new MappingsResult(userAttributes);
     }
 
     /**
@@ -66,17 +65,6 @@ public class MCRAttributeMapper {
         @Override
         public MCRAttributeMapper get() {
             return new MCRAttributeMapper(attributes != null ? attributes : List.of());
-        }
-    }
-
-    /**
-     * The aggregated result of applying all configured attribute mappings.
-     *
-     * @param userAttributes the resulting attributes, keyed by attribute name
-     */
-    public record MappingsResult(Map<String, String> userAttributes) {
-        public MappingsResult {
-            userAttributes = Map.copyOf(userAttributes);
         }
     }
 }

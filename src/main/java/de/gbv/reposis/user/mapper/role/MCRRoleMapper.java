@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstanceList;
 import org.mycore.common.config.annotation.MCRProperty;
+import org.mycore.user2.MCRRoleManager;
 
 /**
  * Maps raw attributes to a set of roles based on a configured list of {@link MCRRoleMapping} instances.
@@ -38,13 +39,9 @@ public class MCRRoleMapper {
     /**
      * Applies all configured role mappings to the given raw attributes and aggregates the
      * results.
-     * <p>
-     * If a default role is configured, it is added to the result unconditionally. If, after
-     * applying all mappings and the default role, the result is still empty and a fallback role
-     * is configured, that fallback role is added.
      *
      * @param attributes the raw attributes, keyed by attribute name, with each value being the
-     *                   (possibly multi-valued) list of values for that attribute
+     *                    (possibly multi-valued) list of values for that attribute
      * @return an immutable set of roles derived from the given attributes
      */
     public Set<String> map(Map<String, List<String>> attributes) {

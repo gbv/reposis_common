@@ -24,9 +24,9 @@ public class MCRAttributeMapperTest {
             fixedMapping("eMail", "jane@example.com")
         ));
 
-        MCRAttributeMapper.MappingsResult result = mapper.map(Map.of());
+        Map<String, String> result = mapper.map(Map.of());
 
-        assertEquals(Map.of("realName", "Jane Doe", "eMail", "jane@example.com"), result.userAttributes());
+        assertEquals(Map.of("realName", "Jane Doe", "eMail", "jane@example.com"), result);
     }
 
     @Test
@@ -36,18 +36,18 @@ public class MCRAttributeMapperTest {
             fixedMapping("realName", "Jane Doe")
         ));
 
-        MCRAttributeMapper.MappingsResult result = mapper.map(Map.of());
+        Map<String, String> result = mapper.map(Map.of());
 
-        assertEquals(Map.of("realName", "Jane Doe"), result.userAttributes());
+        assertEquals(Map.of("realName", "Jane Doe"), result);
     }
 
     @Test
     public void mapReturnsEmptyResultIfNoMappingsAreConfigured() {
         MCRAttributeMapper mapper = new MCRAttributeMapper(List.of());
 
-        MCRAttributeMapper.MappingsResult result = mapper.map(Map.of());
+        Map<String, String> result = mapper.map(Map.of());
 
-        assertTrue(result.userAttributes().isEmpty());
+        assertTrue(result.isEmpty());
     }
 
     @Test
@@ -57,17 +57,17 @@ public class MCRAttributeMapperTest {
             fixedMapping("realName", "Second Value")
         ));
 
-        MCRAttributeMapper.MappingsResult result = mapper.map(Map.of());
+        Map<String, String> result = mapper.map(Map.of());
 
-        assertEquals("First Value", result.userAttributes().get("realName"));
+        assertEquals("First Value", result.get("realName"));
     }
 
     @Test
     public void mappingsResultIsImmutable() {
         MCRAttributeMapper mapper = new MCRAttributeMapper(List.of(fixedMapping("realName", "Jane Doe")));
-        MCRAttributeMapper.MappingsResult result = mapper.map(Map.of());
+        Map<String, String> result = mapper.map(Map.of());
 
-        assertThrows(UnsupportedOperationException.class, () -> result.userAttributes().put("x", "y"));
+        assertThrows(UnsupportedOperationException.class, () -> result.put("x", "y"));
     }
 
     private static MCRAttributeMapping fixedMapping(String key, String value) {

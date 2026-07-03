@@ -91,7 +91,7 @@ public class MCRLDAPAuthService {
         List<String>> rawAttributes) {
         Map<String, String> attributes = new HashMap<>();
         if (attributeMapper != null) {
-            attributes.putAll(attributeMapper.map(rawAttributes).userAttributes());
+            attributes.putAll(attributeMapper.map(rawAttributes));
         }
         Set<String> roles = new HashSet<>();
         if (roleMapper != null) {
