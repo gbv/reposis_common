@@ -3,13 +3,18 @@ package de.gbv.reposis.user;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.user2.MCRRoleManager;
 import org.mycore.user2.MCRUser;
 
 /**
  * Factory for creating {@link MCRUser} instances from {@link MCRUserData}.
  */
 public final class MCRUserFactory {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Set<String> EXCLUDED_ATTRIBUTE_NAMES = Set.of(MCRUserInformation.ATT_EMAIL,
         MCRUserInformation.ATT_REAL_NAME);
@@ -39,10 +44,20 @@ public final class MCRUserFactory {
             user.setRealName(attributes.get(MCRUserInformation.ATT_REAL_NAME));
         }
 
-        roles.forEach(user::assignRole);
+        assignRoles(user, roles);
         applyAttributes(user, attributes);
 
         return user;
+    }
+
+    private static void assignRoles(MCRUser user, Set<String> roles) {
+        for (String role : roles) {
+            if (MCRRoleManager.getRole(role) != null) {
+                user.assignRole(role);
+            } else {
+                LOGGER.warn("Ignoring unknown role '{}' for user '{}'", role, user.getUserID());
+            }
+        }
     }
 
     private static void applyAttributes(MCRUser user, Map<String, String> attributes) {

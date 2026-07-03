@@ -5,8 +5,11 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUserInformation;
+import org.mycore.user2.MCRRoleManager;
 import org.mycore.user2.MCRTransientUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUser2Constants;
@@ -16,6 +19,8 @@ import org.mycore.user2.MCRUser2Constants;
  * depend on realm-based attribute mapping.
  */
 public class MCRStandaloneTransientUser extends MCRTransientUser {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final String SYSTEM_ROLE_PREFIX = MCRUser2Constants.getRoleRootId() + ":";
 
@@ -44,6 +49,13 @@ public class MCRStandaloneTransientUser extends MCRTransientUser {
     private void assignExternalRoles(Set<String> roles) {
         roles.stream()
             .filter(role -> !isSystemRole(role))
+            .filter(role -> {
+                if (MCRRoleManager.getRole(role) == null) {
+                    LOGGER.debug("Ignoring unknown role '{}'", role);
+                    return false;
+                }
+                return true;
+            })
             .forEach(this::assignRole);
     }
 
