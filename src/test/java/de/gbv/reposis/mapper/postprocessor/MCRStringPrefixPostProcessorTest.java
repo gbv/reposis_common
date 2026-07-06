@@ -1,22 +1,22 @@
-package de.gbv.reposis.user.postprocessor;
+package de.gbv.reposis.mapper.postprocessor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
 
-public class MCRPrefixStringPostProcessorTest {
+public class MCRStringPrefixPostProcessorTest {
 
     @Test
     public void shouldPrependPrefix() {
-        MCRPrefixStringPostProcessor processor = new MCRPrefixStringPostProcessor("xxx:");
+        MCRStringPrefixPostProcessor processor = new MCRStringPrefixPostProcessor("xxx:");
         String result = processor.process("fg2");
         assertEquals("xxx:fg2", result);
     }
 
     @Test
     public void shouldHandleEmptyValue() {
-        MCRPrefixStringPostProcessor processor = new MCRPrefixStringPostProcessor("xxx:");
+        MCRStringPrefixPostProcessor processor = new MCRStringPrefixPostProcessor("xxx:");
         String result = processor.process("");
         assertEquals("xxx:", result);
     }
@@ -24,6 +24,6 @@ public class MCRPrefixStringPostProcessorTest {
     @Test
     public void shouldRejectNullPrefix() {
         assertThrows(NullPointerException.class,
-            () -> new MCRPrefixStringPostProcessor(null));
+            () -> new MCRStringPrefixPostProcessor(null));
     }
 }

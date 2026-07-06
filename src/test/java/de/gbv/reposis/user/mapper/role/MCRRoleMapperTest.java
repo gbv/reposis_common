@@ -11,7 +11,12 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import de.gbv.reposis.mapper.source.MCRMapValueSource;
+import de.gbv.reposis.mapper.source.MCRValueSource;
+
 public class MCRRoleMapperTest {
+
+    private static final MCRValueSource<String> EMPTY_SOURCE = new MCRMapValueSource<>(Map.of());
 
     @Test
     public void constructorRejectsNullMappings() {
@@ -22,7 +27,7 @@ public class MCRRoleMapperTest {
     public void mapCombinesRolesOfAllMappings() {
         MCRRoleMapper mapper = new MCRRoleMapper(List.of(fixedRole("editor"), fixedRole("reviewer")));
 
-        Set<String> roles = mapper.map(Map.of());
+        Set<String> roles = mapper.map(EMPTY_SOURCE);
 
         assertEquals(Set.of("editor", "reviewer"), roles);
     }
@@ -31,7 +36,7 @@ public class MCRRoleMapperTest {
     public void mapSkipsMappingsThatDoNotApply() {
         MCRRoleMapper mapper = new MCRRoleMapper(List.of(noRole(), fixedRole("editor")));
 
-        Set<String> roles = mapper.map(Map.of());
+        Set<String> roles = mapper.map(EMPTY_SOURCE);
 
         assertEquals(Set.of("editor"), roles);
     }
@@ -40,7 +45,7 @@ public class MCRRoleMapperTest {
     public void mapReturnsEmptySetIfNoMappingsAreConfigured() {
         MCRRoleMapper mapper = new MCRRoleMapper(List.of());
 
-        Set<String> roles = mapper.map(Map.of());
+        Set<String> roles = mapper.map(EMPTY_SOURCE);
 
         assertTrue(roles.isEmpty());
     }
@@ -48,16 +53,16 @@ public class MCRRoleMapperTest {
     @Test
     public void mapReturnsImmutableSet() {
         MCRRoleMapper mapper = new MCRRoleMapper(List.of(fixedRole("editor")));
-        Set<String> roles = mapper.map(Map.of());
+        Set<String> roles = mapper.map(EMPTY_SOURCE);
 
         assertThrows(UnsupportedOperationException.class, () -> roles.add("x"));
     }
 
     private static MCRRoleMapping fixedRole(String role) {
-        return attributes -> Optional.of(role);
+        return source -> Optional.of(role);
     }
 
     private static MCRRoleMapping noRole() {
-        return attributes -> Optional.empty();
+        return source -> Optional.empty();
     }
 }
