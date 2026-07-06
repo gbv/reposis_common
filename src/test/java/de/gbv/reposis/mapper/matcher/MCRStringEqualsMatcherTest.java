@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-public class MCREqualsStringMatcherTest {
+public class MCRStringEqualsMatcherTest {
 
     @Test
     public void constructorRejectsNullExpectedValue() {
