@@ -2,6 +2,7 @@ package de.gbv.reposis.user;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -22,6 +23,9 @@ public class MCRStandaloneTransientUser extends MCRTransientUser {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private static final Set<String> EXCLUDED_ATTRIBUTE_NAMES = Set.of(MCRUserInformation.ATT_EMAIL,
+        MCRUserInformation.ATT_REAL_NAME);
+
     private static final String SYSTEM_ROLE_PREFIX = MCRUser2Constants.getRoleRootId() + ":";
 
     private final boolean initialized;
@@ -35,6 +39,7 @@ public class MCRStandaloneTransientUser extends MCRTransientUser {
         super(wrap(userData));
         this.initialized = true;
         assignExternalRoles(userData.roles());
+        setAttributes(userData.attributes());
         try {
             // MCRUser#setRealmID(String) has package-private visibility, so reflection
             // is required to initialize the realm outside the package.
@@ -46,12 +51,22 @@ public class MCRStandaloneTransientUser extends MCRTransientUser {
         }
     }
 
+    private void setAttributes(Map<String, String> attributes) {
+        String email = attributes.get(MCRUserInformation.ATT_EMAIL);
+        if (email != null) {
+            this.setEMail(email);
+        }
+        attributes.entrySet().stream()
+            .filter(entry -> !EXCLUDED_ATTRIBUTE_NAMES.contains(entry.getKey()))
+            .forEach(entry -> this.setUserAttribute(entry.getKey(), entry.getValue()));
+    }
+
     private void assignExternalRoles(Set<String> roles) {
         roles.stream()
             .filter(role -> !isSystemRole(role))
             .filter(role -> {
                 if (MCRRoleManager.getRole(role) == null) {
-                    LOGGER.debug("Ignoring unknown role '{}'", role);
+                    LOGGER.warn("Ignoring unknown role '{}'", role);
                     return false;
                 }
                 return true;
