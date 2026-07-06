@@ -373,6 +373,32 @@ The stylesheet can be activated as follows:
 ```
 MCR.ContentTransformer.mcr_error.Stylesheet=xsl/rep-error-page.xsl,%MCR.LayoutTransformerFactory.Default.Stylesheets%
 ```
+### Codemeta
+
+#### Metadata
+Codemeta metadata view and export can be enabled via mycore.properties:
+
+```properties
+# Enable CodeMeta metadata display
+MCR.URIResolver.xslImports.modsmeta=%MCR.URIResolver.xslImports.modsmeta%,metadata/rep-codemeta-metadata.xsl
+MIR.Layout.Start=%MIR.Layout.Start%,rep-codemeta-metadata
+# Enable CodeMeta metadata export
+MCR.ContentTransformer.mods2codemeta-jsonld.Stylesheet=xslt/mycoreobject2codemeta-jsonld.xsl
+MCR.ContentTransformer.mods2codemeta-jsonld.TransformerFactoryClass=net.sf.saxon.TransformerFactoryImpl
+MCR.Export.Transformers=%MCR.Export.Transformers%,mods2codemeta-jsonld:CodeMeta
+```
+
+#### OAI
+OAI Codemeta set can be enabled via mycore.properties:
+
+```properties
+MCR.ContentTransformer.oai-codemeta.Stylesheet=xslt/mycoreobject2codemeta-jsonld.xsl,xslt/codemeta-jsonld2rdf.xsl
+MCR.ContentTransformer.oai-codemeta.TransformerFactoryClass=net.sf.saxon.TransformerFactoryImpl
+MCR.OAIDataProvider.MetadataFormat.codemeta.Schema=http://www.openarchives.org/OAI/2.0/rdf.xsd
+MCR.OAIDataProvider.MetadataFormat.codemeta.Namespace=http://www.w3.org/1999/02/22-rdf-syntax-ns#
+MCR.OAIDataProvider.OAI2.Sets.codemeta.URI=webapp:oai/set_codemeta.xml
+MCR.OAIDataProvider.OAI2.Sets.codemeta.Query=mods.genre:software
+```
 
 ## Development
 
