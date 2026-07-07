@@ -16,6 +16,7 @@ import javax.naming.ldap.LdapName;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUsageException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -48,9 +49,14 @@ public class MCRLDAPSearchDNResolver implements MCRLDAPDNResolver {
      * @param searchFilterTemplate the search filter template, with {@code {0}} as placeholder for the username
      * @param bindDN the DN of the service account, or {@code null}/blank for an anonymous search
      * @param bindPassword the password of the service account, or {@code null} for an anonymous search
+     * @throws MCRUsageException if {@code searchFilterTemplate} does not contain a {@code {0}} placeholder
      */
     public MCRLDAPSearchDNResolver(MCRLDAPConnectionSettings connectionSettings, String baseDN,
         String searchFilterTemplate, String bindDN, String bindPassword) {
+        if (!searchFilterTemplate.contains("{0}")) {
+            throw new MCRUsageException(
+                "SearchFilter must contain a '{0}' placeholder for the username: " + searchFilterTemplate);
+        }
         this.connectionSettings = connectionSettings;
         this.baseDN = baseDN;
         this.searchFilterTemplate = searchFilterTemplate;
@@ -60,10 +66,6 @@ public class MCRLDAPSearchDNResolver implements MCRLDAPDNResolver {
 
     @Override
     public Optional<LdapName> resolve(String username) {
-        if (!searchFilterTemplate.contains("{0}")) {
-            throw new MCRUsageException(
-                "SearchFilter must contain a '{0}' placeholder for the username: " + searchFilterTemplate);
-        }
         String filter = searchFilterTemplate.replace("{0}", escapeSearchFilter(username));
 
         DirContext ctx = null;
@@ -169,6 +171,10 @@ public class MCRLDAPSearchDNResolver implements MCRLDAPDNResolver {
 
         @Override
         public MCRLDAPSearchDNResolver get() {
+            if (!searchFilter.contains("{0}")) {
+                throw new MCRConfigurationException(
+                    "SearchFilter must contain a '{0}' placeholder for the username: " + searchFilter);
+            }
             return new MCRLDAPSearchDNResolver(connectionSettings, baseDN, searchFilter, bindDN, bindPassword);
         }
     }
