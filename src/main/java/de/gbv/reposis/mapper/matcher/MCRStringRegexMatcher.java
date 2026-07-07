@@ -10,11 +10,11 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
- * A {@link MCRMatcher} that checks whether a given string value matches a configured regular
+ * A {@link MCRValueMatcher} that checks whether a given string value matches a configured regular
  * expression. A {@code null} value never matches.
  */
 @MCRConfigurationProxy(proxyClass = MCRStringRegexMatcher.Factory.class)
-public class MCRStringRegexMatcher implements MCRMatcher<String> {
+public class MCRStringRegexMatcher implements MCRValueMatcher<String> {
 
     private final Pattern pattern;
 
@@ -28,7 +28,7 @@ public class MCRStringRegexMatcher implements MCRMatcher<String> {
     }
 
     @Override
-    public boolean matches(String extracted) {
+    public boolean test(String extracted) {
         return extracted != null && pattern.matcher(extracted).matches();
     }
 

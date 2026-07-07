@@ -11,7 +11,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 import de.gbv.reposis.mapper.MCRMapping;
 import de.gbv.reposis.mapper.MCRPipelineMapping;
 import de.gbv.reposis.mapper.extractor.MCRExtractor;
-import de.gbv.reposis.mapper.matcher.MCRMatcher;
+import de.gbv.reposis.mapper.matcher.MCRValueMatcher;
 import de.gbv.reposis.mapper.postprocessor.MCRPostProcessor;
 import de.gbv.reposis.mapper.source.MCRValueSource;
 
@@ -36,7 +36,7 @@ public class MCRConfigurableRolePipelineMapping implements MCRRoleMapping {
      *                      {@code null} if no further processing is needed
      */
     public MCRConfigurableRolePipelineMapping(String attributeName, MCRExtractor<String> extractor,
-        MCRMatcher<String> matcher, MCRPostProcessor<String> postProcessor) {
+        MCRValueMatcher<String> matcher, MCRPostProcessor<String> postProcessor) {
         Objects.requireNonNull(attributeName, "attributeName must not be null");
         this.pipeline = new MCRPipelineMapping<>(attributeName, extractor, matcher, postProcessor);
     }
@@ -63,8 +63,8 @@ public class MCRConfigurableRolePipelineMapping implements MCRRoleMapping {
         @MCRInstance(name = "Extractor", valueClass = MCRExtractor.class, required = false)
         public MCRExtractor<String> extractor;
 
-        @MCRInstance(name = "Matcher", valueClass = MCRMatcher.class, required = false)
-        public MCRMatcher<String> matcher;
+        @MCRInstance(name = "Matcher", valueClass = MCRValueMatcher.class, required = false)
+        public MCRValueMatcher<String> matcher;
 
         @MCRInstance(name = "PostProcessor", valueClass = MCRPostProcessor.class, required = false)
         public MCRPostProcessor<String> postProcessor;

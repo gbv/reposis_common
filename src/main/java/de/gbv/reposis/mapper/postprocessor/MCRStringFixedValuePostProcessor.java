@@ -25,7 +25,7 @@ public class MCRStringFixedValuePostProcessor implements MCRPostProcessor<String
     }
 
     @Override
-    public String process(String ignored) {
+    public String apply(String ignored) {
         return value;
     }
 

@@ -10,14 +10,14 @@ public class MCRStringPrefixPostProcessorTest {
     @Test
     public void shouldPrependPrefix() {
         MCRStringPrefixPostProcessor processor = new MCRStringPrefixPostProcessor("xxx:");
-        String result = processor.process("fg2");
+        String result = processor.apply("fg2");
         assertEquals("xxx:fg2", result);
     }
 
     @Test
     public void shouldHandleEmptyValue() {
         MCRStringPrefixPostProcessor processor = new MCRStringPrefixPostProcessor("xxx:");
-        String result = processor.process("");
+        String result = processor.apply("");
         assertEquals("xxx:", result);
     }
 

@@ -12,15 +12,15 @@ import java.util.regex.Pattern;
 import org.junit.Test;
 
 import de.gbv.reposis.mapper.extractor.MCRStringRegexExtractor;
-import de.gbv.reposis.mapper.matcher.MCRMatcher;
 import de.gbv.reposis.mapper.matcher.MCRStringEqualsMatcher;
+import de.gbv.reposis.mapper.matcher.MCRValueMatcher;
 import de.gbv.reposis.mapper.postprocessor.MCRStringFixedValuePostProcessor;
 import de.gbv.reposis.mapper.source.MCRMapValueSource;
 
 public class MCRConfigurableRolePipelineMappingTest {
 
-    private static final MCRMatcher<String> ALWAYS_MATCHES = value -> true;
-    private static final MCRMatcher<String> NEVER_MATCHES = value -> false;
+    private static final MCRValueMatcher<String> ALWAYS_MATCHES = value -> true;
+    private static final MCRValueMatcher<String> NEVER_MATCHES = value -> false;
 
     @Test
     public void constructorRejectsNullProvider() {

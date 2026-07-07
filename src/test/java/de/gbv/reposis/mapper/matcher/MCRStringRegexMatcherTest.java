@@ -16,26 +16,26 @@ public class MCRStringRegexMatcherTest {
     }
 
     @Test
-    public void matchesReturnsTrueIfValueFullyMatchesPattern() {
+    public void matchesReturnsTrueIfValueFullyTestPattern() {
         MCRStringRegexMatcher matcher = new MCRStringRegexMatcher(Pattern.compile("foo.*"));
-        assertTrue(matcher.matches("foobar"));
+        assertTrue(matcher.test("foobar"));
     }
 
     @Test
-    public void matchesReturnsFalseIfOnlyPartOfValueMatchesPattern() {
+    public void matchesReturnsFalseIfOnlyPartOfValueTestPattern() {
         MCRStringRegexMatcher matcher = new MCRStringRegexMatcher(Pattern.compile("bar"));
-        assertFalse(matcher.matches("foobarbaz"));
+        assertFalse(matcher.test("foobarbaz"));
     }
 
     @Test
-    public void matchesReturnsFalseIfValueDoesNotMatchPattern() {
+    public void testReturnsFalseIfValueDoesNotMatchPattern() {
         MCRStringRegexMatcher matcher = new MCRStringRegexMatcher(Pattern.compile("foo"));
-        assertFalse(matcher.matches("bar"));
+        assertFalse(matcher.test("bar"));
     }
 
     @Test
-    public void matchesReturnsFalseIfActualValueIsNull() {
+    public void testReturnsFalseIfActualValueIsNull() {
         MCRStringRegexMatcher matcher = new MCRStringRegexMatcher(Pattern.compile("foo"));
-        assertFalse(matcher.matches(null));
+        assertFalse(matcher.test(null));
     }
 }

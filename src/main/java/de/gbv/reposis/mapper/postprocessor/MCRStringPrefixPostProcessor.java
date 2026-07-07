@@ -25,7 +25,7 @@ public class MCRStringPrefixPostProcessor implements MCRPostProcessor<String> {
     }
 
     @Override
-    public String process(String extracted) {
+    public String apply(String extracted) {
         return prefix + Objects.requireNonNull(extracted, "extracted must not be null");
     }
 

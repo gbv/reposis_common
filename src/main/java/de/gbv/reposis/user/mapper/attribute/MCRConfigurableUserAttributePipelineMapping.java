@@ -10,7 +10,7 @@ import org.mycore.common.config.annotation.MCRProperty;
 
 import de.gbv.reposis.mapper.MCRPipelineMapping;
 import de.gbv.reposis.mapper.extractor.MCRExtractor;
-import de.gbv.reposis.mapper.matcher.MCRMatcher;
+import de.gbv.reposis.mapper.matcher.MCRValueMatcher;
 import de.gbv.reposis.mapper.postprocessor.MCRPostProcessor;
 import de.gbv.reposis.mapper.source.MCRValueSource;
 
@@ -37,7 +37,7 @@ public class MCRConfigurableUserAttributePipelineMapping implements MCRUserMappi
      * @param targetName the target key the final value should be mapped to
      */
     public MCRConfigurableUserAttributePipelineMapping(String attributeName,
-        MCRExtractor<String> extractor, MCRMatcher<String> matcher,
+        MCRExtractor<String> extractor, MCRValueMatcher<String> matcher,
         MCRPostProcessor<String> postProcessor, String targetName) {
         MCRPipelineMapping<String> pipeline =
             new MCRPipelineMapping<>(attributeName, extractor, matcher, postProcessor);
@@ -68,8 +68,8 @@ public class MCRConfigurableUserAttributePipelineMapping implements MCRUserMappi
         @MCRInstance(name = "Extractor", valueClass = MCRExtractor.class, required = false)
         public MCRExtractor<String> extractor;
 
-        @MCRInstance(name = "Matcher", valueClass = MCRMatcher.class, required = false)
-        public MCRMatcher<String> matcher;
+        @MCRInstance(name = "Matcher", valueClass = MCRValueMatcher.class, required = false)
+        public MCRValueMatcher<String> matcher;
 
         @MCRInstance(name = "PostProcessor", valueClass = MCRPostProcessor.class, required = false)
         public MCRPostProcessor<String> postProcessor;

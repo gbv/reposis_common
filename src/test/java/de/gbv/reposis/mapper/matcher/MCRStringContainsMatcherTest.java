@@ -14,44 +14,44 @@ public class MCRStringContainsMatcherTest {
     }
 
     @Test
-    public void matchesReturnsTrueIfValueContainsSubstring() {
+    public void testReturnsTrueIfValueContainsSubstring() {
         MCRStringContainsMatcher
             matcher = new MCRStringContainsMatcher("bar");
-        assertTrue(matcher.matches("foobarbaz"));
+        assertTrue(matcher.test("foobarbaz"));
     }
 
     @Test
-    public void matchesReturnsTrueIfValueEqualsSubstring() {
+    public void testReturnsTrueIfValueEqualsSubstring() {
         MCRStringContainsMatcher
             matcher = new MCRStringContainsMatcher("bar");
-        assertTrue(matcher.matches("bar"));
+        assertTrue(matcher.test("bar"));
     }
 
     @Test
-    public void matchesReturnsFalseIfValueDoesNotContainSubstring() {
+    public void testReturnsFalseIfValueDoesNotContainSubstring() {
         MCRStringContainsMatcher
             matcher = new MCRStringContainsMatcher("bar");
-        assertFalse(matcher.matches("foobaz"));
+        assertFalse(matcher.test("foobaz"));
     }
 
     @Test
-    public void matchesReturnsFalseIfActualValueIsNull() {
+    public void testReturnsFalseIfActualValueIsNull() {
         MCRStringContainsMatcher
             matcher = new MCRStringContainsMatcher("bar");
-        assertFalse(matcher.matches(null));
+        assertFalse(matcher.test(null));
     }
 
     @Test
-    public void matchesWithEmptySubstringMatchesAnyNonNullValue() {
+    public void matchesWithEmptySubstringTestAnyNonNullValue() {
         MCRStringContainsMatcher
             matcher = new MCRStringContainsMatcher("");
-        assertTrue(matcher.matches("anything"));
+        assertTrue(matcher.test("anything"));
     }
 
     @Test
-    public void matchesIsCaseSensitive() {
+    public void testIsCaseSensitive() {
         MCRStringContainsMatcher
             matcher = new MCRStringContainsMatcher("Bar");
-        assertFalse(matcher.matches("foobarbaz"));
+        assertFalse(matcher.test("foobarbaz"));
     }
 }

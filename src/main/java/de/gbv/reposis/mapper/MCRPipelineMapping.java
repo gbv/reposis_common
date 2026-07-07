@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import de.gbv.reposis.mapper.extractor.MCRExtractor;
-import de.gbv.reposis.mapper.matcher.MCRMatcher;
+import de.gbv.reposis.mapper.matcher.MCRValueMatcher;
 import de.gbv.reposis.mapper.postprocessor.MCRPostProcessor;
 import de.gbv.reposis.mapper.source.MCRValueSource;
 
@@ -23,7 +23,7 @@ public class MCRPipelineMapping<V> implements MCRMapping<V, V> {
 
     private final String attributeName;
     private final MCRExtractor<V> extractor;
-    private final MCRMatcher<V> matcher;
+    private final MCRValueMatcher<V> matcher;
     private final MCRPostProcessor<V> postProcessor;
 
     /**
@@ -38,7 +38,7 @@ public class MCRPipelineMapping<V> implements MCRMapping<V, V> {
      *                      processing is needed
      */
     public MCRPipelineMapping(String attributeName, MCRExtractor<V> extractor,
-        MCRMatcher<V> matcher, MCRPostProcessor<V> postProcessor) {
+        MCRValueMatcher<V> matcher, MCRPostProcessor<V> postProcessor) {
         this.attributeName = Objects.requireNonNull(attributeName, "attributeName must not be null");
         this.extractor = extractor != null ? extractor : Optional::of;
         this.matcher = matcher != null ? matcher : value -> true;
@@ -59,8 +59,8 @@ public class MCRPipelineMapping<V> implements MCRMapping<V, V> {
             .flatMap(List::stream)
             .map(extractor::extract)
             .flatMap(Optional::stream)
-            .filter(matcher::matches)
+            .filter(matcher::test)
             .findFirst()
-            .map(postProcessor::process);
+            .map(postProcessor::apply);
     }
 }

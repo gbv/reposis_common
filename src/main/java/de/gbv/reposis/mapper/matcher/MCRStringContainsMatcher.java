@@ -7,11 +7,11 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 
 /**
- * A {@link MCRMatcher} that checks whether an extracted string value contains a configured
+ * A {@link MCRValueMatcher} that checks whether an extracted string value contains a configured
  * expected substring. A {@code null} value never matches.
  */
 @MCRConfigurationProxy(proxyClass = MCRStringContainsMatcher.Factory.class)
-public class MCRStringContainsMatcher implements MCRMatcher<String> {
+public class MCRStringContainsMatcher implements MCRValueMatcher<String> {
 
     private final String expectedValue;
 
@@ -25,7 +25,7 @@ public class MCRStringContainsMatcher implements MCRMatcher<String> {
     }
 
     @Override
-    public boolean matches(String extracted) {
+    public boolean test(String extracted) {
         return extracted != null && extracted.contains(expectedValue);
     }
 

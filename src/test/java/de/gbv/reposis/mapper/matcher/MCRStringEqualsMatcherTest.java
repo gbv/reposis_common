@@ -14,26 +14,26 @@ public class MCRStringEqualsMatcherTest {
     }
 
     @Test
-    public void matchesReturnsTrueIfValueEqualsExpectedValue() {
+    public void testReturnsTrueIfValueEqualsExpectedValue() {
         MCRStringEqualsMatcher matcher = new MCRStringEqualsMatcher("foo");
-        assertTrue(matcher.matches("foo"));
+        assertTrue(matcher.test("foo"));
     }
 
     @Test
-    public void matchesReturnsFalseIfValueDiffersFromExpectedValue() {
+    public void testReturnsFalseIfValueDiffersFromExpectedValue() {
         MCRStringEqualsMatcher matcher = new MCRStringEqualsMatcher("foo");
-        assertFalse(matcher.matches("bar"));
+        assertFalse(matcher.test("bar"));
     }
 
     @Test
-    public void matchesIsCaseSensitive() {
+    public void testIsCaseSensitive() {
         MCRStringEqualsMatcher matcher = new MCRStringEqualsMatcher("foo");
-        assertFalse(matcher.matches("FOO"));
+        assertFalse(matcher.test("FOO"));
     }
 
     @Test
-    public void matchesReturnsFalseIfActualValueIsNull() {
+    public void testReturnsFalseIfActualValueIsNull() {
         MCRStringEqualsMatcher matcher = new MCRStringEqualsMatcher("foo");
-        assertFalse(matcher.matches(null));
+        assertFalse(matcher.test(null));
     }
 }
