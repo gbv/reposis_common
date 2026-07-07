@@ -1,16 +1,13 @@
 package de.gbv.reposis.user.persistence;
 
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mycore.common.MCRJPATestCase;
-import org.mycore.common.MCRUserInformation;
 import org.mycore.user2.MCRTransientUser;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserManager;

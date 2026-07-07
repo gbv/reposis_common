@@ -1,10 +1,6 @@
 package de.gbv.reposis.user.persistence;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserAttribute;
 import org.mycore.user2.MCRUserManager;
 
 import de.gbv.reposis.user.merger.MCRUserMerger;
