@@ -52,7 +52,7 @@ public class MCRUserUpsertStrategy implements MCRUserPersistenceStrategy {
      */
     public static class Factory implements Supplier<MCRUserUpsertStrategy> {
 
-        @MCRInstance(name = "UpdateStrategy", valueClass =  MCRUserUpdateStrategy.class)
+        @MCRInstance(name = "UpdateStrategy", valueClass = MCRUserUpdateStrategy.class)
         public MCRUserUpdateStrategy updateStrategy;
 
         @Override

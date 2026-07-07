@@ -52,7 +52,7 @@ public class MCRUserUpdateIfExistsStrategy implements MCRUserPersistenceStrategy
      */
     public static class Factory implements Supplier<MCRUserUpdateIfExistsStrategy> {
 
-        @MCRInstance(name = "UpdateStrategy", valueClass =  MCRUserUpdateStrategy.class)
+        @MCRInstance(name = "UpdateStrategy", valueClass = MCRUserUpdateStrategy.class)
         public MCRUserUpdateStrategy updateStrategy;
 
         @Override

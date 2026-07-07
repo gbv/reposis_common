@@ -49,7 +49,7 @@ public class MCRUserUpdateMergeStrategy implements MCRUserUpdateStrategy {
      */
     public static class Factory implements Supplier<MCRUserUpdateMergeStrategy> {
 
-        @MCRInstance(name = "UserMerger", valueClass =  MCRUserMerger.class)
+        @MCRInstance(name = "UserMerger", valueClass = MCRUserMerger.class)
         public MCRUserMerger userMerger;
 
         @Override
