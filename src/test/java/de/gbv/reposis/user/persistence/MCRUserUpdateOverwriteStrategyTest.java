@@ -1,6 +1,7 @@
 package de.gbv.reposis.user.persistence;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -54,8 +55,7 @@ public class MCRUserUpdateOverwriteStrategyTest extends MCRJPATestCase {
 
         MCRUser persistedUser = MCRUserManager.getUser("foo");
         assertEquals("HR", persistedUser.getUserAttribute("department"));
-        // "phone" ist am incomingUser nicht gesetzt, ein echtes Overwrite verwirft es also
-        assertEquals(null, persistedUser.getUserAttribute("phone"));
+        assertNull(persistedUser.getUserAttribute("phone"));
     }
 
     @Test
