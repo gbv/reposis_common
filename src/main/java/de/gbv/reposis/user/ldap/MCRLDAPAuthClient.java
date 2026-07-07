@@ -17,6 +17,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRUsageException;
@@ -52,10 +53,14 @@ public class MCRLDAPAuthClient {
      *
      * @param dn the distinguished name (DN) used as the bind principal
      * @param password the user's password
-     * @return all LDAP attributes of the authenticated user or {@code null} if the credentials are invalid
+     * @return all LDAP attributes of the authenticated user or {@code null} if the credentials
+     *         are invalid, missing, or blank
      * @throws MCRUsageException if a connection or LDAP server error occurs
      */
     public MCRLDAPAuthResult authenticate(String dn, String password) {
+        if (StringUtils.isBlank(dn) || StringUtils.isBlank(password)) {
+            return null;
+        }
         final Hashtable<String, String> bindEnv = new Hashtable<>(baseEnv);
         bindEnv.put(Context.SECURITY_AUTHENTICATION, "simple");
         bindEnv.put(Context.SECURITY_PRINCIPAL, dn);

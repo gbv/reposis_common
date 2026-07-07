@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.MCRSessionMgr;
@@ -55,6 +56,11 @@ public class MCRLDAPLoginServlet extends MCRLoginServlet {
         String pwd = getProperty(req, "pwd");
         String realm = getProperty(req, "realm");
 
+        if (StringUtils.isBlank(realm)) {
+            res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
         MCRLDAPAuthService authService;
         MCRUserPersistenceStrategy persistenceStrategy;
 
@@ -66,7 +72,11 @@ public class MCRLDAPLoginServlet extends MCRLoginServlet {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
-        if (uid != null && realm != null) {
+        if (StringUtils.isNotBlank(uid)) {
+            if (!"POST".equalsIgnoreCase(req.getMethod())) {
+                res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                return;
+            }
             try {
                 MCRUserData userData = authService.authenticate(uid, pwd);
                 MCRUser currentUser = persistenceStrategy.apply(userData);
@@ -80,7 +90,8 @@ public class MCRLDAPLoginServlet extends MCRLoginServlet {
                 res.sendRedirect(res.encodeRedirectURL(getReturnURL(req)));
                 return;
             } catch (MCRLDAPAuthException e) {
-                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                LOGGER.warn("Failed login attempt for uid: {}", uid);
+                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 loginForm.setLoginFailed(true);
             } catch (Exception e) {
                 LOGGER.error("Error while authenticating user", e);

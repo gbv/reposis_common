@@ -10,6 +10,8 @@ import java.util.function.Supplier;
 
 import javax.naming.ldap.LdapName;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRInstance;
 import org.mycore.common.config.annotation.MCRProperty;
@@ -24,6 +26,8 @@ import de.gbv.reposis.user.mapper.role.MCRRoleMapper;
 
 @MCRConfigurationProxy(proxyClass = MCRLDAPAuthService.Factory.class)
 public class MCRLDAPAuthService {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private final MCRLDAPDNResolver resolver;
     private final MCRLDAPAuthClient client;
@@ -52,16 +56,35 @@ public class MCRLDAPAuthService {
         this.fallbackRoles = Objects.requireNonNull(fallbackRoles, "fallbackRoles must not be null");
     }
 
+    /**
+     * Initializes this authentication service for the given realm.
+     *
+     * @param realmId the identifier of the realm this service instance is responsible for
+     */
     public void init(String realmId) {
         this.realmId = realmId;
     }
 
+    /**
+     * Authenticates a user against LDAP by resolving the given username to a distinguished name (DN)
+     * and performing a bind with the supplied password.
+     *
+     * @param username the username to authenticate
+     * @param password the user's password
+     * @return the authenticated user's data
+     * @throws MCRLDAPAuthException if no DN could be resolved for the username, or if the
+     *                              LDAP bind failed (invalid credentials)
+     */
     public MCRUserData authenticate(String username, String password) {
         String dn = resolver.resolve(username).map(LdapName::toString)
-            .orElseThrow(() -> new MCRLDAPAuthException("No DN found for username: " + username));
+            .orElseThrow(() -> {
+                LOGGER.debug("No DN found for username: {}", username);
+                return new MCRLDAPAuthException("Authentication failed");
+            });
         MCRLDAPAuthResult ldapResult = client.authenticate(dn, password);
         if (ldapResult == null) {
-            throw new MCRLDAPAuthException("Authentication failed for DN: " + dn);
+            LOGGER.debug("Authentication failed for DN: {}", dn);
+            throw new MCRLDAPAuthException("Authentication failed");
         }
         return getUserData(username, realmId, ldapResult.attributes());
     }
@@ -78,6 +101,9 @@ public class MCRLDAPAuthService {
         return new MCRUserData(username, realmId, roles, mapped.attributes());
     }
 
+    /**
+     * Factory for creating {@link MCRLDAPAuthService} instances from configuration properties.
+     */
     public static class Factory implements Supplier<MCRLDAPAuthService> {
 
         @MCRInstance(name = "Resolver", valueClass = MCRLDAPDNResolver.class)
