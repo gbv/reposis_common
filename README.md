@@ -318,7 +318,7 @@ MCR.Servlet.LDAPLoginServlet.Disabled=false
 # Define persistence strategy
 MCRLDAPLoginServlet.PersistenceStrategy.test.Class=de.gbv.reposis.user.persistence.MCRUserUpdateIfExistsStrategy
 MCRLDAPLoginServlet.PersistenceStrategy.test.UpdateStrategy.Class=de.gbv.reposis.user.persistence.MCRUserUpdateMergeStrategy
-MCRLDAPLoginServlet.PersistenceStrategy.test.UpdateStrategy.UserMerger.Class=de.gbv.reposis.user.persistence.merger.MCRUserAttributeGapFillMerger
+MCRLDAPLoginServlet.PersistenceStrategy.test.UpdateStrategy.UserMerger.Class=de.gbv.reposis.user.merger.MCRUserAttributeGapFillMerger
 
 # Configure the auth service service.
 MCRLDAPLoginServlet.AuthService.test.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthService
