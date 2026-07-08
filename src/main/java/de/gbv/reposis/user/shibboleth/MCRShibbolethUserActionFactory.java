@@ -2,8 +2,10 @@ package de.gbv.reposis.user.shibboleth;
 
 import org.mycore.common.config.MCRConfiguration2;
 
+import de.gbv.reposis.user.merger.MCRUserMerger;
+
 /**
- * Factory for {@link MCRShibbolethUserMapper} and {@link MCRShibbolethUserMerger}.
+ * Factory for {@link MCRShibbolethUserMapper} and {@link MCRUserMerger}.
  * They will be configured in mycore.properties using the properties {@link #MCR_USER_MAPPER_CLASS} and {@link #MCR_USER_MERGER_CLASS}.
  *
  * @author Sebastian Hofmann
@@ -21,8 +23,8 @@ public class MCRShibbolethUserActionFactory {
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(MCR_USER_MAPPER_CLASS));
     }
 
-    public static MCRShibbolethUserMerger getUserMerger() {
-        return MCRConfiguration2.<MCRShibbolethUserMerger>getSingleInstanceOf(MCR_USER_MERGER_CLASS)
+    public static MCRUserMerger getUserMerger() {
+        return MCRConfiguration2.<MCRUserMerger>getSingleInstanceOf(MCR_USER_MERGER_CLASS)
             .orElseThrow(() -> MCRConfiguration2.createConfigurationException(MCR_USER_MERGER_CLASS));
     }
 
