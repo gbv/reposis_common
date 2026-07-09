@@ -1,8 +1,8 @@
 package de.gbv.reposis.editor;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 /**
  * Utility class providing validation methods for common data formats.
@@ -19,11 +19,25 @@ public final class ValidationUtils {
      * @return {@code true} if the string is a valid URL, {@code false} otherwise
      */
     public static boolean isValidURL(String url) {
-        try {
-            new URL(url).toURI();
-        } catch (MalformedURLException | URISyntaxException e) {
+        if (url == null) {
             return false;
         }
-        return true;
+        try {
+            URI uri = new URI(url);
+            if (!uri.isAbsolute()) {
+                return false;
+            }
+            String scheme = uri.getScheme();
+            if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
+                return false;
+            }
+            if (uri.getHost() == null) {
+                return false;
+            }
+            uri.toURL();
+            return true;
+        } catch (URISyntaxException | MalformedURLException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }
