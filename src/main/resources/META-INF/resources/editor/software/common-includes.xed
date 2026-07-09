@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xed:template
-  xmlns:mir="http://www.mycore.de/mir"
-  xmlns:xed="http://www.mycore.de/xeditor">
+<xed:template xmlns:mir="http://www.mycore.de/mir" xmlns:xed="http://www.mycore.de/xeditor">
 
   <xed:load-resource name="mir_genres" uri="classification:metadata:-1:children:mir_genres" />
 
