@@ -144,7 +144,7 @@
         <xsl:value-of select="mods:accessCondition[@type='embargo']" />
       </fn:string>
     </xsl:if>
-    <xsl:if test="count(mods:relatedItem[@type='isReferencedBy']) &gt; 0">
+    <xsl:if test="count(mods:relatedItem[@type='references']) &gt; 0">
       <fn:array key="referencePublication">
         <xsl:call-template name="parse-relatedItem">
           <xsl:with-param name="relatedItem" select="mods:relatedItem[@type='references']" />
