@@ -2,6 +2,7 @@ package de.gbv.reposis.codemeta;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +23,8 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.transform.JDOMSource;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jsonldjava.core.DocumentLoader;
 
 /**
@@ -29,9 +32,21 @@ import com.github.jsonldjava.core.DocumentLoader;
  */
 public class CodeMetaRDFURIResolver implements URIResolver {
 
-    private static final String CODEMETA_JSONLD_PATH = "/jsonld/codemeta.jsonld";
+    private static final String JSONLD_PATH = "/jsonld/codemeta.jsonld";
 
-    private static final String CODEMETA_JSONLD_URL = "https://doi.org/10.5063/schema/codemeta-2.0";
+    private static final String JSONLD_URL = "https://doi.org/10.5063/schema/codemeta-2.0";
+
+    private static final String JSONLD_DOC;
+
+    static {
+        try {
+            JSONLD_DOC = IOUtils.resourceToString(JSONLD_PATH, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
+    private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     /**
      * Converts CodeMeta JSON-LD content to RDF/XML.
@@ -65,12 +80,22 @@ public class CodeMetaRDFURIResolver implements URIResolver {
             throw new TransformerException("Invalid format of uri for retrieval of json2rdf: " + href);
         }
         String baseURI = hrefParts[1];
-        String json = URLDecoder.decode(hrefParts[2], StandardCharsets.UTF_8);
+        String json = URLDecoder.decode(hrefParts[2].replace("+", "%2B"), StandardCharsets.UTF_8);
         try {
+            requireExpectedContext(json);
             Document result = convertToRDF(json, baseURI);
             return new JDOMSource(result);
         } catch (Exception e) {
             throw new TransformerException("Unable to convert to rdf", e);
+        }
+    }
+
+    private void requireExpectedContext(String json) throws TransformerException, IOException {
+        JsonNode root = JSON_MAPPER.readTree(json);
+        JsonNode context = root.get("@context");
+        if (context == null || !context.isTextual() || !JSONLD_URL.equals(context.asText())) {
+            throw new TransformerException(
+                "Unexpected or missing @context, refusing to process (must be exactly '" + JSONLD_URL + "')");
         }
     }
 
@@ -81,9 +106,8 @@ public class CodeMetaRDFURIResolver implements URIResolver {
     private Document convertToRDF(String json, String baseURI) throws Exception {
         try (InputStream input = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            String codemetaDoc = IOUtils.resourceToString(CODEMETA_JSONLD_PATH, StandardCharsets.UTF_8);
             DocumentLoader docLoader = new DocumentLoader();
-            docLoader.addInjectedDoc(CODEMETA_JSONLD_URL, codemetaDoc);
+            docLoader.addInjectedDoc(JSONLD_URL, JSONLD_DOC);
 
             JSONLDParser parser = new JSONLDParser();
             parser.getParserConfig().set(JSONLDSettings.DOCUMENT_LOADER, docLoader);
