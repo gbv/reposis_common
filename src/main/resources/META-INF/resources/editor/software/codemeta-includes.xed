@@ -111,7 +111,7 @@
   </xed:template>
 
   <xed:template id="rep.codemeta.processorRequirements">
-    <xed:bind xpath="fn:array[@key='processorRequirement']">
+    <xed:bind xpath="fn:array[@key='processorRequirements']">
       <mir:textfield
         xpath="fn:string"
         label="rep.metadata.software.processorRequirement"

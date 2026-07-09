@@ -23,7 +23,7 @@
             <xsl:apply-templates select="$codemeta/fn:array[@key='applicationSubCategory']" />
             <xsl:apply-templates select="$codemeta/fn:array[@key='programmingLanguage']" />
             <xsl:apply-templates select="$codemeta/fn:array[@key='operatingSystem']" />
-            <xsl:apply-templates select="$codemeta/fn:array[@key='processorRequirement']" />
+            <xsl:apply-templates select="$codemeta/fn:array[@key='processorRequirements']" />
             <xsl:apply-templates select="$codemeta/fn:array[@key='memoryRequirements']" />
             <xsl:apply-templates select="$codemeta/fn:array[@key='storageRequirements']" />
             <xsl:apply-templates select="$codemeta/fn:array[@key='runtimePlatform']" />
