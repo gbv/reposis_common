@@ -68,7 +68,7 @@
 
   <xsl:template match="fn:array[@key='permissions']">
     <xsl:call-template name="print-field">
-      <xsl:with-param name="i18n" select="'rep.metadata.software.permission'" />
+      <xsl:with-param name="i18n" select="'rep.metadata.software.permissions'" />
       <xsl:with-param name="value">
         <xsl:call-template name="concat">
           <xsl:with-param name="input" select="fn:string" />
@@ -90,7 +90,7 @@
 
   <xsl:template match="fn:array[@key='storageRequirements']">
     <xsl:call-template name="print-field">
-      <xsl:with-param name="i18n" select="'rep.metadata.software.storageRequirement'" />
+      <xsl:with-param name="i18n" select="'rep.metadata.software.storageRequirements'" />
       <xsl:with-param name="value">
         <xsl:call-template name="concat">
           <xsl:with-param name="input" select="fn:map/fn:string[@key='@value']" />
@@ -123,14 +123,8 @@
         </xsl:if>
       </xsl:for-each>
     </xsl:variable>
-    <xsl:variable name="i18n-suffix">
-      <xsl:choose>
-        <xsl:when test="@key='softwareRequirements'">softwareRequirement</xsl:when>
-        <xsl:otherwise>softwareSuggestion</xsl:otherwise>
-      </xsl:choose>
-    </xsl:variable>
     <xsl:call-template name="print-field">
-      <xsl:with-param name="i18n" select="concat('rep.metadata.software.', $i18n-suffix)" />
+      <xsl:with-param name="i18n" select="concat('rep.metadata.software.', @key)" />
       <xsl:with-param name="value" select="$links" />
     </xsl:call-template>
   </xsl:template>

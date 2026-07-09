@@ -114,8 +114,8 @@
     <xed:bind xpath="fn:array[@key='processorRequirements']">
       <mir:textfield
         xpath="fn:string"
-        label="rep.metadata.software.processorRequirement"
-        help-text="{i18n:rep.editor.codemeta.processorRequirement.help}"
+        label="rep.metadata.software.processorRequirements"
+        help-text="{i18n:rep.editor.codemeta.processorRequirements.help}"
         repeat="true" />
     </xed:bind>
   </xed:template>
@@ -146,14 +146,14 @@
       </xed:bind>
       <div class="form-group row">
         <label class="col-md-3 col-form-label text-right">
-          <xed:output i18n="rep.metadata.software.storageRequirement" />
+          <xed:output i18n="rep.metadata.software.storageRequirements" />
         </label>
         <div class="col-md-6">
           <xed:bind xpath="fn:string[@key='@value']">
             <input type="text" class="form-control form-control-inline" />
           </xed:bind>
         </div>
-        <mir:help-pmud help-text="{i18n:rep.editor.codemeta.storageRequirement.help}" pmud="true" />
+        <mir:help-pmud help-text="{i18n:rep.editor.codemeta.storageRequirements.help}" pmud="true" />
       </div>
     </xed:repeat>
   </xed:template>
@@ -176,7 +176,7 @@
       <div class="mir-fieldset-content-centered">
         <div class="form-group row d-flex align-items-center">
           <label class="col-md-3 col-form-label text-right">
-            <xed:output i18n="rep.metadata.software.softwareRequirement" />
+            <xed:output i18n="rep.metadata.software.softwareRequirements" />
           </label>
           <div class="col-md-6 controls">
             <div class="row">
@@ -185,7 +185,7 @@
                   <input
                     type="text"
                     class="form-control form-control-inline"
-                    placeholder="{i18n:rep.editor.codemeta.softwareRequirement.name.placeholder}" />
+                    placeholder="{i18n:rep.editor.codemeta.softwareRequirements.name.placeholder}" />
                 </xed:bind>
               </div>
             </div>
@@ -195,17 +195,17 @@
                   <input
                     type="text"
                     class="form-control form-control-inline"
-                    placeholder="{i18n:rep.editor.codemeta.softwareRequirement.link.placeholder}" />
+                    placeholder="{i18n:rep.editor.codemeta.softwareRequirements.link.placeholder}" />
                   <xed:validate
                     class="de.gbv.reposis.editor.ValidationUtils"
                     method="isValidURL"
-                    i18n="rep.validation.invalidURL"
+                    i18n="rep.editor.validation.invalidURL"
                     display="global" />
                 </xed:bind>
               </div>
             </div>
           </div>
-          <mir:help-pmud help-text="{i18n:rep.metadata.software.softwareRequirement.help}" pmud="true" />
+          <mir:help-pmud help-text="{i18n:rep.editor.codemeta.softwareRequirements.help}" pmud="true" />
         </div>
       </div>
     </xed:repeat>
@@ -219,7 +219,7 @@
       <div class="mir-fieldset-content-centered">
         <div class="form-group row d-flex align-items-center">
           <label class="col-md-3 col-form-label text-right">
-            <xed:output i18n="rep.metadata.software.softwareSuggestion" />
+            <xed:output i18n="rep.metadata.software.softwareSuggestions" />
           </label>
           <div class="col-md-6 controls">
             <div class="row">
@@ -228,7 +228,7 @@
                   <input
                     type="text"
                     class="form-control form-control-inline"
-                    placeholder="{i18n:rep.editor.codemeta.softwareSuggestion.name.placeholder}" />
+                    placeholder="{i18n:rep.editor.codemeta.softwareSuggestions.name.placeholder}" />
                 </xed:bind>
               </div>
             </div>
@@ -238,17 +238,17 @@
                   <input
                     type="text"
                     class="form-control form-control-inline"
-                    placeholder="{i18n:rep.editor.codemeta.softwareSuggestion.link.placeholder}" />
+                    placeholder="{i18n:rep.editor.codemeta.softwareSuggestions.link.placeholder}" />
                   <xed:validate
                     class="de.gbv.reposis.editor.ValidationUtils"
                     method="isValidURL"
-                    i18n="rep.validation.invalidURL"
+                    i18n="rep.editor.validation.invalidURL"
                     display="global" />
                 </xed:bind>
               </div>
             </div>
           </div>
-          <mir:help-pmud help-text="{i18n:rep.editor.codemeta.softwareSuggestion.help}" pmud="true" />
+          <mir:help-pmud help-text="{i18n:rep.editor.codemeta.softwareSuggestions.help}" pmud="true" />
         </div>
       </div>
     </xed:repeat>
@@ -258,8 +258,8 @@
     <xed:bind xpath="fn:array[@key='permissions']">
       <mir:textfield
         xpath="fn:string"
-        label="rep.metadata.software.permission"
-        help-text="{i18n:rep.editor.codemeta.permission.help}"
+        label="rep.metadata.software.permissions"
+        help-text="{i18n:rep.editor.codemeta.permissions.help}"
         repeat="true" />
     </xed:bind>
   </xed:template>
