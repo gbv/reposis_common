@@ -63,7 +63,7 @@
       mods:name[mods:role/mods:roleTerm[@authority='marcrelator' and @type='code']/text()='cre']
     " />
     <xsl:if test="count($creator) &gt; 0">
-      <fn:array key="creator">
+      <fn:array key="author">
         <xsl:call-template name="parse-name">
           <xsl:with-param name="name" select="$creator" />
         </xsl:call-template>
