@@ -38,7 +38,7 @@ import org.mycore.test.MyCoReTest;
     properties = {
         @MCRTestProperty(key = "MCR.Metadata.Type.object", string = "true"),
         @MCRTestProperty(key = "MCR.Metadata.Type.mods", string = "true"),
-        @MCRTestProperty(key = "MCR.Crypt.Cipher.jcr_intern.class", classNameOf = MCRAESCipher.class),
+        @MCRTestProperty(key = "MCR.Crypt.Cipher.jcr_intern.Class", classNameOf = MCRAESCipher.class),
         @MCRTestProperty(key = "MCR.Crypt.Cipher.jcr_intern.EnableACL", string = "false"),
     }
 )

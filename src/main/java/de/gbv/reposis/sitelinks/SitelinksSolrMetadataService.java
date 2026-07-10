@@ -24,15 +24,16 @@ import java.util.Locale;
 import java.util.function.Supplier;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.SolrQuery;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.FacetParams;
 import org.mycore.common.MCRException;
+import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
-import org.mycore.solr.MCRSolrCoreManager;
+import org.mycore.solr.MCRSolrIndexRegistryManager;
 
 /**
  * Solr-based implementation of {@link SitelinksMetadataService}.
@@ -70,7 +71,11 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
      * @param filterQuery a Solr filter query applied to all queries (e.g., {@code worldReadable:true})
      */
     public SitelinksSolrMetadataService(String filterQuery) {
-        this(MCRSolrCoreManager.getMainSolrClient(), filterQuery);
+        SolrClient client = MCRSolrIndexRegistryManager.obtainRegistry()
+            .getIndex("main")
+            .orElseThrow(() -> new MCRConfigurationException("Solr index 'main' is not configured"))
+            .getClient();
+        this(client, filterQuery);
     }
 
     /**
