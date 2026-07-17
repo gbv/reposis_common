@@ -6,12 +6,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.eclipse.rdf4j.rio.Rio;
@@ -22,6 +22,7 @@ import org.eclipse.rdf4j.rio.rdfxml.RDFXMLWriter;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.transform.JDOMSource;
+import org.mycore.common.MCRClassTools;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,15 +33,15 @@ import com.github.jsonldjava.core.DocumentLoader;
  */
 public class CodeMetaRDFURIResolver implements URIResolver {
 
-    private static final String JSONLD_PATH = "/jsonld/codemeta.jsonld";
+    private static final String JSONLD_PATH = "jsonld/codemeta.jsonld";
 
     private static final String JSONLD_URL = "https://doi.org/10.5063/schema/codemeta-2.0";
 
     private static final String JSONLD_DOC;
 
     static {
-        try {
-            JSONLD_DOC = IOUtils.resourceToString(JSONLD_PATH, StandardCharsets.UTF_8);
+        try (InputStream is = MCRClassTools.getClassLoader().getResourceAsStream(JSONLD_PATH)) {
+            JSONLD_DOC = new String(Objects.requireNonNull(is).readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new ExceptionInInitializerError(e);
         }
