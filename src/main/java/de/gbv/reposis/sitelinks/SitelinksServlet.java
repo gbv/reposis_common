@@ -21,17 +21,17 @@ package de.gbv.reposis.sitelinks;
 import java.io.IOException;
 import java.util.Optional;
 
-import de.gbv.reposis.sitelinks.dto.SitelinksYearPageDto;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.common.config.MCRConfigurationException;
 import org.mycore.common.content.MCRContent;
 import org.mycore.frontend.servlets.MCRContentServlet;
+
+import de.gbv.reposis.sitelinks.dto.SitelinksYearPageDto;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet for managing "Sitelinks" and their associated data.
@@ -80,10 +80,10 @@ public class SitelinksServlet extends MCRContentServlet {
     public void init() throws ServletException {
         super.init();
         try {
-            this.service = MCRConfiguration2.<SitelinksService>getSingleInstanceOf(PROP_PREFIX + "Service.Class")
-                .orElseThrow(() -> new MCRConfigurationException("Missing SitelinksService configuration"));
-            this.mapper = MCRConfiguration2.<SitelinksPageMapper>getSingleInstanceOf(PROP_PREFIX + "Mapper.Class")
-                .orElseThrow(() -> new MCRConfigurationException("Missing SitelinksPageMapper configuration"));
+            this.service =
+                MCRConfiguration2.getSingleInstanceOfOrThrow(SitelinksService.class, PROP_PREFIX + "Service.Class");
+            this.mapper =
+                MCRConfiguration2.getSingleInstanceOfOrThrow(SitelinksPageMapper.class, PROP_PREFIX + "Mapper.Class");
             this.pageSize = MCRConfiguration2.getString("Sitelinks.PageSize")
                 .map(Integer::valueOf)
                 .orElseThrow(() -> new MCRConfigurationException("Please specify property: 'Sitelinks.PageSize'"));
