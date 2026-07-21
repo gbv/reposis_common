@@ -9,6 +9,7 @@ This is a collection of common code used by the reposis projects.
 
 ## Features
 
+
 ### Solr Facet Time Bar
 
 The Solr Facet Time Bar is a component that allows to display a time bar for Solr range facet. It´s intended to be displayed
