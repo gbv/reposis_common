@@ -64,13 +64,16 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
 
     private final String filterQuery;
 
+    private final String requestHandler;
+
     /**
      * Constructs a new service instance using the main Solr client.
      *
      * @param filterQuery a Solr filter query applied to all queries (e.g., {@code worldReadable:true})
+     * @param requestHandler the Solr request handler path to query (e.g., {@code /select})
      */
-    public SitelinksSolrMetadataService(String filterQuery) {
-        this(MCRSolrCoreManager.getMainSolrClient(), filterQuery);
+    public SitelinksSolrMetadataService(String filterQuery, String requestHandler) {
+        this(MCRSolrCoreManager.getMainSolrClient(), filterQuery, requestHandler);
     }
 
     /**
@@ -78,15 +81,18 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
      *
      * @param solrClient the Solr client to use for queries
      * @param filterQuery a Solr filter query applied to all queries (e.g., {@code worldReadable:true})
+     * @param requestHandler the Solr request handler path to query (e.g., {@code /select})
      */
-    public SitelinksSolrMetadataService(SolrClient solrClient, String filterQuery) {
+    public SitelinksSolrMetadataService(SolrClient solrClient, String filterQuery, String requestHandler) {
         this.solrClient = solrClient;
         this.filterQuery = filterQuery;
+        this.requestHandler = requestHandler;
     }
 
     @Override
     public List<Integer> getYearsWithObjects() {
         final SolrQuery query = new SolrQuery(DEFAULT_SOLR_QUERY);
+        query.setRequestHandler(requestHandler);
         query.setRows(0);
         query.addFilterQuery(filterQuery);
         query.setFacet(true);
@@ -94,7 +100,8 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
         query.setFacetSort(FacetParams.FACET_SORT_INDEX);
         query.setFacetLimit(-1);
         try {
-            return solrClient.query(query).getFacetField(FIELD_YEAR_ISSUED).getValues()
+            final QueryResponse response = solrClient.query(query);
+            return response.getFacetField(FIELD_YEAR_ISSUED).getValues()
                 .stream().map(FacetField.Count::getName).map(Integer::parseInt).toList();
         } catch (SolrServerException | IOException e) {
             throw new MCRException(e);
@@ -104,6 +111,7 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
     @Override
     public ObjectIdsWithCount getObjectIdsByYear(int year, int offset, int limit) {
         final SolrQuery query = new SolrQuery(DEFAULT_SOLR_QUERY);
+        query.setRequestHandler(requestHandler);
         query.addFilterQuery(filterQuery);
         query.addFilterQuery(String.format(Locale.ROOT, FIELD_DATE_ISSUED + ":%s*", year));
         query.setFields(FIELD_ID);
@@ -136,9 +144,15 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
         @MCRProperty(name = "FilterQuery")
         public String filterQuery;
 
+        /**
+         * The Solr request handler path configured via {@code .RequestHandler} property.
+         */
+        @MCRProperty(name = "RequestHandler")
+        public String requestHandler;
+
         @Override
         public SitelinksSolrMetadataService get() {
-            return new SitelinksSolrMetadataService(filterQuery);
+            return new SitelinksSolrMetadataService(filterQuery, requestHandler);
         }
     }
 }
