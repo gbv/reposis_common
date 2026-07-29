@@ -1,0 +1,17 @@
+name: Forward Merge
+
+on:
+  push:
+    branches:
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9].x'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  forward-merge:
+    concurrency:
+      group: forward-merge-${{ github.repository }}-${{ github.ref_name }}
+      cancel-in-progress: true
+    uses: gbv/reposis_workflows/.github/workflows/forward-merge.yml@v1
