@@ -3,7 +3,7 @@ name: Snapshot Deploy (main)
 on:
   push:
     branches:
-      - '2024.06.x'
+      - '2025.12.x'
   workflow_dispatch:
 
 permissions:
