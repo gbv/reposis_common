@@ -2,7 +2,6 @@ package de.gbv.reposis.geo;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.NodeList;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -73,18 +72,16 @@ public class GeoFunctions {
      * The MODS Metadata contains single points or polygons. The polygons are either clockwise or counterclockwise.
      * Solr GEO3D only accepts polygons in counterclockwise order, otherwise the polygon is interpreted as a hole.
      * The Polygon gets reversed if it is clockwise.
+     *
      * @param modsCoords The content of the mods:coordinates element.
      * @return a polygon or point WKT string.
      */
-    public static String getNormalizedWKTString(NodeList modsCoords) {
-        if (modsCoords == null) {
-            return null;
-        }
+    public static String getNormalizedWKTString(List<String> modsCoords) {
         StringBuilder sb = new StringBuilder();
         try {
             sb.append("GeometryCollection (");
-            for (int i = 0; i < modsCoords.getLength(); i++) {
-                String coords = modsCoords.item(i).getTextContent();
+            for (int i = 0; i < modsCoords.size(); i++) {
+                String coords = modsCoords.get(i);
                 double[][] verticles = getGeoPoints(coords);
                 if (verticles.length == 1) {
                     sb.append("POINT (").append(verticles[0][0]).append(" ").append(verticles[0][1])
@@ -106,7 +103,7 @@ public class GeoFunctions {
                         .collect(Collectors.joining(", "));
                     sb.append("POLYGON ((").append(points).append("))");
                 }
-                if (i < modsCoords.getLength() - 1) {
+                if (i < modsCoords.size() - 1) {
                     sb.append(", ");
                 }
             }
