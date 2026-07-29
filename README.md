@@ -306,38 +306,78 @@ The entry page is located at `/sitelinks` and may need to be allowed in the `rob
 ## LDAPLoginServlet
 
 The LDAPLoginServlet can be used to enable login via LDAP. By default, the servlet is disabled.
-To set it up, an LDAP client must be configured, and, if necessary, mappers for the user attributes can be defined.
+To set it up, an LDAP DN resolver and an LDAP client must be configured, and, if necessary, mappers for the user
+attributes can be defined.
+The DN resolver determines the distinguished name (DN) used to authenticate a user by their username (e.g. by template
+or LDAP search).
 Additionally, a default role can be assigned to all LDAP users.
 
 ```
 # Set to "false" to enable the servlet.
 MCR.Servlet.LDAPLoginServlet.Disabled=false
-# Persist new users
-LDAPLoginServlet.PersistUser=true
+
+# Define persistence strategy
+MCRLDAPLoginServlet.PersistenceStrategy.test.Class=de.gbv.reposis.user.persistence.MCRUserUpdateIfExistsStrategy
+MCRLDAPLoginServlet.PersistenceStrategy.test.UpdateStrategy.Class=de.gbv.reposis.user.persistence.MCRUserUpdateMergeStrategy
+MCRLDAPLoginServlet.PersistenceStrategy.test.UpdateStrategy.UserMerger.Class=de.gbv.reposis.user.merger.MCRUserAttributeGapFillMerger
 
 # Configure the auth service service.
 MCRLDAPLoginServlet.AuthService.test.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthService
-MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
+# Always map the default role.
+#MCRLDAPLoginServlet.AuthService.test.DefaultRoles=submitter
+# If no role is mapped, the fallback is used
+#MCRLDAPLoginServlet.AuthService.test.FallbackRoles=submitter
+
+# Configure the ldap dn resolver as static template resolver
+MCRLDAPLoginServlet.AuthService.test.Resolver.Class=de.gbv.reposis.user.ldap.dn.MCRLDAPTemplateDNResolver
+MCRLDAPLoginServlet.AuthService.test.Resolver.BaseDN=ou=people,dc=example,dc=org
+MCRLDAPLoginServlet.AuthService.test.Resolver.AttributeName=uid
+
+# Alternatively, configure the ldap dn resolver as a search-based resolver,
+# which looks up the DN via an LDAP search instead of building it from a template.
+# Useful when usernames are not directly part of the DN (e.g. multiple OUs, custom RDN attributes).
+#MCRLDAPLoginServlet.AuthService.test.Resolver.Class=de.gbv.reposis.user.ldap.dn.MCRLDAPSearchDNResolver
+#MCRLDAPLoginServlet.AuthService.test.Resolver.BaseDN=ou=people,dc=example,dc=org
+#MCRLDAPLoginServlet.AuthService.test.Resolver.SearchFilter=(uid={0})
+#MCRLDAPLoginServlet.AuthService.test.Resolver.ConnectionSettings.Class=de.gbv.reposis.user.ldap.MCRLDAPConnectionSettings
+#MCRLDAPLoginServlet.AuthService.test.Resolver.ConnectionSettings.ProviderUrl=ldap://xxxxx
+#MCRLDAPLoginServlet.AuthService.test.Resolver.ConnectionSettings.Protocol=plain
+# Optionally configure a service account for the search; if omitted, the search is anonymous.
+#MCRLDAPLoginServlet.AuthService.test.Resolver.BindDN=cn=service,dc=example,dc=org
+#MCRLDAPLoginServlet.AuthService.test.Resolver.BindPassword=xxxxx
 
 # Configure the ldap client.
 MCRLDAPLoginServlet.AuthService.test.Client.Class=de.gbv.reposis.user.ldap.MCRLDAPAuthClient
-MCRLDAPLoginServlet.AuthService.test.Client.ProviderUrl=ldap://xxxxx
+MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.Class=de.gbv.reposis.user.ldap.MCRLDAPConnectionSettings
+MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.ProviderUrl=ldap://xxxxx
 # Set protocol: plain|ssl
-MCRLDAPLoginServlet.AuthService.test.Client.Protocol=plain
+MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.Protocol=plain
 # Optionally set custom connection timeout in milliseconds (default: 5000)
-#MCRLDAPLoginServlet.AuthService.test.Client.ConnectTimeout=5000
+#MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.ConnectTimeout=5000
 # Optionally set custom read timeout in milliseconds (default: 5000)
-#MCRLDAPLoginServlet.AuthService.test.Client.ReadTimeout=5000
-MCRLDAPLoginServlet.AuthService.test.Client.PrincipalTemplate=(uid={0}),ou=users,dc=example,dc=com
+#MCRLDAPLoginServlet.AuthService.test.Client.ConnectionSettings.ReadTimeout=5000
+
+# Configure the user mapper, combining attribute and role mapping.
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.Class=de.gbv.reposis.user.mapper.MCRUserMapper
 
 # Configure the attribute mappings.
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Class=de.gbv.reposis.user.ldap.mapper.MCRLDAPAttributeMapper
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Class=de.gbv.reposis.user.ldap.mapper.MCRDefaultLDAPMapping
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.Name=displayName
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.1.TargetName=realName
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Class=de.gbv.reposis.user.ldap.mapper.MCRDefaultLDAPMapping
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.Name=mail
-MCRLDAPLoginServlet.AuthService.test.AttributeMapper.Attributes.2.TargetName=eMail
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.AttributeMapper.Class=de.gbv.reposis.user.mapper.attribute.MCRUserAttributeMapper
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.AttributeMapper.Attributes.1.Class=de.gbv.reposis.user.mapper.attribute.MCRConfigurableUserAttributePipelineMapping
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.AttributeMapper.Attributes.1.Source=displayName
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.AttributeMapper.Attributes.1.Target=realName
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.AttributeMapper.Attributes.2.Class=de.gbv.reposis.user.mapper.attribute.MCRConfigurableUserAttributePipelineMapping
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.AttributeMapper.Attributes.2.Source=mail
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.AttributeMapper.Attributes.2.Target=eMail
+
+# Configure the role mappings.
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.RoleMapper.Class=de.gbv.reposis.user.mapper.role.MCRRoleMapper
+# If the foo attribute equals bar, map the baz role
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.RoleMapper.Roles.1.Class=de.gbv.reposis.user.mapper.role.MCRConfigurableRolePipelineMapping
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.RoleMapper.Roles.1.Source=foo
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.RoleMapper.Roles.1.Matcher.Class=de.gbv.reposis.mapper.matcher.MCRStringEqualsMatcher
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.RoleMapper.Roles.1.Matcher.Value=bar
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.RoleMapper.Roles.1.PostProcessor.Class=de.gbv.reposis.mapper.postprocessor.MCRStringFixedValuePostProcessor
+#MCRLDAPLoginServlet.AuthService.test.UserMapper.RoleMapper.Roles.1.PostProcessor.Value=baz
 ```
 
 ### realms.xml
@@ -359,6 +399,46 @@ It can then look like this:
       </info>
     </login>
   </realm>
+```
+
+## Frontend
+
+### Error Page
+
+A stylesheet with customizations for the standard email addresses is available for `mcr_error`.
+In addition, further error-page-specific templates should be integrated using the `xslInclude:ErrorPage` hook.  
+The email addresses can be configured via the following properties: `REP.ErrorPage.Mail.General` and
+`REP.ErrorPage.Mail.Technical`.  
+The stylesheet can be activated as follows:
+
+```
+MCR.ContentTransformer.mcr_error.Stylesheet=xsl/rep-error-page.xsl,%MCR.LayoutTransformerFactory.Default.Stylesheets%
+```
+### Codemeta
+
+#### Metadata
+Codemeta metadata view and export can be enabled via mycore.properties:
+
+```properties
+# Enable CodeMeta metadata display
+MCR.URIResolver.xslImports.modsmeta=%MCR.URIResolver.xslImports.modsmeta%,metadata/rep-codemeta-metadata.xsl
+MIR.Layout.Start=%MIR.Layout.Start%,rep-codemeta-metadata
+# Enable CodeMeta metadata export
+MCR.ContentTransformer.mods2codemeta-jsonld.Stylesheet=xslt/mycoreobject2codemeta-jsonld.xsl
+MCR.ContentTransformer.mods2codemeta-jsonld.TransformerFactoryClass=net.sf.saxon.TransformerFactoryImpl
+MCR.Export.Transformers=%MCR.Export.Transformers%,mods2codemeta-jsonld:CodeMeta
+```
+
+#### OAI
+OAI Codemeta set can be enabled via mycore.properties:
+
+```properties
+MCR.ContentTransformer.oai-codemeta.Stylesheet=xslt/mycoreobject2codemeta-jsonld.xsl,xslt/codemeta-jsonld2rdf.xsl
+MCR.ContentTransformer.oai-codemeta.TransformerFactoryClass=net.sf.saxon.TransformerFactoryImpl
+MCR.OAIDataProvider.MetadataFormat.codemeta.Schema=http://www.openarchives.org/OAI/2.0/rdf.xsd
+MCR.OAIDataProvider.MetadataFormat.codemeta.Namespace=http://www.w3.org/1999/02/22-rdf-syntax-ns#
+MCR.OAIDataProvider.OAI2.Sets.codemeta.URI=webapp:oai/set_codemeta.xml
+MCR.OAIDataProvider.OAI2.Sets.codemeta.Query=mods.genre:software
 ```
 
 ## Development
