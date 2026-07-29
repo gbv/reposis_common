@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mycoreclass ID="development_status"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="MCRClassification.xsd">
+  <label xml:lang="de" text="Entwicklungsstatus" description="Liste von Entwicklungstatus" />
+  <label xml:lang="en" text="Development Status" description="A list of development statuses" />
+  <categories>
+    <category ID="abandoned">
+      <label xml:lang="de" text="Abgebrochen" />
+      <label xml:lang="en" text="Abandoned" />
+    </category>
+    <category ID="active">
+      <label xml:lang="de" text="Aktiv" />
+      <label xml:lang="en" text="Active" />
+    </category>
+    <category ID="concept">
+      <label xml:lang="de" text="Konzept" />
+      <label xml:lang="en" text="Concept" />
+    </category>
+    <category ID="inactive">
+      <label xml:lang="de" text="Inaktiv" />
+      <label xml:lang="en" text="Inactive" />
+    </category>
+    <category ID="moved">
+      <label xml:lang="de" text="Verschoben" />
+      <label xml:lang="en" text="Moved" />
+    </category>
+    <category ID="suspended">
+      <label xml:lang="de" text="Eingestellt" />
+      <label xml:lang="en" text="Suspended" />
+    </category>
+    <category ID="unsupported">
+      <label xml:lang="de" text="Nicht unterstützt" />
+      <label xml:lang="en" text="Unsupported" />
+    </category>
+    <category ID="wip">
+      <label xml:lang="de" text="WIP" />
+      <label xml:lang="en" text="WIP" />
+    </category>
+  </categories>
+</mycoreclass>

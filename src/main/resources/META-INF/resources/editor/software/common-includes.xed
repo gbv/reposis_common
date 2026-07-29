@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xed:template xmlns:mir="http://www.mycore.de/mir" xmlns:xed="http://www.mycore.de/xeditor">
+
+  <xed:load-resource name="mir_genres" uri="classification:metadata:-1:children:mir_genres" />
+
+  <xed:template id="rep.software.involved.repeated">
+    <mir:person.extended.repeated help-text="{i18n:mir.help.research.data.person}">
+      <option value="cre">
+        <xed:output i18n="mir.role.creator" />
+      </option>
+      <option value="ctb">
+        <xed:output i18n="mir.role.contributor" />
+      </option>
+      <option value="pbl">
+        <xed:output i18n="mir.role.publisher" />
+      </option>
+      <option value="cph">
+        <xed:output i18n="rep.role.copyrightHolder" />
+      </option>
+      <option value="spn">
+        <xed:output i18n="rep.role.sponsor" />
+      </option>
+      <option value="prv">
+        <xed:output i18n="rep.role.provider" />
+      </option>
+      <option value="led">
+        <xed:output i18n="rep.role.maintainer" />
+      </option>
+      <option value="fnd">
+        <xed:output i18n="rep.role.funder" />
+      </option>
+    </mir:person.extended.repeated>
+  </xed:template>
+
+  <xed:template id="rep.software.relatedPublications">
+    <fieldset>
+      <legend class="mir-fieldset-legend">
+        <xed:output i18n="rep.editor.software.relatedPublication" />
+      </legend>
+      <xed:repeat xpath="mods:relatedItem" min="1" max="10">
+        <div class="mir-fieldset-content">
+          <div class="form-group row {$xed-validation-marker}">
+            <label class="col-md-3 col-form-label text-right">
+              <xed:output i18n="rep.editor.software.relatedPublication.type" />
+            </label>
+            <div class="col-md-6 controls">
+              <xed:bind xpath="@type" initially="">
+                <select class="form-control form-control-inline">
+                  <option value="">
+                    <xed:output i18n="mir.select" />
+                  </option>
+                  <option value="host">
+                    <xed:output i18n="mir.relatedItem.host" />
+                  </option>
+                  <option value="constituent">
+                    <xed:output i18n="mir.relatedItem.constituent" />
+                  </option>
+                  <option value="isReferencedBy">
+                    <xed:output i18n="mir.relatedItem.isReferencedBy" />
+                  </option>
+                </select>
+              </xed:bind>
+            </div>
+            <mir:help-pmud help-text="{i18n:mir.help.related.item}" pmud="true" />
+          </div>
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label text-right">
+              <xed:output i18n="rep.editor.software.relatedPublication.title" />
+            </label>
+            <div class="col-md-6 controls">
+              <xed:bind xpath="mods:titleInfo/mods:title">
+                <input type="text" class="form-control form-control-inline" />
+              </xed:bind>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label text-right">
+              <xed:output i18n="rep.editor.software.relatedPublication.genre" />
+            </label>
+            <div class="col-md-6 controls">
+              <xed:bind xpath="mods:genre[@type='intern'][@authorityURI=$mir_genres/label[@xml:lang='x-uri']/@text]/@valueURIxEditor">
+                <select class="form-control form-control-inline">
+                  <option value="">
+                    <xed:output i18n="mir.select" />
+                  </option>
+                  <option value="article">
+                    <xed:output value="$mir_genres//category[@ID='article']/label[lang($CurrentLang)]/@text" />
+                  </option>
+                  <option value="research_data">
+                    <xed:output value="$mir_genres//category[@ID='research_data']/label[lang($CurrentLang)]/@text" />
+                  </option>
+                  <option value="software">
+                    <xed:output value="$mir_genres//category[@ID='software']/label[lang($CurrentLang)]/@text" />
+                  </option>
+                  <option value="speech">
+                    <xed:output value="$mir_genres//category[@ID='speech']/label[lang($CurrentLang)]/@text" />
+                  </option>
+                </select>
+              </xed:bind>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-3 col-form-label text-right">
+              <xed:output i18n="rep.editor.software.relatedPublication.link" />
+            </label>
+            <div class="col-md-6 controls">
+              <xed:bind xpath="mods:location/mods:url[@access='raw object']">
+                <input type="text" class="form-control form-control-inline" />
+              </xed:bind>
+            </div>
+          </div>
+        </div>
+        <xed:validate
+          display="global"
+          i18n="rep.editor.software.relatedPublication.validation"
+          relevant-if="string-length(@type) &gt; 0 or string-length(mods:titleInfo/mods:title) &gt; 0 or string-length(mods:location/mods:url) &gt; 0"
+          test="string-length(@type) &gt; 0 and (string-length(mods:titleInfo/mods:title) &gt; 0 or string-length(mods:location/mods:url) &gt; 0)" />
+      </xed:repeat>
+    </fieldset>
+  </xed:template>
+
+</xed:template>
