@@ -19,7 +19,7 @@
     <h1>Es ist ein Fehler aufgetreten</h1>
     <div class="row">
       <div class="col-md-8" lang="de">
-        <xsl:apply-templates select="." />
+        <xsl:apply-templates select="." mode="error-content" />
       </div>
       <xsl:if test="exception/trace">
         <div class="hidden">
@@ -40,7 +40,7 @@
     </div>
   </xsl:template>
 
-  <xsl:template match="mcr_error[@HttpError='500']" priority="10">
+  <xsl:template match="mcr_error[@HttpError='500']" mode="error-content">
     <h2>Interner Serverfehler</h2>
     <p>
       Es ist leider ein Serverfehler aufgetreten.
@@ -55,7 +55,7 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="mcr_error[@HttpError='404']" priority="10">
+  <xsl:template match="mcr_error[@HttpError='404']" mode="error-content">
     <h2><xsl:value-of select="." /></h2>
     <p>
       Die von Ihnen angeforderte Seite konnte leider nicht gefunden werden.
@@ -71,7 +71,7 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="mcr_error[@HttpError='403']" priority="10">
+  <xsl:template match="mcr_error[@HttpError='403']" mode="error-content">
     <h2>Zugriff verweigert</h2>
     <p>
       Sie haben keine Berechtigung diese Seite zu sehen.
@@ -87,7 +87,7 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="mcr_error">
+  <xsl:template match="mcr_error" mode="error-content">
     <h2><xsl:value-of select="." /></h2>
     <p>
       Es ist leider ein Fehler aufgetreten.
