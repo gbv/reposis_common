@@ -7,6 +7,7 @@
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:include href="xslInclude:ErrorPage" />
 
+  <xsl:param name="REP.ProductionMode" select="''" />
   <xsl:param name="REP.ErrorPage.Mail.General" select="''" />
   <xsl:param name="REP.ErrorPage.Mail.Technical" select="''" />
 
@@ -21,7 +22,7 @@
       <div class="col-md-8" lang="de">
         <xsl:apply-templates select="." mode="error-content" />
       </div>
-      <xsl:if test="exception/trace">
+      <xsl:if test="$REP.ProductionMode = 'false' and exception/trace">
         <div class="hidden">
           <div class="panel panel-warning">
             <div class="panel-heading">
