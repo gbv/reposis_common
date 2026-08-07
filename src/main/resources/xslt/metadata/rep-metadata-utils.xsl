@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="3.0"
+  xmlns:mcri18n="http://www.mycore.de/xslt/i18n"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
   <xsl:template name="print-field">
     <xsl:param name="i18n" />
     <xsl:param name="pre-value" />
     <xsl:param name="value" />
     <dt>
-      <xsl:value-of select="document(concat('i18n:', $i18n))" />
+      <xsl:value-of select="mcri18n:translate($i18n)" />
     </dt>
     <dd>
       <xsl:choose>
@@ -42,14 +45,6 @@
         <xsl:text>, </xsl:text>
       </xsl:if>
     </xsl:for-each>
-  </xsl:template>
-
-  <xsl:template name="get-classification-label">
-    <xsl:param name="classification" />
-    <xsl:value-of select="
-      document(concat('classification:metadata:0:children:', $classification))
-        //category/label[@xml:lang=$CurrentLang]/@text
-    " />
   </xsl:template>
 
 </xsl:stylesheet>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet version="3.0"
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
+  xmlns:mcrclassification="http://www.mycore.de/xslt/classification"
   xmlns:mods="http://www.loc.gov/mods/v3"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="fn mods">
+  exclude-result-prefixes="#all">
 
   <xsl:import href="xslImport:modsmeta:metadata/rep-codemeta-metadata.xsl" />
   <xsl:import href="resource:xsl/metadata/rep-metadata-utils.xsl" />
@@ -44,14 +45,12 @@
   </xsl:template>
 
   <xsl:template match="fn:map[@key='developmentStatus']">
-    <xsl:variable name="status" select="fn:string[@key='@value']" />
+    <xsl:variable name="status" select="substring-after(fn:string[@key='@value'], ':')" />
     <xsl:call-template name="print-field">
       <xsl:with-param name="i18n" select="'rep.metadata.software.developmentStatus'" />
-      <xsl:with-param name="value">
-        <xsl:call-template name="get-classification-label">
-          <xsl:with-param name="classification" select="$status" />
-        </xsl:call-template>
-      </xsl:with-param>
+      <xsl:with-param name="value" select="
+        mcrclassification:current-label-text(mcrclassification:category('development_status', $status))
+      " />
     </xsl:call-template>
   </xsl:template>
 

@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet version="3.0"
+  xmlns:local="http://www.w3.org/2005/xquery-local-functions"
+  xmlns:mcrproperty="http://www.mycore.de/xslt/property"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  exclude-result-prefixes="#all">
 
-  <xsl:output method="html" encoding="UTF-8" indent="yes" />
+  <xsl:import href="resource:xslt/output-html.xsl" />
 
-  <xsl:param name="WebApplicationBaseURL" />
-  <xsl:param name="Sitelinks.PageSize" />
+  <xsl:include href="resource:xslt/default-parameters.xsl" />
+  <xsl:include href="xslInclude:functions" />
+
   <xsl:param name="base-url" select="concat($WebApplicationBaseURL, 'sitelinks')" />
 
   <xsl:template match="/">
-    <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html&gt;</xsl:text>
     <html lang="en">
       <xsl:apply-templates />
     </html>
@@ -44,12 +49,9 @@
   </xsl:template>
 
   <xsl:template match="page">
-    <xsl:variable name="year" select="@year" />
-    <xsl:variable name="max-page-number">
-      <xsl:call-template name="max-page-number">
-        <xsl:with-param name="total-count" select="@total-count" />
-      </xsl:call-template>
-    </xsl:variable>
+    <xsl:variable name="page-size" select="xs:integer(mcrproperty:one('Sitelinks.PageSize'))" />
+    <xsl:variable name="year" select="xs:integer(year)" />
+    <xsl:variable name="max-page-number" select="local:get-max-page-number(@total-count, $page-size)" />
     <xsl:variable name="page-title">
       Page <xsl:value-of select="@number" /> of <xsl:value-of select="$max-page-number" />
     </xsl:variable>
@@ -119,19 +121,19 @@
     <title><xsl:value-of select="$title" /></title>
   </xsl:template>
 
-  <xsl:template name="max-page-number">
-    <xsl:param name="total-count" />
-    <xsl:choose>
-      <xsl:when test="$Sitelinks.PageSize = 0 or $total-count = 0">
-        <xsl:value-of select="1" />
-      </xsl:when>
-      <xsl:when test="($total-count mod $Sitelinks.PageSize) = 0">
-        <xsl:value-of select="floor($total-count div $Sitelinks.PageSize)" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="floor($total-count div $Sitelinks.PageSize) + 1" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
+  <xsl:function name="local:get-max-page-number" as="xs:integer">
+    <xsl:param name="total-count" as="xs:integer" />
+    <xsl:param name="page-size" as="xs:integer" />
+
+    <xsl:sequence select="
+      xs:integer(
+        if ($page-size = 0 or $total-count = 0)
+        then 1
+        else if (($total-count mod $page-size) = 0)
+        then floor($total-count div $page-size)
+        else floor($total-count div $page-size) + 1
+      )
+    " />
+  </xsl:function>
 
 </xsl:stylesheet>
