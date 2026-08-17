@@ -72,6 +72,22 @@
     </p>
   </xsl:template>
 
+  <xsl:template match="mcr_error[@HttpError='401']" mode="error-content">
+    <h2>Anmeldung erforderlich</h2>
+    <p>
+      Sie müssen angemeldet sein, um diese Seite zu sehen.
+      Bitte melden Sie sich am System an.
+      <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
+        Sollten Sie trotz Anmeldung keinen Zugriff auf diese Seite haben, wenden Sie sich ggf. an
+        Ihren Administrator oder schreiben Sie eine Mail an
+        <xsl:call-template name="mail">
+          <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
+        </xsl:call-template>.
+        Vielen Dank!
+      </xsl:if>
+    </p>
+  </xsl:template>
+
   <xsl:template match="mcr_error[@HttpError='403']" mode="error-content">
     <h2>Zugriff verweigert</h2>
     <p>
