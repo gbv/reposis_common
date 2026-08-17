@@ -92,7 +92,6 @@
     <h2>Zugriff verweigert</h2>
     <p>
       Sie haben keine Berechtigung, diese Seite zu sehen.
-      Melden Sie sich bitte am System an.
       <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
         Sollten Sie trotz Anmeldung nicht die nötigen Rechte haben, um diese Seite zu sehen, wenden Sie sich ggf. an
         Ihren Administrator oder schreiben Sie eine Mail an
