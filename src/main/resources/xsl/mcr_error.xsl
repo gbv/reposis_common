@@ -7,6 +7,7 @@
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:include href="xslInclude:ErrorPage" />
 
+  <xsl:param name="REP.ProductionMode" select="''" />
   <xsl:param name="REP.ErrorPage.Mail.General" select="''" />
   <xsl:param name="REP.ErrorPage.Mail.Technical" select="''" />
 
@@ -19,9 +20,9 @@
     <h1>Es ist ein Fehler aufgetreten</h1>
     <div class="row">
       <div class="col-md-8" lang="de">
-        <xsl:apply-templates select="." />
+        <xsl:apply-templates select="." mode="error-content" />
       </div>
-      <xsl:if test="exception/trace">
+      <xsl:if test="$REP.ProductionMode = 'false' and exception/trace">
         <div class="hidden">
           <div class="panel panel-warning">
             <div class="panel-heading">
@@ -40,7 +41,7 @@
     </div>
   </xsl:template>
 
-  <xsl:template match="mcr_error[@HttpError='500']" priority="10">
+  <xsl:template match="mcr_error[@HttpError='500']" mode="error-content">
     <h2>Interner Serverfehler</h2>
     <p>
       Es ist leider ein Serverfehler aufgetreten.
@@ -49,18 +50,18 @@
         Gern können Sie uns eine Mail an
         <xsl:call-template name="mail">
           <xsl:with-param name="address" select="$REP.ErrorPage.Mail.Technical" />
-        </xsl:call-template> schicken und kurz schildern wie es zu diesem Fehler kam.
+        </xsl:call-template> schicken und kurz schildern, wie es zu diesem Fehler kam.
         Vielen Dank!
       </xsl:if>
     </p>
   </xsl:template>
 
-  <xsl:template match="mcr_error[@HttpError='404']" priority="10">
+  <xsl:template match="mcr_error[@HttpError='404']" mode="error-content">
     <h2><xsl:value-of select="." /></h2>
     <p>
       Die von Ihnen angeforderte Seite konnte leider nicht gefunden werden.
       Eventuell haben Sie ein altes Lesezeichen oder einen veralteten Link benutzt.
-      Bitte versuchen Sie mithilfe der <a href="/index.html">Suche</a> die gewünschte Seite zu finden.
+      Bitte versuchen Sie, mithilfe der <a href="/index.html">Suche</a> die gewünschte Seite zu finden.
       <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
         Alternativ können Sie eine Mail an
         <xsl:call-template name="mail">
@@ -71,11 +72,26 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="mcr_error[@HttpError='403']" priority="10">
+  <xsl:template match="mcr_error[@HttpError='401']" mode="error-content">
+    <h2>Anmeldung erforderlich</h2>
+    <p>
+      Sie müssen angemeldet sein, um diese Seite zu sehen.
+      Bitte melden Sie sich am System an.
+      <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
+        Sollten Sie trotz Anmeldung keinen Zugriff auf diese Seite haben, wenden Sie sich ggf. an
+        Ihren Administrator oder schreiben Sie eine Mail an
+        <xsl:call-template name="mail">
+          <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
+        </xsl:call-template>.
+        Vielen Dank!
+      </xsl:if>
+    </p>
+  </xsl:template>
+
+  <xsl:template match="mcr_error[@HttpError='403']" mode="error-content">
     <h2>Zugriff verweigert</h2>
     <p>
-      Sie haben keine Berechtigung diese Seite zu sehen.
-      Melden Sie sich bitte am System an.
+      Sie haben keine Berechtigung, diese Seite zu sehen.
       <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
         Sollten Sie trotz Anmeldung nicht die nötigen Rechte haben, um diese Seite zu sehen, wenden Sie sich ggf. an
         Ihren Administrator oder schreiben Sie eine Mail an
@@ -87,7 +103,7 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="mcr_error">
+  <xsl:template match="mcr_error" mode="error-content">
     <h2><xsl:value-of select="." /></h2>
     <p>
       Es ist leider ein Fehler aufgetreten.
@@ -95,7 +111,7 @@
         Sollte dies wiederholt der Fall sein, schreiben Sie bitte eine Mail an
         <xsl:call-template name="mail">
           <xsl:with-param name="address" select="$REP.ErrorPage.Mail.Technical" />
-        </xsl:call-template> und schildern kurz wie es dazu kam.
+        </xsl:call-template> und schildern kurz, wie es dazu kam.
         Vielen Dank!
       </xsl:if>
     </p>
