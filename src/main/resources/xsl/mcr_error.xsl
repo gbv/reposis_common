@@ -50,7 +50,7 @@
         Gern können Sie uns eine Mail an
         <xsl:call-template name="mail">
           <xsl:with-param name="address" select="$REP.ErrorPage.Mail.Technical" />
-        </xsl:call-template> schicken und kurz schildern wie es zu diesem Fehler kam.
+        </xsl:call-template> schicken und kurz schildern, wie es zu diesem Fehler kam.
         Vielen Dank!
       </xsl:if>
     </p>
@@ -61,7 +61,7 @@
     <p>
       Die von Ihnen angeforderte Seite konnte leider nicht gefunden werden.
       Eventuell haben Sie ein altes Lesezeichen oder einen veralteten Link benutzt.
-      Bitte versuchen Sie mithilfe der <a href="/index.html">Suche</a> die gewünschte Seite zu finden.
+      Bitte versuchen Sie, mithilfe der <a href="/index.html">Suche</a> die gewünschte Seite zu finden.
       <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
         Alternativ können Sie eine Mail an
         <xsl:call-template name="mail">
@@ -75,7 +75,7 @@
   <xsl:template match="mcr_error[@HttpError='403']" mode="error-content">
     <h2>Zugriff verweigert</h2>
     <p>
-      Sie haben keine Berechtigung diese Seite zu sehen.
+      Sie haben keine Berechtigung, diese Seite zu sehen.
       Melden Sie sich bitte am System an.
       <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
         Sollten Sie trotz Anmeldung nicht die nötigen Rechte haben, um diese Seite zu sehen, wenden Sie sich ggf. an
@@ -96,7 +96,7 @@
         Sollte dies wiederholt der Fall sein, schreiben Sie bitte eine Mail an
         <xsl:call-template name="mail">
           <xsl:with-param name="address" select="$REP.ErrorPage.Mail.Technical" />
-        </xsl:call-template> und schildern kurz wie es dazu kam.
+        </xsl:call-template> und schildern kurz, wie es dazu kam.
         Vielen Dank!
       </xsl:if>
     </p>
