@@ -120,8 +120,8 @@ public class MCRCircleRepairServlet extends MCRServlet {
     static org.jdom2.Element previewXml(MCRCircleRepairService.Preview preview) {
         var root = new org.jdom2.Element("circleRepair")
             .setAttribute("objects", Integer.toString(preview.objectCount()))
-            .setAttribute("generated", java.time.LocalDateTime.now().format(
-                java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")));
+            .setAttribute("generated", java.time.LocalDateTime.now(java.time.ZoneId.systemDefault()).format(
+                java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss", java.util.Locale.ROOT)));
         for (var group : preview.cases()) {
             var element = new org.jdom2.Element("group").setAttribute("suggested", Boolean.toString(group.suggested()));
             element.addContent(new org.jdom2.Element("explanation").setText(group.explanation()));
