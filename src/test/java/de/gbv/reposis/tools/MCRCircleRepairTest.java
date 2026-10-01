@@ -95,6 +95,44 @@ public class MCRCircleRepairTest extends MCRTestCase {
         Assert.assertTrue(result.links().stream().noneMatch(MCRCircleRepairService.PreviewLink::remove));
     }
 
+    @Test
+    public void simpleCircleIsFoundFromEitherObject() throws Exception {
+        var repository = pair("otherVersion", "otherVersion");
+        for (String id : List.of(A, B)) {
+            var repairCase = MCRCircleRepairService.caseOf(repository, id).orElseThrow();
+            var removal = MCRCircleRepairService.simpleRemoval(repairCase).orElseThrow();
+            Assert.assertEquals(B, removal.from());
+            Assert.assertEquals(A, removal.to());
+            Assert.assertEquals(1, removal.position());
+        }
+        Assert.assertEquals(MCRCircleRepairService.simpleRemoval(previewPair(repository).cases().get(0)),
+            MCRCircleRepairService.simpleRemoval(MCRCircleRepairService.caseOf(repository, A).orElseThrow()));
+    }
+
+    @Test
+    public void onlySimpleCirclesHaveASimpleRemoval() throws Exception {
+        var manual = pair("host", "host");
+        Assert.assertTrue(MCRCircleRepairService.simpleRemoval(
+            MCRCircleRepairService.caseOf(manual, A).orElseThrow()).isEmpty());
+
+        var threeObjects = pair("otherVersion", "otherVersion");
+        String c = "test_mods_00000003";
+        threeObjects.xml.put(B, object(B, link(A, "otherVersion") + link(c, "otherVersion")));
+        threeObjects.xml.put(c, object(c, link(A, "otherVersion")));
+        var repairCase = MCRCircleRepairService.caseOf(threeObjects, A).orElseThrow();
+        Assert.assertTrue(repairCase.suggested());
+        Assert.assertTrue(MCRCircleRepairService.simpleRemoval(repairCase).isEmpty());
+
+        var twoLinks = pair("otherVersion", "otherVersion");
+        twoLinks.xml.put(B, object(B, link(A, "otherVersion") + link(A, "otherFormat")));
+        Assert.assertTrue(MCRCircleRepairService.simpleRemoval(
+            MCRCircleRepairService.caseOf(twoLinks, A).orElseThrow()).isEmpty());
+
+        var noCircle = pair("otherVersion", "otherVersion");
+        noCircle.xml.put(B, object(B, ""));
+        Assert.assertTrue(MCRCircleRepairService.caseOf(noCircle, A).isEmpty());
+    }
+
     private static MCRCircleRepairService.Preview previewPair(MemoryRepository repository) throws Exception {
         return MCRCircleRepairService.previewIndexed(repository, List.of(
             new MCRObjectLinkGraph.MCRObjectLink(A, B, "reference"),

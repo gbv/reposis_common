@@ -58,23 +58,11 @@ public class MCRCircleRepairServlet extends MCRServlet {
 
     /** One scalar database query, without loading managed entities or individual XML objects. */
     protected java.util.List<MCRObjectLinkGraph.MCRObjectLink> indexedLinks() {
-        return org.mycore.backend.jpa.MCREntityManagerProvider.getCurrentEntityManager()
-            .createQuery("select l.key.mcrfrom, l.key.mcrto, l.key.mcrtype "
-                + "from MCRLINKHREF l where l.key.mcrtype in ('parent', 'reference')", Object[].class)
-            .getResultList().stream()
-            .map(row -> new MCRObjectLinkGraph.MCRObjectLink((String) row[0], (String) row[1], (String) row[2]))
-            .toList();
+        return MCRCircleRepairService.indexedLinks();
     }
 
     protected MCRCircleRepairService.Reader repository() {
-        return new MCRCircleRepairService.Reader() {
-            public byte[] read(String id) throws Exception {
-                try (var input = org.mycore.datamodel.common.MCRXMLMetadataManager.instance()
-                    .retrieveContent(org.mycore.datamodel.metadata.MCRObjectID.getInstance(id)).getInputStream()) {
-                    return input.readAllBytes();
-                }
-            }
-        };
+        return MCRCircleRepairService.repository();
     }
 
     private static void acquire(HttpServletRequest request) throws RequestFailure {

@@ -46,8 +46,79 @@ Ein Vorschlag garantiert nicht, dass das Dokument im Editor gespeichert werden k
 Bestehende Kreise können die Metadatenübernahme weiterhin blockieren. In diesem Fall
 müssen die betroffenen IDs zur technischen Klärung weitergegeben werden.
 
-Alle Circle-CLI-Kommandos einschließlich Diagnose, Dry-Run und Reparatur sind entfernt.
-Änderungen erfolgen ausschließlich manuell im vorhandenen Editor.
+## CLI-Kommandos für einfache Kreise
+
+Einfache Kreise lassen sich über die MyCoRe-CLI auflösen. Ein einfacher Kreis besteht aus
+genau zwei Dokumenten mit genau einem direkten Verweis in jede Richtung, für den die Übersicht
+einen Änderungsvorschlag macht (also nicht „Fachliche Prüfung nötig“). Entfernt wird genau der
+in der Übersicht vorgeschlagene `relatedItem`. Alle anderen Kreise bleiben unverändert und
+müssen weiterhin im Editor bearbeitet werden.
+
+```text
+repair simple circle for object {0}
+repair all simple circles
+```
+
+`repair simple circle for object {0}` erwartet eine der beiden Objekt-IDs. Das Kommando liest das
+Objekt und alle von ihm aus erreichbaren Objekte direkt aus dem gespeicherten XML, nutzt also nicht
+den Verweisindex. Ist das Objekt nicht Teil eines einfachen Kreises, wird nur eine Meldung
+protokolliert. Vor dem Speichern wird geprüft, ob der `relatedItem` an der geplanten Position noch
+auf das erwartete Ziel mit der erwarteten Relation zeigt.
+
+Beim Speichern verteilt MyCoRe die geteilten Metadaten des Objekts an seine Kinder und an alle
+Objekte, die darauf verweisen, und von dort weiter. MyCoRe schreibt das Objekt, bevor es verteilt.
+Scheitert die Verteilung an einem anderen Objekt mit Kreis, wird nur die Datenbanktransaktion
+zurückgerollt. Die bereits geschriebenen XML-Dokumente bleiben geändert, Linkindex und Dokumente
+passen dann nicht mehr zusammen. Deshalb simuliert das Kommando vor dem Speichern die gesamte
+Verteilung im Speicher (`org.mycore.mods.MCRMODSShareCascadeSimulator`). Würde sie scheitern,
+wird nichts geschrieben und eine Warnung mit dem blockierenden Objekt protokolliert. Dieser Kreis
+muss zuerst aufgelöst werden.
+
+Ein Sonderfall sind veraltete eingebettete Kopien: Kinder und verweisende Objekte speichern Kopien
+der geteilten Metadaten. Sind diese entstanden, während der Kreis bestand, enthalten sie ihn noch.
+MyCoRe prüft beim Weiterverteilen auf Kreise, bevor es die alte Kopie ersetzt, und bricht deshalb
+ab. Solche Objekte erkennt die Simulation: Sie leert deren geteilte Metadaten und rechnet mit dem
+geleerten Stand weiter. Gelingt die Simulation so, leert das Kommando die geteilten Metadaten dieser
+Objekte wirklich, speichert sie ohne Weiterverteilung und repariert danach den Kreis. Die Reparatur
+füllt die Kopien wieder auf. Parent und Verweise bleiben dabei unverändert. Ein echter Kreis
+blockiert weiterhin, weil die Kopie in der Simulation aus den aktuellen Objekten neu aufgebaut wird.
+
+Die Zahl der simulierten Speichervorgänge begrenzt
+`MCR.CircleRepair.MaxCascadeUpdates`; größere Kaskaden werden nicht repariert.
+
+`repair all simple circles` erzeugt die Liste der Kreisgruppen wie die Übersicht (Verweisindex
+plus Prüfung der XML-Dokumente) und reiht für jeden einfachen Kreis das Einzelkommando ein.
+Anschließend sollte der Verweisindex aktuell sein, damit die Übersicht das Ergebnis zeigt.
+Die Kommandos sollten ohne gleichzeitige Bearbeitung der betroffenen Dokumente laufen.
+
+## CLI-Kommandos für veraltete Kopien nach aufgelösten Kreisen
+
+Wird ein Kreis auf anderem Weg aufgelöst, etwa im Editor, bleiben die eingebetteten Kopien aus der Zeit
+des Kreises in anderen Objekten stehen. Der Verweisindex enthält den Kreis dann nicht mehr, deshalb
+zeigt die Übersicht nichts an. Jedes Speichern eines solchen Objekts scheitert trotzdem mit
+`Hierarchy of mods:relatedItem contains ciruit by object <ID>`.
+
+```text
+refresh shared metadata of object {0}
+refresh all outdated shared metadata
+```
+
+`refresh shared metadata of object {0}` baut die geteilten Metadaten des Objekts neu auf und verteilt
+sie weiter, auch wenn sich das Objekt selbst nicht ändert (wie `repair shared metadata for the ID {0}`).
+Vorher wird die Verteilung wie bei der Kreisreparatur im Speicher simuliert. Veraltete Kopien in der
+Kaskade werden geleert und ohne Weiterverteilung gespeichert. Würde die Simulation scheitern, wird nichts
+geschrieben.
+
+Aufgerufen wird das Kommando auf dem Objekt, das in der Fehlermeldung hinter „ciruit by object“ steht.
+Dieses Objekt holt sich beim Neuaufbau die aktuelle Fassung seiner Ziele, die den Kreis nicht mehr
+enthält, und verteilt sie an alle Objekte mit veralteter Kopie. Auf einem dieser Objekte selbst hilft
+das Kommando nicht, weil es die veraltete Kopie wieder erben würde. Besteht der Kreis noch, scheitert
+die Simulation; dann muss zuerst der Kreis aufgelöst werden.
+
+`refresh all outdated shared metadata` prüft die geteilten Metadaten aller MODS-Objekte direkt im
+gespeicherten XML, so wie MyCoRe beim Speichern prüft, und reiht für jedes Objekt, das dort einen
+Kreis schließt, einmal das Einzelkommando ein. Die Prüfung liest jedes Objekt und dauert bei großen
+Beständen einige Minuten.
 
 ## Verhalten unter MyCoRe 2025.12
 

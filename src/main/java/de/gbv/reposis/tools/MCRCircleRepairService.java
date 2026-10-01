@@ -19,14 +19,21 @@
 package de.gbv.reposis.tools;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
+import org.mycore.backend.jpa.MCREntityManagerProvider;
+import org.mycore.common.content.MCRContent;
+import org.mycore.datamodel.common.MCRXMLMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 import de.gbv.reposis.tools.MCRCircleRepair.Decision;
 import de.gbv.reposis.tools.MCRCircleRepair.Link;
@@ -35,6 +42,7 @@ import de.gbv.reposis.tools.MCRCircleRepair.Link;
 public final class MCRCircleRepairService {
     @FunctionalInterface
     public interface Reader {
+        /** Returns the stored XML of the object, or <code>null</code> if it does not exist. */
         byte[] read(String id) throws Exception;
     }
 
@@ -51,6 +59,29 @@ public final class MCRCircleRepairService {
     }
 
     public record PreviewLink(String from, String to, String relation, int position, boolean remove, String reason) {
+    }
+
+    /** One scalar database query, without loading managed entities or individual XML objects. */
+    public static List<MCRObjectLinkGraph.MCRObjectLink> indexedLinks() {
+        return MCREntityManagerProvider.getCurrentEntityManager()
+            .createQuery("select l.key.mcrfrom, l.key.mcrto, l.key.mcrtype "
+                + "from MCRLINKHREF l where l.key.mcrtype in ('parent', 'reference')", Object[].class)
+            .getResultList().stream()
+            .map(row -> new MCRObjectLinkGraph.MCRObjectLink((String) row[0], (String) row[1], (String) row[2]))
+            .toList();
+    }
+
+    /** Reads objects from the metadata store of the application. */
+    public static Reader repository() {
+        return id -> {
+            MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(MCRObjectID.getInstance(id));
+            if (content == null) {
+                return null;
+            }
+            try (var input = content.getInputStream()) {
+                return input.readAllBytes();
+            }
+        };
     }
 
     /** Uses the link index to select candidates; never reads XML outside cyclic components. */
@@ -72,6 +103,9 @@ public final class MCRCircleRepairService {
         List<Link> verifiedLinks = new ArrayList<>();
         for (String id : candidates) {
             byte[] xml = repository.read(id);
+            if (xml == null) {
+                throw new IllegalStateException("Indiziertes Objekt fehlt im Speicher: " + id);
+            }
             Document document = parse(xml);
             if (!id.equals(document.getRootElement().getAttributeValue("ID"))) {
                 throw new IllegalStateException("Abweichende Dokument-ID beim Lesen von " + id);
@@ -81,6 +115,50 @@ public final class MCRCircleRepairService {
         // Suggestions concern each actual circle.
         return preview(new Snapshot(verifiedLinks,
             MCRCircleRepair.plan(candidates, verifiedLinks)), ids.size());
+    }
+
+    /**
+     * Reads the given object and every object reachable from it directly from the stored XML and returns the circle
+     * group that contains the object. Does not use the link index and never changes documents.
+     */
+    public static Optional<RepairCase> caseOf(Reader repository, String id) throws Exception {
+        Set<String> ids = new TreeSet<>();
+        Set<String> visited = new HashSet<>(Set.of(id));
+        var queue = new ArrayDeque<>(List.of(id));
+        List<Link> links = new ArrayList<>();
+        while (!queue.isEmpty()) {
+            String current = queue.remove();
+            byte[] xml = repository.read(current);
+            if (xml == null) {
+                continue;
+            }
+            Document document = parse(xml);
+            if (!current.equals(document.getRootElement().getAttributeValue("ID"))) {
+                throw new IllegalStateException("Abweichende Dokument-ID beim Lesen von " + current);
+            }
+            ids.add(current);
+            for (Link link : MCRCircleRepair.links(document)) {
+                links.add(link);
+                if (!link.to().contains("_derivate_") && visited.add(link.to())) {
+                    queue.add(link.to());
+                }
+            }
+        }
+        return preview(new Snapshot(links, MCRCircleRepair.plan(ids, links)), ids.size()).cases().stream()
+            .filter(repairCase -> repairCase.members().contains(id))
+            .findFirst();
+    }
+
+    /**
+     * Returns the only proposed removal of a simple circle: exactly two objects with one direct link in each
+     * direction, for which the overview proposes a change and needs no review of the relations.
+     */
+    public static Optional<PreviewLink> simpleRemoval(RepairCase repairCase) {
+        if (!repairCase.suggested() || repairCase.members().size() != 2 || repairCase.links().size() != 2) {
+            return Optional.empty();
+        }
+        List<PreviewLink> removals = repairCase.links().stream().filter(PreviewLink::remove).toList();
+        return removals.size() == 1 ? Optional.of(removals.get(0)) : Optional.empty();
     }
 
     private static Preview preview(Snapshot snapshot, int objectCount) {
