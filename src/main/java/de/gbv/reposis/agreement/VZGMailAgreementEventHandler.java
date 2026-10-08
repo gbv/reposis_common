@@ -99,17 +99,38 @@ public class VZGMailAgreementEventHandler extends MCREventHandlerBase {
                 .collect(Collectors.toList());
 
             final Element mailElement = createMailElement(MCRConfiguration2.getStringOrThrow("MCR.mir-module.MailSender"),
-                MCRConfiguration2.getStringOrThrow("MCR.mir-module.EditorMail"),
+                getRecipient(),
                 "Einverständniserklärung von " + MCRSessionMgr.getCurrentSession().getUserInformation().getUserID()
                     + " für " + obj.getId().toString(),
                 html,
-                MCRFrontendUtil.getBaseURL() + "content/publish/"+ agreementFile);
+                getAttachmentURL(agreementFile));
             try {
                 MCRMailer.send(mailElement, true);
             } catch (Exception e) {
                 throw new MCRException("Error while sending mail!", e);
             }
         }
+    }
+
+    /**
+     * Returns the recipient of the agreement mail. This is {@code MIR.Agreement.MailTo} if set,
+     * otherwise {@code MCR.mir-module.EditorMail}.
+     */
+    static String getRecipient() {
+        return MCRConfiguration2.getString("MIR.Agreement.MailTo")
+            .filter(recipient -> !recipient.isBlank())
+            .orElseGet(() -> MCRConfiguration2.getStringOrThrow("MCR.mir-module.EditorMail"));
+    }
+
+    /**
+     * Returns the URL of the file which is attached to the agreement mail. This is
+     * {@code MIR.Agreement.File.URL} if set, otherwise the file {@code agreementFile} in the web folder
+     * {@code content/publish/}.
+     */
+    static String getAttachmentURL(String agreementFile) {
+        return MCRConfiguration2.getString("MIR.Agreement.File.URL")
+            .filter(url -> !url.isBlank())
+            .orElseGet(() -> MCRFrontendUtil.getBaseURL() + "content/publish/" + agreementFile);
     }
 
     private Element createMailElement(String from, String to, String subject, List<Content> htmlPartRoot,
