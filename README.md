@@ -246,10 +246,12 @@ the [configurable instace concept](https://www.mycore.de/documentation/basics/ba
 | Property                   | Description                                                                                                |
 |----------------------------|------------------------------------------------------------------------------------------------------------|
 | MCR.mir-module.MailSender  | The Mail Address from which the agreement will be sent                                                     |
-| MCR.mir-module.EditorMail  | The Mail Address where the agreement will be sent to                                                       |
+| MCR.mir-module.EditorMail  | The Mail Address where the agreement will be sent to, if `MIR.Agreement.MailTo` is not set                 |
+| MIR.Agreement.MailTo       | Optional. Mail Address where the agreement will be sent to, instead of `MCR.mir-module.EditorMail`         |
 | MCR.Mail.Server            | The Mail Server which will be used to send the mail                                                        |
 | MIR.Agreement.MailTemplate | The template which will be used for the Mail. Default Value: agreement_mail_template.xhtml                 |
 | MIR.Agreement.File         | The file which will be attached to the mail. The file must be stored in the web folder `content/publish/`. |
+| MIR.Agreement.File.URL     | Optional. Complete URL of the file which will be attached to the mail, instead of `MIR.Agreement.File`. Useful if the application can not reach its own web folder, e.g. because of a WAF. |
 
 There is also an editor specific property and an event handler which needs to be set in the mycore.properties:
 ```properties
