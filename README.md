@@ -406,15 +406,13 @@ It can then look like this:
 
 ### Error Page
 
-A stylesheet with customizations for the standard email addresses is available for `mcr_error`.
-In addition, further error-page-specific templates should be integrated using the `xslInclude:ErrorPage` hook.  
+The stylesheet `xsl/mcr_error.xsl` overrides the MIR error page and customizes the contact email addresses.
+For 401 and 403 errors it distinguishes by login state rather than by status code, since servlets usually respond
+with 403 even for guests: guests get a login link, logged-in users a "permission denied" message.
+Further error-page-specific templates can be integrated using the `xslInclude:ErrorPage` hook.  
 The email addresses can be configured via the following properties: `REP.ErrorPage.Mail.General` and
-`REP.ErrorPage.Mail.Technical`.  
-The stylesheet can be activated as follows:
+`REP.ErrorPage.Mail.Technical`.
 
-```
-MCR.ContentTransformer.mcr_error.Stylesheet=xsl/rep-error-page.xsl,%MCR.LayoutTransformerFactory.Default.Stylesheets%
-```
 ### Codemeta
 
 #### Metadata

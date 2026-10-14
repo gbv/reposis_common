@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
+  xmlns:encoder="xalan://java.net.URLEncoder"
   xmlns:mcri18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="mcri18n">
+  exclude-result-prefixes="encoder mcri18n mcrxsl">
 
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:include href="xslInclude:ErrorPage" />
@@ -72,35 +74,42 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="mcr_error[@HttpError='401']" mode="error-content">
-    <h2>Anmeldung erforderlich</h2>
-    <p>
-      Sie müssen angemeldet sein, um diese Seite zu sehen.
-      Bitte melden Sie sich am System an.
-      <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
-        Sollten Sie trotz Anmeldung keinen Zugriff auf diese Seite haben, wenden Sie sich ggf. an
-        Ihren Administrator oder schreiben Sie eine Mail an
-        <xsl:call-template name="mail">
-          <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
-        </xsl:call-template>.
-        Vielen Dank!
-      </xsl:if>
-    </p>
-  </xsl:template>
-
-  <xsl:template match="mcr_error[@HttpError='403']" mode="error-content">
-    <h2>Zugriff verweigert</h2>
-    <p>
-      Sie haben keine Berechtigung, diese Seite zu sehen.
-      <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
-        Sollten Sie trotz Anmeldung nicht die nötigen Rechte haben, um diese Seite zu sehen, wenden Sie sich ggf. an
-        Ihren Administrator oder schreiben Sie eine Mail an
-        <xsl:call-template name="mail">
-          <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
-        </xsl:call-template>.
-        Vielen Dank!
-      </xsl:if>
-    </p>
+  <!-- servlets mostly respond with 403 even for guests, so distinguish by login state instead of status code -->
+  <xsl:template match="mcr_error[@HttpError='401' or @HttpError='403']" mode="error-content">
+    <xsl:choose>
+      <xsl:when test="mcrxsl:isCurrentUserGuestUser()">
+        <xsl:variable name="loginURL"
+          select="concat($ServletsBaseURL, 'MCRLoginServlet', $HttpSession, '?url=', encoder:encode(string($RequestURL)))" />
+        <h2>Anmeldung erforderlich</h2>
+        <p>
+          Sie müssen angemeldet sein, um diese Seite zu sehen.
+          Bitte <a href="{$loginURL}">melden Sie sich am System an</a>.
+          <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
+            Sollten Sie trotz Anmeldung keinen Zugriff auf diese Seite haben, wenden Sie sich ggf. an
+            Ihren Administrator oder schreiben Sie eine Mail an
+            <xsl:call-template name="mail">
+              <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
+            </xsl:call-template>.
+            Vielen Dank!
+          </xsl:if>
+        </p>
+      </xsl:when>
+      <xsl:otherwise>
+        <h2>Zugriff verweigert</h2>
+        <p>
+          Sie sind als <strong><xsl:value-of select="$CurrentUser" /></strong> angemeldet,
+          haben aber keine Berechtigung, diese Seite zu sehen.
+          <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
+            Sollten Sie der Meinung sein, dass Sie die nötigen Rechte haben müssten, wenden Sie sich ggf. an
+            Ihren Administrator oder schreiben Sie eine Mail an
+            <xsl:call-template name="mail">
+              <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
+            </xsl:call-template>.
+            Vielen Dank!
+          </xsl:if>
+        </p>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="mcr_error" mode="error-content">
