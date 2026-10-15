@@ -42,7 +42,7 @@ public class MCRCircleRepairServlet extends MCRServlet {
             .map(String::trim).filter(role -> !role.isEmpty()).toArray(String[]::new);
         boolean allowed = java.util.Arrays.stream(roles).anyMatch(user::isUserInRole);
         if (!allowed) {
-            throw org.mycore.access.MCRAccessException.missingPrivilege("Kreisverweise prüfen", roles);
+            throw new org.mycore.access.MCRMissingPrivilegeException("Kreisverweise prüfen", roles);
         }
         if (!"GET".equals(request.getMethod())) {
             throw new RequestFailure(405,

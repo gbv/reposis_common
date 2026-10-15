@@ -167,7 +167,7 @@ public class MCRCircleRepairServletTest extends org.mycore.common.MCRTestCase {
                 return null;
             });
         for (Exception failure : java.util.List.of(new Exception("simulated transaction commit failure"),
-            org.mycore.access.MCRAccessException.missingPrivilege("Kreisverweise prüfen", "editor"))) {
+            new org.mycore.access.MCRMissingPrivilegeException("Kreisverweise prüfen", "editor"))) {
             Assert.assertSame(failure, Assert.assertThrows(Exception.class,
                 () -> new MCRCircleRepairServlet().render(new MCRServletJob(request, response), failure)));
             Assert.assertEquals(200, status[0]);
