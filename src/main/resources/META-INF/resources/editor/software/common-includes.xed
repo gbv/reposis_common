@@ -40,12 +40,12 @@
       <xed:repeat xpath="mods:relatedItem" min="1" max="10">
         <div class="mir-fieldset-content">
           <div class="form-group row {$xed-validation-marker}">
-            <label class="col-md-3 col-form-label text-right">
+            <label class="col-md-3 col-form-label text-end">
               <xed:output i18n="rep.editor.software.relatedPublication.type" />
             </label>
             <div class="col-md-6 controls">
               <xed:bind xpath="@type" initially="">
-                <select class="form-control form-control-inline">
+                <select class="form-control form-control-inline form-select">
                   <option value="">
                     <xed:output i18n="mir.select" />
                   </option>
@@ -64,7 +64,7 @@
             <mir:help-pmud help-text="{i18n:mir.help.related.item}" pmud="true" />
           </div>
           <div class="form-group row">
-            <label class="col-md-3 col-form-label text-right">
+            <label class="col-md-3 col-form-label text-end">
               <xed:output i18n="rep.editor.software.relatedPublication.title" />
             </label>
             <div class="col-md-6 controls">
@@ -74,12 +74,12 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-md-3 col-form-label text-right">
+            <label class="col-md-3 col-form-label text-end">
               <xed:output i18n="rep.editor.software.relatedPublication.genre" />
             </label>
             <div class="col-md-6 controls">
               <xed:bind xpath="mods:genre[@type='intern'][@authorityURI=$mir_genres/label[@xml:lang='x-uri']/@text]/@valueURIxEditor">
-                <select class="form-control form-control-inline">
+                <select class="form-control form-control-inline form-select">
                   <option value="">
                     <xed:output i18n="mir.select" />
                   </option>
@@ -100,7 +100,7 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-md-3 col-form-label text-right">
+            <label class="col-md-3 col-form-label text-end">
               <xed:output i18n="rep.editor.software.relatedPublication.link" />
             </label>
             <div class="col-md-6 controls">
