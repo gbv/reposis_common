@@ -53,4 +53,13 @@
     <url-pattern>/vue/geo-search/config.json</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>MCRCircleRepairServlet</servlet-name>
+    <servlet-class>de.gbv.reposis.tools.MCRCircleRepairServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRCircleRepairServlet</servlet-name>
+    <url-pattern>/servlets/MCRCircleRepairServlet</url-pattern>
+  </servlet-mapping>
+
 </web-fragment>

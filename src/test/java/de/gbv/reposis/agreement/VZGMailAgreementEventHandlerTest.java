@@ -23,6 +23,7 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -47,11 +48,36 @@ public class VZGMailAgreementEventHandlerTest extends MCRTestCase {
         Assert.assertTrue("Mail should contain the user", html.contains("guest"));
     }
 
+    @Test
+    public void getRecipientFallsBackToEditorMail() {
+        Assert.assertEquals("editor@example.org", VZGMailAgreementEventHandler.getRecipient());
+    }
+
+    @Test
+    public void getRecipientUsesMailTo() {
+        MCRConfiguration2.set("MIR.Agreement.MailTo", "agreement@example.org");
+        Assert.assertEquals("agreement@example.org", VZGMailAgreementEventHandler.getRecipient());
+    }
+
+    @Test
+    public void getAttachmentURLFallsBackToPublishFolder() {
+        final String url = VZGMailAgreementEventHandler.getAttachmentURL("agreement.pdf");
+        Assert.assertTrue(url.endsWith("content/publish/agreement.pdf"));
+    }
+
+    @Test
+    public void getAttachmentURLUsesConfiguredURL() {
+        MCRConfiguration2.set("MIR.Agreement.File.URL", "https://example.org/api/v2/agreement.pdf");
+        Assert.assertEquals("https://example.org/api/v2/agreement.pdf",
+            VZGMailAgreementEventHandler.getAttachmentURL("agreement.pdf"));
+    }
+
     @Override
     protected Map<String, String> getTestProperties() {
         final Map<String, String> testProperties = super.getTestProperties();
 
         testProperties.put("MCR.Metadata.Type.object", Boolean.TRUE.toString());
+        testProperties.put("MCR.mir-module.EditorMail", "editor@example.org");
 
 
         return testProperties;
