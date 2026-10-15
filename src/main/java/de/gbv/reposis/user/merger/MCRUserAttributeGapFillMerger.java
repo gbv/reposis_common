@@ -31,8 +31,8 @@ public class MCRUserAttributeGapFillMerger implements MCRUserMerger {
                 LOGGER.debug("Added missing attribute '{}' for user {}.", attribute.getName(), source.getUserID());
             }
         }
-        if (target.getEMailAddress() == null && source.getEMailAddress() != null) {
-            target.setEMail(source.getEMailAddress());
+        if (target.getEMail() == null && source.getEMail() != null) {
+            target.setEMail(source.getEMail());
             changed = true;
             LOGGER.debug("Added missing e-mail address for user {}.", source.getUserID());
         }
