@@ -93,7 +93,7 @@ public class MCRCircleRepairServlet extends MCRServlet {
                 throw failure;
             }
             if (request.getAttribute(RESULT) instanceof org.jdom2.Element page) {
-                org.mycore.common.xml.MCRLayoutService.instance().doLayout(request, response,
+                org.mycore.common.xml.MCRLayoutService.obtainInstance().doLayout(request, response,
                     new org.mycore.common.content.MCRJDOMContent(page));
             } else {
                 throw new org.mycore.common.MCRException("Die Kreisprüfung hat keinen Bericht erzeugt.");

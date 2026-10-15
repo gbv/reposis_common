@@ -92,7 +92,7 @@ public class MCRMODSShareCascadeSimulator {
     /** Simulates on the stored objects and the link table of the application. */
     public static MCRMODSShareCascadeSimulator ofRepository(int maxUpdates) {
         return new MCRMODSShareCascadeSimulator(MCRMetadataManager::retrieveMCRObject,
-            id -> MCRLinkTableManager.instance().getSourceOf(id, MCRLinkTableManager.ENTRY_TYPE_REFERENCE),
+            id -> MCRLinkTableManager.getInstance().getSourceOf(id, MCRLinkTableManager.ENTRY_TYPE_REFERENCE),
             maxUpdates);
     }
 

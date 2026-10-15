@@ -49,7 +49,7 @@ public class MCRReposisCommonCommands {
             + " and the unused declarations below it. Objects that are already normalized are not stored again.",
         order = 10)
     public static List<String> normalizeObjectsOfTypeMods() {
-        return toCommands(MCRXMLMetadataManager.instance().listIDsOfType(MCRMODSWrapper.MODS_OBJECT_TYPE));
+        return toCommands(MCRXMLMetadataManager.getInstance().listIDsOfType(MCRMODSWrapper.MODS_OBJECT_TYPE));
     }
 
     @MCRCommand(
@@ -59,7 +59,7 @@ public class MCRReposisCommonCommands {
         order = 20)
     public static List<String> normalizeObjectsOfTypeModsAndProject(String project) {
         String base = project + "_" + MCRMODSWrapper.MODS_OBJECT_TYPE;
-        return toCommands(MCRXMLMetadataManager.instance().listIDsForBase(base));
+        return toCommands(MCRXMLMetadataManager.getInstance().listIDsForBase(base));
     }
 
     @MCRCommand(

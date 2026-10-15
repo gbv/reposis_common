@@ -74,7 +74,7 @@ public final class MCRCircleRepairService {
     /** Reads objects from the metadata store of the application. */
     public static Reader repository() {
         return id -> {
-            MCRContent content = MCRXMLMetadataManager.instance().retrieveContent(MCRObjectID.getInstance(id));
+            MCRContent content = MCRXMLMetadataManager.getInstance().retrieveContent(MCRObjectID.getInstance(id));
             if (content == null) {
                 return null;
             }

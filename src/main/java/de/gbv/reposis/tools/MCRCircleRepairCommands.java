@@ -26,9 +26,9 @@ import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jdom2.Element;
+import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
-import org.mycore.access.MCRAccessException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.common.MCRXMLMetadataManager;
@@ -155,7 +155,7 @@ public class MCRCircleRepairCommands {
             + REFRESH_SHARED_METADATA + "{0}' for every object that closes such a circuit.",
         order = 40)
     public static List<String> refreshAllOutdatedSharedMetadata() {
-        List<MCRObjectID> ids = MCRXMLMetadataManager.instance().listIDs().stream()
+        List<MCRObjectID> ids = MCRXMLMetadataManager.getInstance().listIDs().stream()
             .map(MCRObjectID::getInstance)
             .filter(MCRMODSWrapper::isSupported)
             .sorted()
