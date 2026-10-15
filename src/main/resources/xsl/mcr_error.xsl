@@ -42,23 +42,21 @@
       <div class="col-md-8">
         <xsl:apply-templates select="." mode="error-content" />
       </div>
-      <xsl:if test="$REP.ProductionMode = 'false' and exception/trace">
-        <div class="hidden">
-          <div class="panel panel-warning">
-            <div class="panel-heading">
-              <xsl:value-of select="concat(mcri18n:translate('error.stackTrace'),' :')" />
-            </div>
-            <div class="panel-body">
-              <xsl:for-each select="exception/trace">
-                <pre style="font-size:0.8em;">
-                  <xsl:value-of select="." />
-                </pre>
-              </xsl:for-each>
-            </div>
-          </div>
-        </div>
-      </xsl:if>
     </div>
+    <xsl:if test="$REP.ProductionMode = 'false' and exception/trace">
+      <div class="card">
+        <div class="card-header bg-danger">
+          <xsl:value-of select="concat(mcri18n:translate('error.stackTrace'), ':')" />
+        </div>
+        <div class="card-body">
+          <xsl:for-each select="exception/trace">
+            <pre style="font-size:0.8em;">
+              <xsl:value-of select="." />
+            </pre>
+          </xsl:for-each>
+        </div>
+      </div>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="mcr_error[@HttpError='500']" mode="error-content">
