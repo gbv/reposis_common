@@ -246,10 +246,12 @@ the [configurable instace concept](https://www.mycore.de/documentation/basics/ba
 | Property                   | Description                                                                                                |
 |----------------------------|------------------------------------------------------------------------------------------------------------|
 | MCR.mir-module.MailSender  | The Mail Address from which the agreement will be sent                                                     |
-| MCR.mir-module.EditorMail  | The Mail Address where the agreement will be sent to                                                       |
+| MCR.mir-module.EditorMail  | The Mail Address where the agreement will be sent to, if `MIR.Agreement.MailTo` is not set                 |
+| MIR.Agreement.MailTo       | Optional. Mail Address where the agreement will be sent to, instead of `MCR.mir-module.EditorMail`         |
 | MCR.Mail.Server            | The Mail Server which will be used to send the mail                                                        |
 | MIR.Agreement.MailTemplate | The template which will be used for the Mail. Default Value: agreement_mail_template.xhtml                 |
 | MIR.Agreement.File         | The file which will be attached to the mail. The file must be stored in the web folder `content/publish/`. |
+| MIR.Agreement.File.URL     | Optional. Complete URL of the file which will be attached to the mail, instead of `MIR.Agreement.File`. Useful if the application can not reach its own web folder, e.g. because of a WAF. |
 
 There is also an editor specific property and an event handler which needs to be set in the mycore.properties:
 ```properties
@@ -404,15 +406,13 @@ It can then look like this:
 
 ### Error Page
 
-A stylesheet with customizations for the standard email addresses is available for `mcr_error`.
-In addition, further error-page-specific templates should be integrated using the `xslInclude:ErrorPage` hook.  
+The stylesheet `xsl/mcr_error.xsl` overrides the MIR error page and customizes the contact email addresses.
+For 401 and 403 errors it distinguishes by login state rather than by status code, since servlets usually respond
+with 403 even for guests: guests get a login link, logged-in users a "permission denied" message.
+Further error-page-specific templates can be integrated using the `xslInclude:ErrorPage` hook.  
 The email addresses can be configured via the following properties: `REP.ErrorPage.Mail.General` and
-`REP.ErrorPage.Mail.Technical`.  
-The stylesheet can be activated as follows:
+`REP.ErrorPage.Mail.Technical`.
 
-```
-MCR.ContentTransformer.mcr_error.Stylesheet=xsl/rep-error-page.xsl,%MCR.LayoutTransformerFactory.Default.Stylesheets%
-```
 ### Codemeta
 
 #### Metadata
