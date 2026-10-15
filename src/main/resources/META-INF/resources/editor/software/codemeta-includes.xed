@@ -18,12 +18,12 @@
         <input type="hidden" value="Text" />
       </xed:bind>
       <div class="form-group row">
-        <label class="col-md-3 col-form-label text-right">
+        <label class="col-md-3 col-form-label text-end">
           <xed:output i18n="rep.metadata.software.developmentStatus" />
         </label>
         <div class="col-md-6">
           <xed:bind xpath="fn:string[@key='@value']" initially="">
-            <select class="form-control form-control-inline">
+            <select class="form-control form-control-inline form-select">
               <option value="">
                 <xed:output i18n="mir.select" />
               </option>
@@ -49,7 +49,7 @@
         <input type="hidden" value="Text" />
       </xed:bind>
       <div class="form-group row">
-        <label class="col-md-3 col-form-label text-right">
+        <label class="col-md-3 col-form-label text-end">
           <xed:output i18n="rep.metadata.software.applicationCategory" />
         </label>
         <div class="col-md-6">
@@ -68,7 +68,7 @@
         <input type="hidden" value="Text" />
       </xed:bind>
       <div class="form-group row">
-        <label class="col-md-3 col-form-label text-right">
+        <label class="col-md-3 col-form-label text-end">
           <xed:output i18n="rep.metadata.software.applicationSubCategory" />
         </label>
         <div class="col-md-6">
@@ -87,7 +87,7 @@
         <input type="hidden" value="http://schema.org/ComputerLanguage" />
       </xed:bind>
       <div class="form-group row">
-        <label class="col-md-3 col-form-label text-right">
+        <label class="col-md-3 col-form-label text-end">
           <xed:output i18n="rep.metadata.software.programmingLanguage" />
         </label>
         <div class="col-md-6">
@@ -126,7 +126,7 @@
         <input type="hidden" value="Text" />
       </xed:bind>
       <div class="form-group row">
-        <label class="col-md-3 col-form-label text-right">
+        <label class="col-md-3 col-form-label text-end">
           <xed:output i18n="rep.metadata.software.memoryRequirement" />
         </label>
         <div class="col-md-6">
@@ -145,7 +145,7 @@
         <input type="hidden" value="Text" />
       </xed:bind>
       <div class="form-group row">
-        <label class="col-md-3 col-form-label text-right">
+        <label class="col-md-3 col-form-label text-end">
           <xed:output i18n="rep.metadata.software.storageRequirements" />
         </label>
         <div class="col-md-6">
@@ -175,7 +175,7 @@
       </xed:bind>
       <div class="mir-fieldset-content-centered">
         <div class="form-group row d-flex align-items-center">
-          <label class="col-md-3 col-form-label text-right">
+          <label class="col-md-3 col-form-label text-end">
             <xed:output i18n="rep.metadata.software.softwareRequirements" />
           </label>
           <div class="col-md-6 controls">
@@ -218,7 +218,7 @@
       </xed:bind>
       <div class="mir-fieldset-content-centered">
         <div class="form-group row d-flex align-items-center">
-          <label class="col-md-3 col-form-label text-right">
+          <label class="col-md-3 col-form-label text-end">
             <xed:output i18n="rep.metadata.software.softwareSuggestions" />
           </label>
           <div class="col-md-6 controls">

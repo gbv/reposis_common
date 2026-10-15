@@ -69,14 +69,10 @@ window.addEventListener('load', function () {
         formStart.placeholder = 'JJJJ';
         formInputGroup.appendChild(formStart);
 
-        let formInputGroupAppendOne = document.createElement('div');
-        formInputGroupAppendOne.classList.add('input-group-append');
-
         let formInputGroupText = document.createElement('span');
         formInputGroupText.classList.add('input-group-text');
         formInputGroupText.innerHTML = ' - ';
-        formInputGroupAppendOne.appendChild(formInputGroupText);
-        formInputGroup.appendChild(formInputGroupAppendOne);
+        formInputGroup.appendChild(formInputGroupText);
 
         let formEnd = document.createElement('input');
         formEnd.type = 'text';
@@ -87,16 +83,12 @@ window.addEventListener('load', function () {
         formInputGroup.appendChild(formEnd);
         timebar.appendChild(formInputGroup);
 
-        let formInputGroupAppendTwo = document.createElement('div');
-        formInputGroupAppendTwo.classList.add('input-group-append');
-        formInputGroup.appendChild(formInputGroupAppendTwo);
-
         let buttonApply = document.createElement('button');
         buttonApply.classList.add('btn');
         buttonApply.classList.add('btn-sm');
         buttonApply.classList.add('btn-secondary');
         buttonApply.innerHTML = '<i class="fas fa-check"></i>';
-        formInputGroupAppendTwo.appendChild(buttonApply);
+        formInputGroup.appendChild(buttonApply);
 
         let buttonReset = document.createElement('button');
         buttonReset.classList.add('btn');
@@ -109,7 +101,7 @@ window.addEventListener('load', function () {
             return value.startsWith(searchField + ':');
         }).length>0;
         if(hasRange) {
-            formInputGroupAppendTwo.appendChild(buttonReset);
+            formInputGroup.appendChild(buttonReset);
             buttonReset.addEventListener('click', function () {
                 let keep = [];
                 let doDelete = false;

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
+  xmlns:encoder="xalan://java.net.URLEncoder"
   xmlns:mcri18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:mcrxsl="xalan://org.mycore.common.xml.MCRXMLFunctions"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="mcri18n">
+  exclude-result-prefixes="encoder mcri18n mcrxsl">
 
   <xsl:include href="MyCoReLayout.xsl" />
   <xsl:include href="xslInclude:ErrorPage" />
@@ -12,14 +14,32 @@
   <xsl:param name="REP.ErrorPage.Mail.Technical" select="''" />
 
   <xsl:variable name="Type" select="'document'" />
-  <xsl:variable name="PageTitle" select="
-    mcri18n:translate('titles.pageTitle.error', concat(' ', /mcr_error/@HttpError))
-  " />
+  <xsl:variable name="is-access-error" select="/mcr_error/@HttpError='401' or /mcr_error/@HttpError='403'" />
+  <xsl:variable name="is-guest" select="mcrxsl:isCurrentUserGuestUser()" />
+  <xsl:variable name="access-error-title">
+    <xsl:choose>
+      <xsl:when test="$is-guest">
+        <xsl:value-of select="mcri18n:translate('rep.errorPage.loginRequired')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="mcri18n:translate('rep.errorPage.accessDenied')" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name="PageTitle">
+    <xsl:choose>
+      <xsl:when test="$is-access-error">
+        <xsl:value-of select="$access-error-title" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="mcri18n:translate('titles.pageTitle.error', concat(' ', /mcr_error/@HttpError))" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
   <xsl:template match="/mcr_error">
-    <h1>Es ist ein Fehler aufgetreten</h1>
     <div class="row">
-      <div class="col-md-8" lang="de">
+      <div class="col-md-8">
         <xsl:apply-templates select="." mode="error-content" />
       </div>
       <xsl:if test="$REP.ProductionMode = 'false' and exception/trace">
@@ -42,79 +62,134 @@
   </xsl:template>
 
   <xsl:template match="mcr_error[@HttpError='500']" mode="error-content">
-    <h2>Interner Serverfehler</h2>
+    <h1><xsl:value-of select="mcri18n:translate('rep.errorPage.internalServerError')" /></h1>
     <p>
-      Es ist leider ein Serverfehler aufgetreten.
-      Wir arbeiten an dessen Beseitigung!
+      <xsl:value-of select="mcri18n:translate('rep.errorPage.internalServerError.text')" />
       <xsl:if test="string-length($REP.ErrorPage.Mail.Technical) &gt; 0">
-        Gern können Sie uns eine Mail an
-        <xsl:call-template name="mail">
-          <xsl:with-param name="address" select="$REP.ErrorPage.Mail.Technical" />
-        </xsl:call-template> schicken und kurz schildern, wie es zu diesem Fehler kam.
-        Vielen Dank!
+        <xsl:text> </xsl:text>
+        <xsl:call-template name="translate-with-placeholder">
+          <xsl:with-param name="key" select="'rep.errorPage.internalServerError.mail'" />
+          <xsl:with-param name="placeholder">
+            <xsl:call-template name="mail">
+              <xsl:with-param name="address" select="$REP.ErrorPage.Mail.Technical" />
+            </xsl:call-template>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:if>
     </p>
   </xsl:template>
 
   <xsl:template match="mcr_error[@HttpError='404']" mode="error-content">
-    <h2><xsl:value-of select="." /></h2>
+    <h1><xsl:value-of select="mcri18n:translate('rep.errorPage.notFound')" /></h1>
     <p>
-      Die von Ihnen angeforderte Seite konnte leider nicht gefunden werden.
-      Eventuell haben Sie ein altes Lesezeichen oder einen veralteten Link benutzt.
-      Bitte versuchen Sie, mithilfe der <a href="/index.html">Suche</a> die gewünschte Seite zu finden.
+      <xsl:call-template name="translate-with-placeholder">
+        <xsl:with-param name="key" select="'rep.errorPage.notFound.text'" />
+        <xsl:with-param name="placeholder">
+          <a href="/index.html">
+            <xsl:value-of select="mcri18n:translate('rep.errorPage.notFound.searchLink')" />
+          </a>
+        </xsl:with-param>
+      </xsl:call-template>
       <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
-        Alternativ können Sie eine Mail an
-        <xsl:call-template name="mail">
-          <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
-        </xsl:call-template> schicken und schildern darin kurz, wie es zu diesem Fehler kam.
-        Vielen Dank!
+        <xsl:text> </xsl:text>
+        <xsl:call-template name="translate-with-placeholder">
+          <xsl:with-param name="key" select="'rep.errorPage.notFound.mail'" />
+          <xsl:with-param name="placeholder">
+            <xsl:call-template name="mail">
+              <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
+            </xsl:call-template>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:if>
     </p>
   </xsl:template>
 
-  <xsl:template match="mcr_error[@HttpError='401']" mode="error-content">
-    <h2>Anmeldung erforderlich</h2>
-    <p>
-      Sie müssen angemeldet sein, um diese Seite zu sehen.
-      Bitte melden Sie sich am System an.
-      <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
-        Sollten Sie trotz Anmeldung keinen Zugriff auf diese Seite haben, wenden Sie sich ggf. an
-        Ihren Administrator oder schreiben Sie eine Mail an
-        <xsl:call-template name="mail">
-          <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
-        </xsl:call-template>.
-        Vielen Dank!
-      </xsl:if>
-    </p>
-  </xsl:template>
-
-  <xsl:template match="mcr_error[@HttpError='403']" mode="error-content">
-    <h2>Zugriff verweigert</h2>
-    <p>
-      Sie haben keine Berechtigung, diese Seite zu sehen.
-      <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
-        Sollten Sie trotz Anmeldung nicht die nötigen Rechte haben, um diese Seite zu sehen, wenden Sie sich ggf. an
-        Ihren Administrator oder schreiben Sie eine Mail an
-        <xsl:call-template name="mail">
-          <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
-        </xsl:call-template>.
-        Vielen Dank!
-      </xsl:if>
-    </p>
+  <xsl:template match="mcr_error[@HttpError='401' or @HttpError='403']" mode="error-content">
+    <h1><xsl:value-of select="$access-error-title" /></h1>
+    <xsl:choose>
+      <xsl:when test="$is-guest">
+        <xsl:variable name="login-url"
+          select="concat($ServletsBaseURL, 'MCRLoginServlet', $HttpSession, '?url=', encoder:encode(string($RequestURL)))" />
+        <p>
+          <xsl:call-template name="translate-with-placeholder">
+            <xsl:with-param name="key" select="'rep.errorPage.loginRequired.text'" />
+            <xsl:with-param name="placeholder">
+              <a href="{$login-url}">
+                <xsl:value-of select="mcri18n:translate('rep.errorPage.loginRequired.loginLink')" />
+              </a>
+            </xsl:with-param>
+          </xsl:call-template>
+          <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
+            <xsl:text> </xsl:text>
+            <xsl:call-template name="translate-with-placeholder">
+              <xsl:with-param name="key" select="'rep.errorPage.loginRequired.mail'" />
+              <xsl:with-param name="placeholder">
+                <xsl:call-template name="mail">
+                  <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
+                </xsl:call-template>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
+        </p>
+      </xsl:when>
+      <xsl:otherwise>
+        <p>
+          <xsl:call-template name="translate-with-placeholder">
+            <xsl:with-param name="key" select="'rep.errorPage.accessDenied.text'" />
+            <xsl:with-param name="placeholder">
+              <strong><xsl:value-of select="$CurrentUser" /></strong>
+            </xsl:with-param>
+          </xsl:call-template>
+          <xsl:if test="string-length($REP.ErrorPage.Mail.General) &gt; 0">
+            <xsl:text> </xsl:text>
+            <xsl:call-template name="translate-with-placeholder">
+              <xsl:with-param name="key" select="'rep.errorPage.accessDenied.mail'" />
+              <xsl:with-param name="placeholder">
+                <xsl:call-template name="mail">
+                  <xsl:with-param name="address" select="$REP.ErrorPage.Mail.General" />
+                </xsl:call-template>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:if>
+        </p>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="mcr_error" mode="error-content">
+    <h1><xsl:value-of select="mcri18n:translate('rep.errorPage.generic')" /></h1>
     <h2><xsl:value-of select="." /></h2>
     <p>
-      Es ist leider ein Fehler aufgetreten.
+      <xsl:value-of select="mcri18n:translate('rep.errorPage.generic.text')" />
       <xsl:if test="string-length($REP.ErrorPage.Mail.Technical) &gt; 0">
-        Sollte dies wiederholt der Fall sein, schreiben Sie bitte eine Mail an
-        <xsl:call-template name="mail">
-          <xsl:with-param name="address" select="$REP.ErrorPage.Mail.Technical" />
-        </xsl:call-template> und schildern kurz, wie es dazu kam.
-        Vielen Dank!
+        <xsl:text> </xsl:text>
+        <xsl:call-template name="translate-with-placeholder">
+          <xsl:with-param name="key" select="'rep.errorPage.generic.mail'" />
+          <xsl:with-param name="placeholder">
+            <xsl:call-template name="mail">
+              <xsl:with-param name="address" select="$REP.ErrorPage.Mail.Technical" />
+            </xsl:call-template>
+          </xsl:with-param>
+        </xsl:call-template>
       </xsl:if>
     </p>
+  </xsl:template>
+
+  <xsl:template name="translate-with-placeholder">
+    <xsl:param name="key" />
+    <xsl:param name="placeholder" />
+
+    <xsl:variable name="text" select="mcri18n:translate($key)" />
+    <xsl:choose>
+      <xsl:when test="contains($text, '{0}')">
+        <xsl:value-of select="substring-before($text, '{0}')" />
+        <xsl:copy-of select="$placeholder" />
+        <xsl:value-of select="substring-after($text, '{0}')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text" />
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template name="mail">

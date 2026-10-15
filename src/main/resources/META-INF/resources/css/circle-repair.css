@@ -1,0 +1,32 @@
+/* Scope all additions to this page; typography, navigation and buttons use MyCoReLayout. */
+#circle-repair{padding:1rem 0 3rem}
+#circle-repair .repair-header{display:flex;align-items:center;justify-content:space-between;gap:2rem;margin-bottom:1.5rem}
+#circle-repair h1{margin:.25rem 0 .75rem}
+#circle-repair .eyebrow{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase}
+#circle-repair .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+#circle-repair .stats>div{padding:1.25rem;border:1px solid #dbe1e6;border-radius:.5rem;background:#f8fafb}
+#circle-repair .stats strong{display:block;font-size:2rem}
+#circle-repair .toolbar{display:flex;gap:1.25rem;margin-bottom:1rem}
+#circle-repair .toolbar label{display:flex;flex-direction:column;gap:.35rem}
+#circle-repair .toolbar label:first-child{flex:1}
+#circle-repair .hint,#circle-repair .description,#circle-repair .actions p{color:#50616d;font-size:.9rem}
+#circle-repair details{border:1px solid #dbe1e6;border-radius:.5rem;margin:1rem 0;background:#fff}
+#circle-repair summary{padding:1.25rem;cursor:pointer}
+#circle-repair .group-title{font-weight:700;margin-right:1rem}
+#circle-repair .description{display:block;margin-top:.5rem;overflow-wrap:anywhere}
+#circle-repair .repair-badge{background:#e2f1ec;color:#215c48;border-radius:1rem;padding:.2rem .6rem;font-size:.8rem;font-weight:600}
+#circle-repair .repair-badge.manual{background:#fff0d3;color:#765016}
+#circle-repair .repair-body{border-top:1px solid #e4e9ed;padding:1.25rem}
+#circle-repair .members{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0;font-size:.85rem}
+#circle-repair table{font-size:.85rem}
+#circle-repair td{vertical-align:top}
+#circle-repair td a{overflow-wrap:anywhere}
+#circle-repair td.reason{min-width:220px;max-width:360px}
+#circle-repair tr.remove{background:#fff7f0}
+#circle-repair .actions{display:flex;align-items:center;gap:1.25rem;margin-top:1rem}
+#circle-repair .actions p{margin:0}
+#circle-repair #notice{white-space:pre-wrap}
+#circle-repair .empty{padding:2rem;text-align:center;border:1px dashed #bdcbd5}
+#circle-repair #more{display:block;margin:1.5rem auto}
+#circle-repair [hidden]{display:none!important}
+@media(max-width:700px){#circle-repair .repair-header,#circle-repair .actions{display:block}#circle-repair .repair-header button{margin-top:1rem}#circle-repair .stats{gap:.5rem}#circle-repair .stats>div{padding:.75rem}#circle-repair .stats strong{font-size:1.5rem}#circle-repair .toolbar{flex-direction:column}}

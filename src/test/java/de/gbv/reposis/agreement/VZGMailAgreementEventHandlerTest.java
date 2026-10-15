@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mycore.common.MCRTestConfiguration;
 import org.mycore.common.MCRTestProperty;
+import org.mycore.common.config.MCRConfiguration2;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -34,6 +35,7 @@ import org.mycore.test.MyCoReTest;
 @MCRTestConfiguration(
     properties = {
         @MCRTestProperty(key = "MCR.Metadata.Type.object", string = "true"),
+        @MCRTestProperty(key = "MCR.mir-module.EditorMail", string = "editor@example.org"),
     }
 )
 public class VZGMailAgreementEventHandlerTest {
@@ -55,5 +57,28 @@ public class VZGMailAgreementEventHandlerTest {
         Assertions.assertTrue(html.contains("guest"), "Mail should contain the user");
     }
 
+    @Test
+    public void getRecipientFallsBackToEditorMail() {
+        Assertions.assertEquals("editor@example.org", VZGMailAgreementEventHandler.getRecipient());
+    }
+
+    @Test
+    public void getRecipientUsesMailTo() {
+        MCRConfiguration2.set("MIR.Agreement.MailTo", "agreement@example.org");
+        Assertions.assertEquals("agreement@example.org", VZGMailAgreementEventHandler.getRecipient());
+    }
+
+    @Test
+    public void getAttachmentURLFallsBackToPublishFolder() {
+        final String url = VZGMailAgreementEventHandler.getAttachmentURL("agreement.pdf");
+        Assertions.assertTrue(url.endsWith("content/publish/agreement.pdf"));
+    }
+
+    @Test
+    public void getAttachmentURLUsesConfiguredURL() {
+        MCRConfiguration2.set("MIR.Agreement.File.URL", "https://example.org/api/v2/agreement.pdf");
+        Assertions.assertEquals("https://example.org/api/v2/agreement.pdf",
+            VZGMailAgreementEventHandler.getAttachmentURL("agreement.pdf"));
+    }
 
 }
