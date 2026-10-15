@@ -24,7 +24,7 @@
       </section>
       <div class="toolbar">
         <label>Dokument suchen<input id="search" class="form-control" type="search" placeholder="Objekt-ID eingeben" autocomplete="off"/></label>
-        <label>Anzeige<select id="filter" class="form-control"><option value="all">Alle Fälle</option><option value="ready">Mit Änderungsvorschlag</option><option value="manual">Fachliche Prüfung nötig</option></select></label>
+        <label>Anzeige<select id="filter" class="form-control form-select"><option value="all">Alle Fälle</option><option value="ready">Mit Änderungsvorschlag</option><option value="manual">Fachliche Prüfung nötig</option></select></label>
       </div>
       <p class="hint">Diese Seite prüft die indizierten Verweise und ändert keine Dokumente. Öffnen Sie ein Dokument über seine ID
         und wählen Sie dort „Bearbeiten“. Nach dem Speichern im Editor klicken Sie hier auf „Bestand erneut prüfen“.
