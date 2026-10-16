@@ -54,6 +54,16 @@ einen Änderungsvorschlag macht (also nicht „Fachliche Prüfung nötig“). En
 in der Übersicht vorgeschlagene `relatedItem`. Alle anderen Kreise bleiben unverändert und
 müssen weiterhin im Editor bearbeitet werden.
 
+Automatisch entfernt werden nur leere Verweise der Typen `succeeding`, `isReferencedBy`,
+`otherFormat` und `otherVersion`. Welcher Verweis vorgeschlagen wird:
+
+- Bei Vorgänger/Nachfolger bleibt `preceding` erhalten, entfernt wird `succeeding`.
+- Bei Referenzen bleibt `references` erhalten, entfernt wird `isReferencedBy`.
+- Bei `otherFormat` und `otherVersion` bleibt der Verweis der neueren auf die ältere Version
+  erhalten, gemessen an der Objekt-ID; entfernt wird der Verweis der älteren auf die neuere.
+- Ist nur eine Seite ein entfernbarer Verweis, wird immer dieser entfernt. `succeeding` und
+  `isReferencedBy` werden vor `otherFormat` und `otherVersion` entfernt.
+
 ```text
 repair simple circle for object {0}
 repair all simple circles

@@ -85,6 +85,35 @@ public class MCRCircleRepairTest extends MCRTestCase {
     }
 
     @Test
+    public void newerVersionKeepsLinkToOlderVersion() throws Exception {
+        var removal = MCRCircleRepairService.simpleRemoval(
+            previewPair(pair("otherVersion", "otherVersion")).cases().get(0)).orElseThrow();
+        Assert.assertEquals(A, removal.from());
+        Assert.assertEquals(B, removal.to());
+
+        var format = MCRCircleRepairService.simpleRemoval(
+            previewPair(pair("otherFormat", "otherFormat")).cases().get(0)).orElseThrow();
+        Assert.assertEquals(A, format.from());
+        Assert.assertEquals(B, format.to());
+    }
+
+    @Test
+    public void inverseLinksAreRemoved() throws Exception {
+        for (var relations : List.of(List.of("preceding", "succeeding"), List.of("references", "isReferencedBy"))) {
+            for (var repository : List.of(pair(relations.get(0), relations.get(1)),
+                pair(relations.get(1), relations.get(0)))) {
+                var removal = MCRCircleRepairService.simpleRemoval(previewPair(repository).cases().get(0))
+                    .orElseThrow();
+                Assert.assertEquals(relations.get(1), removal.relation());
+            }
+        }
+        var removal = MCRCircleRepairService.simpleRemoval(
+            previewPair(pair("succeeding", "otherVersion")).cases().get(0)).orElseThrow();
+        Assert.assertEquals("succeeding", removal.relation());
+        Assert.assertFalse(previewPair(pair("preceding", "references")).cases().get(0).suggested());
+    }
+
+    @Test
     public void suggestionsProtectHierarchyAndLocalMetadata() throws Exception {
         Assert.assertFalse(previewPair(pair("host", "host")).cases().get(0).suggested());
         var repository = pair("preceding", "otherFormat");
@@ -101,8 +130,8 @@ public class MCRCircleRepairTest extends MCRTestCase {
         for (String id : List.of(A, B)) {
             var repairCase = MCRCircleRepairService.caseOf(repository, id).orElseThrow();
             var removal = MCRCircleRepairService.simpleRemoval(repairCase).orElseThrow();
-            Assert.assertEquals(B, removal.from());
-            Assert.assertEquals(A, removal.to());
+            Assert.assertEquals(A, removal.from());
+            Assert.assertEquals(B, removal.to());
             Assert.assertEquals(1, removal.position());
         }
         Assert.assertEquals(MCRCircleRepairService.simpleRemoval(previewPair(repository).cases().get(0)),

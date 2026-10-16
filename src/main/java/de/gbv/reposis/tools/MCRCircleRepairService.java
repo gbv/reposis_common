@@ -175,7 +175,10 @@ public final class MCRCircleRepairService {
                     reason = link.from().equals(link.to()) ? "Dieser Verweis zeigt auf das Dokument selbst."
                         : "Dieser Verweis schließt den Kreis über den erhaltenen Rückweg: "
                             + returnPath(link.to(), link.from(), kept)
-                            + ". Bei gleichrangigen Verweisen entscheidet die aufsteigende Quell-/Ziel-ID.";
+                            + ". Entfernt werden zuerst succeeding und isReferencedBy, preceding und"
+                            + " references bleiben erhalten. Bei otherFormat und otherVersion bleibt der Verweis"
+                            + " von der neueren (höheren) auf die ältere ID erhalten, sonst entscheidet die"
+                            + " aufsteigende Quell-/Ziel-ID.";
                 } else if (reason == null) {
                     reason =
                         "Dieser Verweis kann erhalten bleiben, ohne den vorgeschlagenen Ergebnisgraphen zyklisch zu machen.";
@@ -211,7 +214,7 @@ public final class MCRCircleRepairService {
         if (!link.empty()) {
             return "Das Element enthält Metadaten oder zusätzliche Attribute. Automatisches Löschen könnte Angaben verlieren.";
         }
-        if (!link.from().equals(link.to()) && !Set.of("otherFormat", "otherVersion").contains(link.relation())) {
+        if (!link.from().equals(link.to()) && !MCRCircleRepair.isRemovable(link.relation())) {
             return "Für die Relation '" + link.relation() + "' ist keine automatische Löschregel festgelegt.";
         }
         return null;
