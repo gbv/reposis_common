@@ -16,7 +16,7 @@
   <properties>
     <MCR.AppName>reposis-common</MCR.AppName>
     <maven-dependency-plugin.version>3.5.0</maven-dependency-plugin.version>
-    <node.version>v16.19.1</node.version>
+    <node.version>v20.19.0</node.version>
   </properties>
 
   <build>
@@ -94,6 +94,28 @@
             <configuration>
               <arguments>build</arguments>
               <workingDirectory>src/main/js/epusta/</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-install-common</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <arguments>install</arguments>
+              <workingDirectory>src/main/ts/common/</workingDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>yarn-build-common</id>
+            <goals>
+              <goal>yarn</goal>
+            </goals>
+            <phase>compile</phase>
+            <configuration>
+              <arguments>build</arguments>
+              <workingDirectory>src/main/ts/common/</workingDirectory>
             </configuration>
           </execution>
         </executions>
