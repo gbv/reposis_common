@@ -107,7 +107,7 @@
     <xsl:choose>
       <xsl:when test="$is-guest">
         <xsl:variable name="login-url"
-          select="concat($ServletsBaseURL, 'MCRLoginServlet', $HttpSession, '?url=', encoder:encode(string($RequestURL)))" />
+          select="concat($ServletsBaseURL, 'MCRLoginServlet?url=', encoder:encode(string($RequestURL)))" />
         <p>
           <xsl:call-template name="translate-with-placeholder">
             <xsl:with-param name="key" select="'rep.errorPage.loginRequired.text'" />
