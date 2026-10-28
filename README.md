@@ -407,7 +407,7 @@ It can then look like this:
 
 ### Error Page
 
-The stylesheet `xslt/mcr_error.xsl` overrides the MIR error page and customizes the contact email addresses.
+The stylesheet `xslt/mir/layout/error.xsl` overrides the MIR error page and customizes the contact email addresses.
 For 401 and 403 errors it distinguishes by login state rather than by status code, since servlets usually respond
 with 403 even for guests: guests get a login link, logged-in users a "permission denied" message.
 Further error-page-specific templates can be integrated using the `xslInclude:ErrorPage` hook.  
