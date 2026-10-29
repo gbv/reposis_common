@@ -6,7 +6,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="#all">
 
-  <xsl:import href="xslImport:modsmeta:metadata/mir-epusta.xsl" />
+  <xsl:import href="xslImport:modsmeta:mir/object-page/boxes/epusta.xsl" />
 
   <xsl:variable name="epusta-prefix" select="mcrproperty:one('MIR.ePuSta.Prefix')" />
   <xsl:variable name="epusta-provider-url" select="mcrproperty:one('MIR.ePuSta.providerURL')" />
