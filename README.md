@@ -306,9 +306,9 @@ The entry page is located at `/sitelinks` and may need to be allowed in the `rob
 
 ## Google Scholar
 
-The stylesheet `xsl/metadata/rep-citation-pdf.xsl` adds a `citation_pdf_url` meta tag to the object page for each
-derivate that is readable by the current user and has a PDF file as main document. It is enabled by default and should
-be removed as soon as MIR provides this tag, otherwise the tag is written twice.
+The stylesheet `xsl/metadata/rep-citation-pdf.xsl` adds a `citation_pdf_url` meta tag to the object page if the first
+derivate of type `content` that is readable by the current user has a PDF file as main document. It is enabled by
+default and should be removed as soon as MIR provides this tag, otherwise the tag is written twice.
 
 ## LDAPLoginServlet
 

@@ -20,9 +20,8 @@ package de.gbv.reposis.metadata;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Map;
+import java.util.regex.Pattern;
 
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -43,82 +42,86 @@ public class RepCitationPdfXslTest extends MCRTestCase {
         + " xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"><xsl:template match=\"/\"><next />"
         + "</xsl:template></xsl:stylesheet>";
 
+    private static final Pattern READABLE_DERIVATE = Pattern.compile("xlink:href=\"([^\"]+)\" readable=\"true\"");
+
     @Test
-    public void testReadablePdf() throws TransformerException {
-        String result = transform(Map.of("a_derivate_00000001", "article.pdf"), "a_derivate_00000001");
-        assertContains(result, "<citation_meta><meta content=\"" + BASE_URL
-            + "a_derivate_00000001/article.pdf\" name=\"citation_pdf_url\"/></citation_meta>");
+    public void testContentDerivateWithPdf() throws TransformerException {
+        assertTag(BASE_URL + "a_derivate_00000001/article.pdf",
+            transform(derivate("a_derivate_00000001", "content", "article.pdf", true)));
     }
 
     @Test
-    public void testAllReadablePdfsAreListed() throws TransformerException {
-        String result = transform(Map.of("a_derivate_00000001", "article.pdf", "a_derivate_00000002", "appendix.PDF"),
-            "a_derivate_00000001", "a_derivate_00000002");
-        assertContains(result, BASE_URL + "a_derivate_00000001/article.pdf");
-        assertContains(result, BASE_URL + "a_derivate_00000002/appendix.PDF");
+    public void testOtherDerivateTypesAreIgnored() throws TransformerException {
+        assertTag(BASE_URL + "a_derivate_00000002/article.pdf",
+            transform(derivate("a_derivate_00000001", "thumbnail", "cover.pdf", true)
+                + derivate("a_derivate_00000002", "content", "article.pdf", true)));
+    }
+
+    @Test
+    public void testOnlyFirstContentDerivateIsUsed() throws TransformerException {
+        String result = transform(derivate("a_derivate_00000001", "content", "article.PDF", true)
+            + derivate("a_derivate_00000002", "content", "appendix.pdf", true));
+        assertTag(BASE_URL + "a_derivate_00000001/article.PDF", result);
+        Assert.assertFalse(result.contains("appendix.pdf"));
+    }
+
+    @Test
+    public void testFirstContentDerivateWithoutPdfIsNotSkipped() throws TransformerException {
+        Assert.assertFalse(transform(derivate("a_derivate_00000001", "content", "index.xml", true)
+            + derivate("a_derivate_00000002", "content", "article.pdf", true)).contains("citation_pdf_url"));
+    }
+
+    @Test
+    public void testUnreadableDerivateIsSkipped() throws TransformerException {
+        String result = transform(derivate("a_derivate_00000001", "content", "secret.pdf", false)
+            + derivate("a_derivate_00000002", "content", "article.pdf", true));
+        assertTag(BASE_URL + "a_derivate_00000002/article.pdf", result);
+        Assert.assertFalse(result.contains("secret.pdf"));
     }
 
     @Test
     public void testPathIsEncoded() throws TransformerException {
-        String result = transform(Map.of("a_derivate_00000001", "/sub dir/my article.pdf"), "a_derivate_00000001");
-        assertContains(result, BASE_URL + "a_derivate_00000001/sub%20dir/my%20article.pdf");
-    }
-
-    @Test
-    public void testOtherFileTypeIsIgnored() throws TransformerException {
-        Assert.assertFalse(transform(Map.of("a_derivate_00000001", "image.tif"), "a_derivate_00000001")
-            .contains("citation_pdf_url"));
+        assertTag(BASE_URL + "a_derivate_00000001/sub%20dir/my%20article.pdf",
+            transform(derivate("a_derivate_00000001", "content", "/sub dir/my article.pdf", true)));
     }
 
     @Test
     public void testMissingMaindocIsIgnored() throws TransformerException {
-        Assert.assertFalse(transform(Map.of("a_derivate_00000001", ""), "a_derivate_00000001")
+        Assert.assertFalse(transform(derivate("a_derivate_00000001", "content", "", true))
             .contains("citation_pdf_url"));
     }
 
     @Test
-    public void testUnreadableDerivateIsIgnored() throws TransformerException {
-        Assert.assertFalse(transform(Map.of("a_derivate_00000001", "article.pdf")).contains("citation_pdf_url"));
-    }
-
-    @Test
     public void testNextStylesheetIsApplied() throws TransformerException {
-        assertContains(transform(Map.of("a_derivate_00000001", "article.pdf"), "a_derivate_00000001"), "<next/>");
+        Assert.assertTrue(transform("").contains("<next/>"));
     }
 
-    private static void assertContains(String result, String expected) {
+    private static void assertTag(String url, String result) {
+        String expected = "<citation_meta><meta content=\"" + url + "\" name=\"citation_pdf_url\"/></citation_meta>";
         Assert.assertTrue("Missing " + expected + " in " + result, result.contains(expected));
     }
 
-    private static String transform(Map<String, String> maindocs, String... readableDerivates)
-        throws TransformerException {
+    private static String transform(String derivates) throws TransformerException {
         TransformerFactory factory = TransformerFactory.newInstance(XALAN, null);
         factory.setURIResolver((href, base) -> new StreamSource(new StringReader(NEXT_STYLESHEET)));
-        Source stylesheet = new StreamSource(
+        Transformer transformer = factory.newTransformer(new StreamSource(
             RepCitationPdfXslTest.class.getClassLoader().getResource("xsl/metadata/rep-citation-pdf.xsl")
-                .toExternalForm());
-        Transformer transformer = factory.newTransformer(stylesheet);
+                .toExternalForm()));
         transformer.setParameter("ServletsBaseURL", "https://example.org/servlets/");
-        transformer.setURIResolver((href, base) -> new StreamSource(
-            new StringReader(derivate(maindocs.get(href.substring("mcrobject:".length()))))));
         StringWriter result = new StringWriter();
-        transformer.transform(new StreamSource(new StringReader(object(maindocs, readableDerivates))),
-            new StreamResult(result));
+        transformer.transform(new StreamSource(new StringReader(object(derivates))), new StreamResult(result));
         return result.toString();
     }
 
-    private static String derivate(String maindoc) {
-        return "<mycorederivate><derivate><internals><internal maindoc=\"" + maindoc
-            + "\" /></internals></derivate></mycorederivate>";
+    private static String derivate(String id, String type, String maindoc, boolean readable) {
+        return "<derobject xlink:href=\"" + id + "\" readable=\"" + readable + "\"><maindoc>" + maindoc + "</maindoc>"
+            + "<classification classid=\"derivate_types\" categid=\"" + type + "\" /></derobject>";
     }
 
-    private static String object(Map<String, String> maindocs, String... readableDerivates) {
-        StringBuilder derivates = new StringBuilder();
-        maindocs.keySet().forEach(id -> derivates.append("<derobject xlink:href=\"").append(id).append("\" />"));
+    private static String object(String derivates) {
         StringBuilder rights = new StringBuilder();
-        for (String id : readableDerivates) {
-            rights.append("<right id=\"").append(id).append("\" read=\"\" />");
-        }
+        READABLE_DERIVATE.matcher(derivates).results()
+            .forEach(match -> rights.append("<right id=\"").append(match.group(1)).append("\" read=\"\" />"));
         return "<mycoreobject xmlns:xlink=\"http://www.w3.org/1999/xlink\"><structure><derobjects>" + derivates
             + "</derobjects></structure><rights>" + rights + "</rights></mycoreobject>";
     }
