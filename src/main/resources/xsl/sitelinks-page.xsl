@@ -56,16 +56,36 @@
     <xsl:variable name="title">
       <xsl:value-of select="concat('Sitelinks ', $year, ' - ', $page-title)" />
     </xsl:variable>
+    <xsl:variable name="canonical-url">
+      <xsl:call-template name="page-url">
+        <xsl:with-param name="number" select="@number" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="first-url">
+      <xsl:call-template name="page-url">
+        <xsl:with-param name="number" select="1" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="prev-url">
+      <xsl:call-template name="page-url">
+        <xsl:with-param name="number" select="@number - 1" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="next-url">
+      <xsl:call-template name="page-url">
+        <xsl:with-param name="number" select="@number + 1" />
+      </xsl:call-template>
+    </xsl:variable>
     <head>
       <xsl:call-template name="basic-head">
         <xsl:with-param name="title" select="$title" />
       </xsl:call-template>
-      <link rel="canonical" href="{concat($base-url, '/', @year)}" />
+      <link rel="canonical" href="{$canonical-url}" />
       <xsl:if test="@number > 1">
-        <link rel="prev" href="{concat($base-url, '/', @year, '/page/', @number - 1)}" />
+        <link rel="prev" href="{$prev-url}" />
       </xsl:if>
       <xsl:if test="@number &lt; $max-page-number">
-        <link rel="next" href="{concat($base-url, '/', @year, '/page/', @number + 1)}" />
+        <link rel="next" href="{$next-url}" />
       </xsl:if>
     </head>
     <body>
@@ -77,17 +97,32 @@
           </li>
           <xsl:if test="@number > 1">
             <li>
-              <a href="{concat($base-url, '/', @year, '/page/', @number - 1)}" rel="prev">
+              <a href="{$first-url}"><xsl:value-of select="concat('All Pages of ', @year)" /></a>
+            </li>
+          </xsl:if>
+          <xsl:if test="@number > 1">
+            <li>
+              <a href="{$prev-url}" rel="prev">
                 « Previous Page
               </a>
             </li>
           </xsl:if>
-          <li aria-current="page">
-            <span><xsl:value-of select="concat('Page ', @number)" /></span>
-          </li>
+          <xsl:choose>
+            <xsl:when test="@number = 1">
+              <xsl:call-template name="page-links">
+                <xsl:with-param name="from" select="1" />
+                <xsl:with-param name="to" select="$max-page-number" />
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <li aria-current="page">
+                <span><xsl:value-of select="concat('Page ', @number)" /></span>
+              </li>
+            </xsl:otherwise>
+          </xsl:choose>
           <xsl:if test="@number &lt; $max-page-number">
             <li>
-              <a href="{concat($base-url, '/', @year, '/page/', @number + 1)}" rel="next">
+              <a href="{$next-url}" rel="next">
                 Next Page »
               </a>
             </li>
@@ -100,10 +135,64 @@
     </body>
   </xsl:template>
 
+  <!-- The first page has no URL of its own, it is the year page. -->
+  <xsl:template name="page-url">
+    <xsl:param name="number" />
+    <xsl:value-of select="concat($base-url, '/', @year)" />
+    <xsl:if test="$number > 1">
+      <xsl:value-of select="concat('/page/', $number)" />
+    </xsl:if>
+  </xsl:template>
+
+  <!--
+    Links every page of a year, so that all objects are reachable by a small number of links.
+    Only the year page lists them, otherwise the navigation of every page would grow with the
+    number of pages. The range is split in halves to keep the recursion depth small.
+  -->
+  <xsl:template name="page-links">
+    <xsl:param name="from" />
+    <xsl:param name="to" />
+    <xsl:choose>
+      <xsl:when test="$from &lt; $to">
+        <xsl:variable name="middle" select="floor(($from + $to) div 2)" />
+        <xsl:call-template name="page-links">
+          <xsl:with-param name="from" select="$from" />
+          <xsl:with-param name="to" select="$middle" />
+        </xsl:call-template>
+        <xsl:call-template name="page-links">
+          <xsl:with-param name="from" select="$middle + 1" />
+          <xsl:with-param name="to" select="$to" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:when test="$from = @number">
+        <li aria-current="page">
+          <span><xsl:value-of select="$from" /></span>
+        </li>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="url">
+          <xsl:call-template name="page-url">
+            <xsl:with-param name="number" select="$from" />
+          </xsl:call-template>
+        </xsl:variable>
+        <li>
+          <a href="{$url}"><xsl:value-of select="$from" /></a>
+        </li>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="object-id">
     <li>
       <a href="{concat($WebApplicationBaseURL, 'receive/', text())}">
-        <xsl:value-of select="text()" />
+        <xsl:choose>
+          <xsl:when test="normalize-space(@title)">
+            <xsl:value-of select="@title" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="text()" />
+          </xsl:otherwise>
+        </xsl:choose>
       </a>
     </li>
   </xsl:template>
