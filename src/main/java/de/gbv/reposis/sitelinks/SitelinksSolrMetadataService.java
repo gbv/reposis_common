@@ -34,6 +34,8 @@ import org.mycore.common.config.annotation.MCRConfigurationProxy;
 import org.mycore.common.config.annotation.MCRProperty;
 import org.mycore.solr.MCRSolrClientFactory;
 
+import de.gbv.reposis.sitelinks.dto.SitelinksObjectDto;
+
 /**
  * Solr-based implementation of {@link SitelinksMetadataService}.
  * <p>
@@ -45,12 +47,15 @@ import org.mycore.solr.MCRSolrClientFactory;
  *       used for sorting</li>
  *   <li>{@code created} - the object creation timestamp, used as a fallback sort field</li>
  *   <li>{@code id} - the unique object identifier</li>
+ *   <li>{@code mods.title.main} - the title of the object</li>
  * </ul>
  */
 @MCRConfigurationProxy(proxyClass = SitelinksSolrMetadataService.Factory.class)
 public class SitelinksSolrMetadataService implements SitelinksMetadataService {
 
     private static final String FIELD_ID = "id";
+
+    private static final String FIELD_TITLE = "mods.title.main";
 
     private static final String FIELD_YEAR_ISSUED = "mods.yearIssued";
 
@@ -109,12 +114,12 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
     }
 
     @Override
-    public ObjectIdsWithCount getObjectIdsByYear(int year, int offset, int limit) {
+    public ObjectsWithCount getObjectsByYear(int year, int offset, int limit) {
         final SolrQuery query = new SolrQuery(DEFAULT_SOLR_QUERY);
         query.setRequestHandler(requestHandler);
         query.addFilterQuery(filterQuery);
         query.addFilterQuery(String.format(Locale.ROOT, FIELD_DATE_ISSUED + ":%s*", year));
-        query.setFields(FIELD_ID);
+        query.setFields(FIELD_ID, FIELD_TITLE);
         query.setStart(offset);
         query.setRows(limit);
         query.addSort(FIELD_DATE_ISSUED, SolrQuery.ORDER.desc);
@@ -122,9 +127,11 @@ public class SitelinksSolrMetadataService implements SitelinksMetadataService {
         try {
             final QueryResponse response = solrClient.query(query);
             long totalCount = response.getResults().getNumFound();
-            final List<String> objectIds =
-                response.getResults().stream().map((document) -> (String) document.getFieldValue(FIELD_ID)).toList();
-            return new ObjectIdsWithCount(objectIds, totalCount);
+            final List<SitelinksObjectDto> objects = response.getResults().stream()
+                .map(document -> new SitelinksObjectDto((String) document.getFieldValue(FIELD_ID),
+                    (String) document.getFirstValue(FIELD_TITLE)))
+                .toList();
+            return new ObjectsWithCount(objects, totalCount);
         } catch (SolrServerException | IOException e) {
             throw new MCRException(e);
         }
