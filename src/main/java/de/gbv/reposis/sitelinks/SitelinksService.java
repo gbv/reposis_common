@@ -38,7 +38,7 @@ import de.gbv.reposis.sitelinks.dto.SitelinksYearPageDto;
  * Application service for generating sitelinks page data transfer objects.
  * <p>
  * This service provides methods to generate root pages listing all available years
- * and paginated year-specific pages containing object IDs. Year data is cached to
+ * and paginated year-specific pages containing objects. Year data is cached to
  * optimize performance.
  */
 @MCRConfigurationProxy(proxyClass = SitelinksService.Factory.class)
@@ -75,12 +75,12 @@ public class SitelinksService {
     }
 
     /**
-     * Retrieves a paginated page of object IDs for a specific year.
+     * Retrieves a paginated page of objects for a specific year.
      *
-     * @param year the year for which to retrieve object IDs (e.g., 2024)
+     * @param year the year for which to retrieve objects (e.g., 2024)
      * @param page the page number to retrieve (1-indexed, must be ≥ 1)
-     * @param pageSize the maximum number of object IDs to include per page (must be &gt; 0)
-     * @return a {@link SitelinksYearPageDto} containing the requested page of object IDs,
+     * @param pageSize the maximum number of objects to include per page (must be &gt; 0)
+     * @return a {@link SitelinksYearPageDto} containing the requested page of objects,
      *         pagination metadata, and the total count of objects for the year
      * @throws MCRException if {@code page < 1} or {@code pageSize < 1}
      * @throws SitelinksNotFoundException if no data exists for the specified year
@@ -96,14 +96,19 @@ public class SitelinksService {
             throw SitelinksNotFoundException.forYear(year);
         }
 
-        SitelinksMetadataService.ObjectIdsWithCount data =
-            metadataService.getObjectIdsByYear(year, (page - 1) * pageSize, pageSize);
+        long offset = (page - 1L) * pageSize;
+        if (offset + pageSize > Integer.MAX_VALUE) {
+            throw new SitelinksNotFoundException("Page " + page + " is out of range for year " + year);
+        }
+
+        SitelinksMetadataService.ObjectsWithCount data =
+            metadataService.getObjectsByYear(year, (int) offset, pageSize);
         long totalPages = (data.totalCount() + pageSize - 1) / pageSize;
         if (data.totalCount() == 0 || page > totalPages) {
             throw SitelinksNotFoundException.forPage(year, page, totalPages);
         }
 
-        return new SitelinksYearPageDto(year, page, data.totalCount(), data.objectIds());
+        return new SitelinksYearPageDto(year, page, data.totalCount(), data.objects());
     }
 
     /**
@@ -128,13 +133,11 @@ public class SitelinksService {
         long currentTime = System.currentTimeMillis();
         Set<Integer> cached = yearCache.getIfUpToDate(CACHE_KEY, currentTime - CACHE_TTL_MS);
 
-        if (LOGGER.isDebugEnabled()) {
-            if (cached != null) {
-                LOGGER.debug("Using cached years data");
-                return cached;
-            }
-            LOGGER.debug("Fetching fresh years data from metadata service");
+        if (cached != null) {
+            LOGGER.debug("Using cached years data");
+            return cached;
         }
+        LOGGER.debug("Fetching fresh years data from metadata service");
 
         Set<Integer> years = new HashSet<>(metadataService.getYearsWithObjects());
         Set<Integer> immutableYears = Set.copyOf(years);

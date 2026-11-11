@@ -24,12 +24,16 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.jdom2.Element;
+import org.jdom2.Verifier;
+import org.mycore.common.MCRException;
 import org.mycore.common.config.annotation.MCRConfigurationProxy;
+import org.mycore.common.content.MCRByteContent;
 import org.mycore.common.content.MCRContent;
 import org.mycore.common.content.MCRJDOMContent;
 import org.mycore.common.content.transformer.MCRContentTransformer;
 import org.mycore.common.xml.MCRLayoutTransformerFactory;
 
+import de.gbv.reposis.sitelinks.dto.SitelinksObjectDto;
 import de.gbv.reposis.sitelinks.dto.SitelinksRootPageDto;
 import de.gbv.reposis.sitelinks.dto.SitelinksYearPageDto;
 
@@ -52,6 +56,7 @@ public class SitelinksXslPageMapper implements SitelinksPageMapper {
     private static final String ATTR_NUMBER = "number";
     private static final String ATTR_TOTAL_COUNT = "total-count";
     private static final String ATTR_YEAR = "year";
+    private static final String ATTR_TITLE = "title";
 
     private final MCRContentTransformer transformer;
 
@@ -78,22 +83,37 @@ public class SitelinksXslPageMapper implements SitelinksPageMapper {
     public MCRContent map(SitelinksRootPageDto rootPage) {
         Element root = new Element(ROOT);
         root.addContent(buildYearsElement(rootPage.years()));
-        try {
-            return transformer.transform(new MCRJDOMContent(root));
-        } catch (IOException e) {
-            throw new SitelinksMappingException("Error while mapping page", e);
-        }
+        return transform(root);
     }
 
     @Override
     public MCRContent map(SitelinksYearPageDto yearPage) {
         Element root = new Element(ROOT);
-        root.addContent(buildPageElement(yearPage.year(), yearPage.page(), yearPage.totalCount(), yearPage.objectIds()));
+        root.addContent(buildPageElement(yearPage.year(), yearPage.page(), yearPage.totalCount(), yearPage.objects()));
+        return transform(root);
+    }
+
+    private MCRContent transform(Element root) {
         try {
-            return transformer.transform(new MCRJDOMContent(root));
-        }  catch (IOException e) {
+            return withContentBasedETag(transformer.transform(new MCRJDOMContent(root)));
+        } catch (IOException | MCRException e) {
             throw new SitelinksMappingException("Error while mapping page", e);
         }
+    }
+
+    /**
+     * Copies the page into a {@link MCRByteContent}, whose ETag is computed from its bytes.
+     * <p>
+     * The ETag of transformed content only depends on the state of the whole system, while a page also
+     * changes with the Solr index. The modification date of a page is unknown and therefore left unset.
+     * Pages do not depend on the session, so the copy is not marked as using it.
+     */
+    private static MCRContent withContentBasedETag(MCRContent content) throws IOException {
+        MCRContent page = new MCRByteContent(content.asByteArray(), -1);
+        page.setName(content.getName());
+        page.setMimeType(content.getMimeType());
+        page.setEncoding(content.getEncoding());
+        return page;
     }
 
     private static Element buildYearsElement(List<Integer> years) {
@@ -104,17 +124,27 @@ public class SitelinksXslPageMapper implements SitelinksPageMapper {
         return yearsElement;
     }
 
-    private static Element buildPageElement(int year, int page, long totalCount, List<String> objectIds) {
+    private static Element buildPageElement(int year, int page, long totalCount,
+        List<SitelinksObjectDto> objects) {
         Element pageElement = new Element(PAGE);
         pageElement.setAttribute(ATTR_NUMBER, String.valueOf(page));
         pageElement.setAttribute(ATTR_TOTAL_COUNT, String.valueOf(totalCount));
         pageElement.setAttribute(ATTR_YEAR, String.valueOf(year));
 
         Element objectIdsElement = new Element(OBJECT_IDS);
-        objectIds.forEach(id -> objectIdsElement.addContent(createElement(OBJECT_ID, id)));
+        objects.forEach(object -> objectIdsElement.addContent(buildObjectElement(object)));
         pageElement.addContent(objectIdsElement);
 
         return pageElement;
+    }
+
+    private static Element buildObjectElement(SitelinksObjectDto object) {
+        Element element = createElement(OBJECT_ID, object.id());
+        // a title with characters not allowed in XML must not break the whole page
+        if (object.title() != null && Verifier.checkCharacterData(object.title()) == null) {
+            element.setAttribute(ATTR_TITLE, object.title());
+        }
+        return element;
     }
 
     private static Element createElement(String name, String text) {
