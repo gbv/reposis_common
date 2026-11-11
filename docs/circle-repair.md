@@ -33,17 +33,16 @@ Dadurch werden veraltete positive Indexeinträge nicht ungeprüft als Vorschlag 
 Die Zahl „Dokumente im Verweisnetz“ zählt die eindeutigen Objekt-IDs dieser Kanten,
 nicht alle Dokumente des Repositories. Die Übersicht zeigt einzelne tatsächliche Kreisgruppen.
 
-Voraussetzung ist ein aktueller Linkindex. Nicht indizierte Beziehungen und ausschließlich
-in übernommenem XML enthaltene Kreise sind damit nicht vollständig erkennbar. Insbesondere
-indiziert MyCoRe 2023.06 MODS-Hostbeziehungen über den strukturellen Elternverweis.
-Die Übersicht baut den Index nicht selbst neu auf und schreibt keine Daten.
+Voraussetzung ist ein aktueller Linkindex. Nicht indizierte Beziehungen sind damit nicht
+erkennbar. Die Übersicht baut den Index nicht selbst neu auf und schreibt keine Daten.
 
 Darstellung: XML-Modell `circleRepair` → `MCRLayoutService` → `xsl/circleRepair.xsl`
 mit `MyCoReLayout.xsl` und dem Layout der Anwendung. JavaScript filtert die vorhandenen
 Elemente und lädt bei Bedarf eine neue serverseitig gerenderte Ansicht per GET.
 
 Ein Vorschlag garantiert nicht, dass das Dokument im Editor gespeichert werden kann:
-Bestehende Kreise können die Metadatenübernahme weiterhin blockieren. In diesem Fall
+Der `MCRMODSLoopValidator` prüft beim Speichern alle erreichbaren Verweise, sodass ein
+weiterer bestehender Kreis das Speichern blockieren kann (siehe unten). In diesem Fall
 müssen die betroffenen IDs zur technischen Klärung weitergegeben werden.
 
 ## CLI-Kommandos für einfache Kreise
