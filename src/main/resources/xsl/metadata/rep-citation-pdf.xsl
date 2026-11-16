@@ -15,24 +15,24 @@
   <xsl:template match="/">
     <citation_meta>
       <xsl:apply-templates mode="citation-pdf-url"
-        select="mycoreobject/structure/derobjects/derobject[classification[@classid='derivate_types' and @categid='content']][key('rights', @xlink:href)/@read][1]" />
+        select="mycoreobject/structure/derobjects/derobject
+          [classification[@classid='derivate_types' and @categid='content']]
+          [key('rights', @xlink:href)/@read]
+          [translate(substring(maindoc, string-length(maindoc) - 3), 'PDF', 'pdf') = '.pdf'][1]" />
     </citation_meta>
     <xsl:apply-imports />
   </xsl:template>
 
   <xsl:template match="derobject" mode="citation-pdf-url">
     <xsl:variable name="maindoc" select="string(maindoc)" />
-    <xsl:variable name="extension" select="substring($maindoc, string-length($maindoc) - 3)" />
-    <xsl:if test="translate($extension, 'PDF', 'pdf') = '.pdf'">
-      <xsl:variable name="path">
-        <xsl:if test="not(starts-with($maindoc, '/'))">
-          <xsl:text>/</xsl:text>
-        </xsl:if>
-        <xsl:value-of select="$maindoc" />
-      </xsl:variable>
-      <meta name="citation_pdf_url"
-        content="{$ServletsBaseURL}MCRFileNodeServlet/{@xlink:href}{mcrxsl:encodeURIPath(string($path))}" />
-    </xsl:if>
+    <xsl:variable name="path">
+      <xsl:if test="not(starts-with($maindoc, '/'))">
+        <xsl:text>/</xsl:text>
+      </xsl:if>
+      <xsl:value-of select="$maindoc" />
+    </xsl:variable>
+    <meta name="citation_pdf_url"
+      content="{$ServletsBaseURL}MCRFileNodeServlet/{@xlink:href}{mcrxsl:encodeURIPath(string($path), true())}" />
   </xsl:template>
 
 </xsl:stylesheet>

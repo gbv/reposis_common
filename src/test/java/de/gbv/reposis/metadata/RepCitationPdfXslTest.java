@@ -66,9 +66,17 @@ public class RepCitationPdfXslTest extends MCRTestCase {
     }
 
     @Test
-    public void testFirstContentDerivateWithoutPdfIsNotSkipped() throws TransformerException {
-        Assert.assertFalse(transform(derivate("a_derivate_00000001", "content", "index.xml", true)
-            + derivate("a_derivate_00000002", "content", "article.pdf", true)).contains("citation_pdf_url"));
+    public void testContentDerivateWithoutPdfIsSkipped() throws TransformerException {
+        String result = transform(derivate("a_derivate_00000001", "content", "index.xml", true)
+            + derivate("a_derivate_00000002", "content", "article.pdf", true));
+        assertTag(BASE_URL + "a_derivate_00000002/article.pdf", result);
+        Assert.assertFalse(result.contains("index.xml"));
+    }
+
+    @Test
+    public void testContentDerivatesWithoutPdfAreIgnored() throws TransformerException {
+        Assert.assertFalse(transform(derivate("a_derivate_00000001", "content", "index.xml", true))
+            .contains("citation_pdf_url"));
     }
 
     @Test
@@ -83,6 +91,12 @@ public class RepCitationPdfXslTest extends MCRTestCase {
     public void testPathIsEncoded() throws TransformerException {
         assertTag(BASE_URL + "a_derivate_00000001/sub%20dir/my%20article.pdf",
             transform(derivate("a_derivate_00000001", "content", "/sub dir/my article.pdf", true)));
+    }
+
+    @Test
+    public void testNonAsciiPathIsEncoded() throws TransformerException {
+        assertTag(BASE_URL + "a_derivate_00000001/%C3%9Cbersicht.pdf",
+            transform(derivate("a_derivate_00000001", "content", "\u00DCbersicht.pdf", true)));
     }
 
     @Test
