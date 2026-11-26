@@ -19,6 +19,7 @@
 package de.gbv.reposis.tools;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +33,10 @@ import de.gbv.reposis.tools.MCRObjectLinkGraph.MCRObjectLink;
 
 /** Pure, conservative repair planner. Never changes input documents. */
 public final class MCRCircleRepair {
-    private static final Set<String> WEAK = Set.of("otherFormat", "otherVersion");
+
+    private static final Set<String> VERSIONS = Set.of("otherFormat", "otherVersion");
+
+    private static final Set<String> INVERSE = Set.of("succeeding", "isReferencedBy");
 
     private static final Set<String> PROTECTED = Set.of("parent", "host");
 
@@ -101,8 +105,9 @@ public final class MCRCircleRepair {
                 .filter(l -> members.contains(l.from()) && members.contains(l.to())).toList();
             List<Link> candidates = internal.stream().filter(l -> l.position() >= 0 && l.empty())
                 .filter(l -> !PROTECTED.contains(l.relation()))
-                .filter(l -> l.from().equals(l.to()) || WEAK.contains(l.relation()))
-                .sorted(java.util.Comparator.comparing(Link::from).thenComparing(Link::to)
+                .filter(l -> l.from().equals(l.to()) || isRemovable(l.relation()))
+                .sorted(Comparator.comparingInt(MCRCircleRepair::removalRank)
+                    .thenComparing(Link::from).thenComparing(Link::to)
                     .thenComparing(Link::relation).thenComparingInt(Link::position))
                 .toList();
             List<Link> kept = new ArrayList<>(internal);
@@ -124,6 +129,28 @@ public final class MCRCircleRepair {
                 "Die vorgeschlagenen Entfernungen unterbrechen alle direkten Kreise dieser Gruppe."));
         }
         return decisions;
+    }
+
+    /**
+     * Checks whether links of the specified relation can be removed automatically to resolve a cycle.
+     *
+     * @param relation the relation to check
+     * @return {@code true} if links of the relation can be removed automatically; {@code false} otherwise
+     */
+    public static boolean isRemovable(String relation) {
+        return VERSIONS.contains(relation) || INVERSE.contains(relation);
+    }
+
+    /**
+     * Candidates with a higher rank are sorted last and therefore removed first: inverse links, then links from an
+     * older to a newer object, then all others.
+     */
+    private static int removalRank(Link link) {
+        if (INVERSE.contains(link.relation())) {
+            return 2;
+        }
+        return VERSIONS.contains(link.relation())
+                   && MCRObjectID.getInstance(link.from()).compareTo(MCRObjectID.getInstance(link.to())) < 0 ? 1 : 0;
     }
 
     private static MCRObjectLinkGraph graph(Set<String> ids, List<Link> links) {
