@@ -97,17 +97,15 @@ public class SitelinksServlet extends MCRContentServlet {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             // GET /sitelinks -> list years
-            try {
-                return mapper.map(service.getRootPage());
-            } catch (SitelinksMappingException e) {
-                LOGGER.error("Failed to map root page", e);
-                return null;
-            }
+            return mapper.map(service.getRootPage());
         }
         if (pathInfo.endsWith("/")) {
             pathInfo = pathInfo.substring(0, pathInfo.length() - 1);
         }
         String[] pathParts = pathInfo.substring(1).split("/");
+        if (pathParts.length == 0) {
+            return null;
+        }
 
         return parseYear(pathParts[0])
             .flatMap(year -> {
@@ -120,7 +118,7 @@ public class SitelinksServlet extends MCRContentServlet {
                 }
                 return Optional.empty();
             }).orElseGet(() -> {
-                LOGGER.error(() -> "Invalid or missing content for path" + request.getPathInfo());
+                LOGGER.debug(() -> "Invalid or missing content for path " + request.getPathInfo());
                 return null;
             });
     }
@@ -135,7 +133,7 @@ public class SitelinksServlet extends MCRContentServlet {
 
     private Optional<Integer> parsePage(String pageStr) {
         try {
-            return Optional.of(Integer.parseInt(pageStr));
+            return Optional.of(Integer.parseInt(pageStr)).filter(page -> page >= 1);
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -147,9 +145,6 @@ public class SitelinksServlet extends MCRContentServlet {
             return Optional.of(mapper.map(resultPage));
         } catch (SitelinksNotFoundException e) {
             LOGGER.debug("Sitelinks not found: {}", e.getMessage());
-            return Optional.empty();
-        } catch (SitelinksMappingException e) {
-            LOGGER.error("Mapping failed for year {} page {}", year, page, e);
             return Optional.empty();
         }
     }
