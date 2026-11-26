@@ -27,6 +27,8 @@
             <xsl:value-of select="document('i18n:component.mods.metaData.dictionary.oa_nlz.short')/i18n/text()"/>
           </xsl:when>
           <xsl:otherwise>
+            <!-- REP-1118 changed from MIR, original: -->
+            <!-- <xsl:value-of select="document(concat('callJava:org.mycore.common.xml.MCRXMLFunctions:getDisplayName:mir_licenses:', $accessCondition))"/> -->
             <xsl:value-of select="document(concat('callJava:de.gbv.reposis.classification.ReposisClassificationFunctions:getDisplayName:mir_licenses:', $accessCondition))"/>
           </xsl:otherwise>
         </xsl:choose>
@@ -57,6 +59,8 @@
             <xsl:value-of select="document('i18n:component.mods.metaData.dictionary.oa_nlz.short')/i18n/text()"/>
           </xsl:when>
           <xsl:otherwise>
+            <!-- REP-1118 changed from MIR, original: -->
+            <!-- <xsl:value-of select="document(concat('callJava:org.mycore.common.xml.MCRXMLFunctions:getDisplayName:mir_licenses:', $accessCondition))"/> -->
             <xsl:value-of select="document(concat('callJava:de.gbv.reposis.classification.ReposisClassificationFunctions:getDisplayName:mir_licenses:', $accessCondition))"/>
           </xsl:otherwise>
         </xsl:choose>

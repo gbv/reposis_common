@@ -9,6 +9,8 @@
                 xmlns:str="http://exslt.org/strings"
                 exclude-result-prefixes="i18n mcrxsl repclass encoder xalan fn str">
 
+  <!-- REP-1118 changed from MIR: added xmlns:repclass and repclass to exclude-result-prefixes -->
+
   <xsl:param name="CurrentLang"/>
   <xsl:param name="RequestURL"/>
 
@@ -187,6 +189,16 @@
           <label class="custom-control-label">
             <span class="title">
               <xsl:choose>
+                <!-- REP-1118 changed from MIR, original:
+                <xsl:when
+                  test="$categoryClassValues = true() and mcrxsl:isCategoryID(substring-before(@name, ':'), substring-after(@name, ':'))">
+                  <xsl:value-of
+                    select="mcrxsl:getDisplayName(substring-before(@name, ':'), substring-after(@name, ':'))"/>
+                </xsl:when>
+                <xsl:when test="mcrxsl:isCategoryID($classId, @name)">
+                  <xsl:value-of select="mcrxsl:getDisplayName($classId, @name)"/>
+                </xsl:when>
+                -->
                 <xsl:when
                   test="$categoryClassValues = true() and repclass:isCategoryID(substring-before(@name, ':'), substring-after(@name, ':'))">
                   <xsl:value-of

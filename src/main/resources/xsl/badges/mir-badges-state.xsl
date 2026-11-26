@@ -15,6 +15,10 @@
     " />
 
     <xsl:if test="string-length($state) &gt; 0 and not($is-guest)">
+      <!-- REP-1118 changed from MIR, original: -->
+      <!-- <xsl:variable name="label-text-native" select="
+        document(concat('callJava:org.mycore.common.xml.MCRXMLFunctions:getDisplayName:state:', $state))
+      " /> -->
       <xsl:variable name="label-text-native" select="
         document(concat('callJava:de.gbv.reposis.classification.ReposisClassificationFunctions:getDisplayName:state:', $state))
       " />
@@ -34,6 +38,8 @@
     <xsl:variable name="state" select="//servstate[@classid='state']/@categid"/>
 
     <xsl:if test="string-length($state) &gt; 0">
+      <!-- REP-1118 changed from MIR, original: -->
+      <!-- <xsl:variable name="label-text-native" select="document(concat('callJava:org.mycore.common.xml.MCRXMLFunctions:getDisplayName:state:', $state))"/> -->
       <xsl:variable name="label-text-native" select="document(concat('callJava:de.gbv.reposis.classification.ReposisClassificationFunctions:getDisplayName:state:', $state))"/>
 
       <xsl:call-template name="output-badge">
