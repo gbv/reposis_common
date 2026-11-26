@@ -128,7 +128,7 @@ public final class ReposisClassificationFunctions {
 
         MCRCategory category = null;
         try {
-            MCRCategoryID categID = MCRCategoryID.fromString(classificationId + ":" + categoryId);
+            MCRCategoryID categID = new MCRCategoryID(classificationId, categoryId);
             category = getCachedCategory(categID);
         } catch (Throwable e) {
             LOGGER.error("Could not determine state for classification id {} and category id {}", classificationId,
@@ -140,7 +140,7 @@ public final class ReposisClassificationFunctions {
 
     private static MCRCategory getCachedCategory(MCRCategoryID categID) {
         String rootId = categID.getRootID();
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.obtainInstance();
         long lastModified = dao.getLastModified(rootId);
         CachedClassification cached = CACHE.get(rootId);
         if (cached == null || cached.lastModified() != lastModified) {
@@ -151,7 +151,7 @@ public final class ReposisClassificationFunctions {
     }
 
     private static Map<String, MCRCategory> loadCategories(MCRCategoryDAO dao, String rootId) {
-        MCRCategoryID rootID = MCRCategoryID.rootID(rootId);
+        MCRCategoryID rootID = new MCRCategoryID(rootId);
         if (!dao.exist(rootID)) {
             LOGGER.debug("Classification {} does not exist, caching empty result", rootId);
             return Collections.emptyMap();
